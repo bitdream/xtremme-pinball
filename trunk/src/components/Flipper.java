@@ -1,8 +1,7 @@
 package components;
 
-import input.FlipperInputHandler;
-
 import com.jme.scene.*;
+
 
 /**
  * Componente de flipper, para golpear la pelotita.
@@ -19,10 +18,7 @@ public class Flipper extends Node
 
 	/* Modelo grafico del flipper */
 	private Spatial model;
-	
-	/* Controlador del flipper */
-	private FlipperInputHandler inputHandler;
-	
+		
 	/* Indica si esta en su posicion de descanso */
 	private boolean restored;
     
@@ -52,15 +48,10 @@ public class Flipper extends Node
     /**
      * Actualizo el estado de su golpe y a su controlador
      */
-    public void update()
+    public void update(float time)
     {
     	
     }
-
-	public void setInputHandler(FlipperInputHandler inputHandler)
-	{
-		this.inputHandler = inputHandler;
-	}
 
 	public FlipperType getFlipperType()
 	{

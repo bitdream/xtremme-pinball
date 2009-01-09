@@ -1,39 +1,47 @@
 package mainloop;
 
-import input.FlipperInputHandler;
+import input.FengJMEInputHandler;
+import input.PinballInputHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.*;
 
+import org.fenggui.*;
+import org.fenggui.binding.render.lwjgl.LWJGLBinding;
+import org.fenggui.composite.Window;
+import org.fenggui.event.ButtonPressedEvent;
+import org.fenggui.event.IButtonPressedListener;
+import org.fenggui.layout.RowLayout;
+import org.fenggui.util.Point;
+import org.fenggui.util.Spacing;
+import org.lwjgl.opengl.GL13;
+
 import com.jme.app.BaseGame;
-import com.jme.bounding.BoundingBox;
-import com.jme.image.Texture;
-import com.jme.input.InputHandler;
-import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
-import com.jme.light.DirectionalLight;
-import com.jme.math.Matrix3f;
+import com.jme.input.MouseInput;
+import com.jme.light.PointLight;
+import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
-import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
-import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
-import com.jme.scene.state.TextureState;
 import com.jme.scene.state.ZBufferState;
 import com.jme.system.DisplaySystem;
 import com.jme.system.JmeException;
-import com.jme.util.TextureManager;
 import com.jme.util.Timer;
+
 import components.Flipper;
+import components.Plunger;
 
-
+/**
+ * Clase principal del juego.
+ *
+ */
 public class Pinball extends BaseGame
 {
 	private static final String GAME_NAME = "Pinball Pro";
@@ -42,26 +50,35 @@ public class Pinball extends BaseGame
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(Pinball.class.getName());
     
-    /* Timer para los FPS */
+    /* Timer para calcular tiempos transcurridos */
 	protected Timer timer;
 	
 	/* Camara de la escena */
 	private Camera cam;
 	
-	private FlipperInputHandler inputHandlerLflipper;
+	/* InputHandler para el pinball */
+	private PinballInputHandler pinballInputHandler;
 	
+	/* Input Handler de FengGUI, sirve para que FengGUI capture las teclas
+	 * y las envie al display de JME para ser capturadas por los otros handlers */
+	private FengJMEInputHandler fengGUIInputHandler;
+	
+	/* Lista de los flippers del juego actual */
 	private List<Flipper> flippers;
 	
-	//TODO the root node of the scene graph
+	/* Configuracion del juego */
+	private PinballSettings pinballSettings;
+	
+	/* Nodo raiz del grafo de la escena */
 	private Node scene;
 	
-	//TODO TextureState to show the monkey on the sphere.
-	private TextureState ts;
+	/* Pantalla para FengGUI */
+	private Display fengGUIdisplay;
 	
-	/* Atributos visuales requeridos por el usuario */
-	private int width, height, depth, freq;
-	private boolean fullscreen;
-
+	/* Menu de opciones */
+	private Window menu;
+	
+	
 	/**
 	 * Punto de entrada al juego
 	 */
@@ -71,13 +88,27 @@ public class Pinball extends BaseGame
 		Pinball app = new Pinball();
 		
 		//TODO We will load our own "fantastic" Flag Rush logo. Yes, I'm an artist.
-		app.setConfigShowMode(ConfigShowMode.AlwaysShow, Pinball.class.getClassLoader()
-				.getResource("jmetest/data/images/FlagRush.png"));
+		// TODO cablear que siempre use LWJGL
+		app.setConfigShowMode(ConfigShowMode.AlwaysShow, Pinball.class.getClassLoader().getResource("jmetest/data/images/FlagRush.png"));
 		
 		/* Doy comienzo al juego */
 		app.start();
 	}
-
+	
+	public void buildSettings()
+	{
+		/* Creo las configuraciones */
+		pinballSettings = new PinballSettings();
+		
+		/* Les guardo los valores recogidos de la ventana de configuraciones */
+		pinballSettings.setWidth(settings.getWidth());
+		pinballSettings.setHeight(settings.getHeight());
+		pinballSettings.setDepth(settings.getDepth());
+		pinballSettings.setFreq(settings.getFrequency());
+		pinballSettings.setFullscreen(settings.isFullscreen());
+		pinballSettings.setRenderer(settings.getRenderer());
+	}
+	
 	/**
 	 * Se debe actualizar la fisica, el puntaje, el tiempo, todo lo relacionado al juego en si.
 	 */
@@ -86,26 +117,19 @@ public class Pinball extends BaseGame
 		/* Actualizo el timer */
 		timer.update();
 		
-		/* Actualizo el framerate */
+		/* Pido al timer el tiempo transcurrido desde la ultima llamada */
+		/* Actualmente me deberia llegar en interpolation, pero el engine no lo hace aun
+		 * (no esta implementado) */
 		interpolation = timer.getTimePerFrame();
 		
-        /* Proceso el estado de los flippers existentes */
-		inputHandlerLflipper.update(interpolation);
-        for (Flipper f : flippers)
-        	f.update(); // TODO ver si conviene mas en vez de recorrer una lista de flippers, recorrer de una el grafo
+		/* Actualizo los controladores de input */
+        fengGUIInputHandler.update(interpolation);
+        pinballInputHandler.update(interpolation);
 		
-		/* Chequeo de teclas generales */
-		// ESC -> Salir
-		if (KeyBindingManager.getKeyBindingManager().isValidCommand("exit"))
-		{
-			finished = true;
-		}
-		
-		if (KeyBindingManager.getKeyBindingManager().isValidCommand("Lflipper"))
-		{
-			flippers.get(0).setLocalRotation(new Quaternion(1f, 1f, 1f, 1f));
-		}
-		
+		/* Proceso el estado de los flippers existentes */
+       for (Flipper f : flippers)
+        	f.update(interpolation);
+
 		/* Se modifico la escena, entonces actualizo el grafo */
         scene.updateGeometricState(interpolation, true);
 	}
@@ -115,36 +139,38 @@ public class Pinball extends BaseGame
 	 */
 	protected void render(float interpolation)
 	{
-		/* Limpio la pantalla */
+		/* Limpio la pantalla y dibujo la escena via JME */
 		display.getRenderer().clearBuffers();
-
-		/* Dibujo la escena */
 		display.getRenderer().draw(scene);
+		
+		/* Para que la GUI se muestre bien */
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		
+		/* Muestro la pantalla de FengGUI */
+		fengGUIdisplay.display();
 	}
 
 	/**
-	 * Inicializar el display y la camara
+	 * Inicializar el display, los input handlers y la camara
 	 */
 	protected void initSystem()
 	{
-		/* Guardo las configuraciones */
-		width = settings.getWidth();
-		height = settings.getHeight();
-		depth = settings.getDepth();
-		freq = settings.getFrequency();
-		fullscreen = settings.isFullscreen();
 		
-		/* Creo la lista de flippers */
-		flippers = new ArrayList<Flipper>();
+		/* Tomo las configuraciones */
+		buildSettings();
 		
 		try
 		{
 			/* Creo el display */
-			display = DisplaySystem.getDisplaySystem(settings.getRenderer());
-			display.createWindow(width, height, depth, freq, fullscreen);
+			display = DisplaySystem.getDisplaySystem(pinballSettings.getRenderer());
+			display.createWindow(pinballSettings.getWidth(), 
+					pinballSettings.getHeight(), 
+					pinballSettings.getDepth(), 
+					pinballSettings.getFreq(), 
+					pinballSettings.isFullscreen());
 
 			/* Creo la camara */
-			cam = display.getRenderer().createCamera(width, height);
+			cam = display.getRenderer().createCamera(pinballSettings.getWidth(), pinballSettings.getHeight());
 		} catch (JmeException e)
 		{
 			logger.log(Level.SEVERE, "No se pudo crear la pantalla de juego", e);
@@ -157,34 +183,32 @@ public class Pinball extends BaseGame
 		/* Fijo el fondo en negro */
 		display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 		
+		/* Creo los input handlers */
+		pinballInputHandler = new PinballInputHandler(cam, this);
+		
+		/* Hago visible al cursor para poder seleccionar las opciones del menu TODO ver si esto va aca o que pasa si sale del menu (deberia desaparecer el cursor) */
+		MouseInput.get().setCursorVisible(true);
+		
 		/* Inicializo la camara */
 		
 		/* Perspectiva y FOV */
-		cam.setFrustumPerspective(45.0f, (float)width / (float)height, 1, 1000);
+		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
 		
-		/* Ubicacion */
+		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
 		Vector3f loc = new Vector3f(0.0f, 0.0f, 25.0f);
 		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
 		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
 		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
 		cam.setFrame(loc, left, up, dir);
 		
-		
 		/* Aplicar los cambios a la camara */
 		cam.update();
-		
-		 /* Creo el timer para controlar FPS */
+				
+		 /* Creo el timer para medir tiempos transcurridos */
 	    timer = Timer.getTimer();
 
 	    /* Fijo la camara al display */
 		display.getRenderer().setCamera(cam);
-
-		/* Mapeo de teclas */
-		// ESC -> Exit
-		KeyBindingManager.getKeyBindingManager().set("exit", KeyInput.KEY_ESCAPE);
-		
-		// A
-		KeyBindingManager.getKeyBindingManager().set("Lflipper", KeyInput.KEY_A);
 	}
 
 	/**
@@ -200,15 +224,16 @@ public class Pinball extends BaseGame
 	    buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
 	    scene.setRenderState(buf);
 	    
+	    /* Ilumino la escena */
+		scene.setRenderState(buildLighting());
+	    
 	    /* Optimizacion - aplico culling a todos los nodos */
         CullState cs = display.getRenderer().createCullState();
         cs.setCullFace(CullState.Face.Back);
         scene.setRenderState(cs);
 		
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
-		
-		//TODO Create our Sphere
-		/*Sphere s = new Sphere("Sphere", 30, 30, 25);
+        /*Sphere s = new Sphere("Sphere", 30, 30, 25);
 		s.setLocalTranslation(new Vector3f(0, 0, -40));
 		s.setModelBound(new BoundingBox());
 		s.updateModelBound();*/
@@ -224,15 +249,79 @@ public class Pinball extends BaseGame
         // TODO super temporal
         buildAndAttachComponents();
 		
-        
-        /* Construyo las luces de la escena */
-		scene.setRenderState(buildLighting());
-		
-		
-		
-		//update the scene graph for rendering
+		/* Actualizo el nodo raiz */
 		scene.updateGeometricState(0.0f, true);
 		scene.updateRenderState();
+		
+		/* Creo la lista de flippers */
+		flippers = new ArrayList<Flipper>(4);
+		
+		/* Inicializo la GUI */
+		initGUI();
+	}
+	
+	/**
+	 * Inicializa la GUI.
+	 */
+	protected void initGUI()
+	{
+		/* Obtengo un display en Feng con LWJGL */
+		fengGUIdisplay = new Display(new LWJGLBinding());
+ 
+		/* Inicializo el input handler de FengGUI */
+		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
+ 
+		/* Creo el menu */
+		final Window menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
+		menu.setTitle("Main menu");
+		menu.setPosition(new Point(50, 200));
+		menu.getContentContainer().setLayoutManager(new RowLayout(false));
+		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
+		this.menu = menu;
+ 
+		/* Boton de juego nuevo */
+		final Button newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
+		
+		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+
+				/* Habilito el controlador del juego */
+				pinballInputHandler.setEnabled(true);
+				
+				/* Oculto el menu */
+				menu.setVisible(false);
+
+				// TODO Iniciar o reiniciar el juego.
+			}
+		});
+		
+		/* Boton de salir */
+		final Button exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
+		
+		exitButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0)
+			{
+ 				Pinball.this.finish();
+			}
+		});
+ 
+		/* Comprime lo posible los botones */
+		//menu.pack(); TODO darle algo de estilo al menu
+ 
+		/* Actualizo la pantalla con los nuevos componentes */
+		fengGUIdisplay.layout();
+
+	}
+	
+	public void showMenu()
+	{
+		/* Desactivo el controlador del pinball */
+		pinballInputHandler.setEnabled(false);
+		
+		/* Muestro el menu */
+		menu.setVisible(true);
 	}
 
 	/**
@@ -241,7 +330,11 @@ public class Pinball extends BaseGame
 	protected void reinit()
 	{
 		/* Creo nuevamente el display con las propiedades requeridas */
-		display.recreateWindow(width, height, depth, freq, fullscreen);
+		display.recreateWindow(pinballSettings.getWidth(), 
+				pinballSettings.getHeight(), 
+				pinballSettings.getDepth(), 
+				pinballSettings.getFreq(), 
+				pinballSettings.isFullscreen());
 	}
     
 	/**
@@ -259,7 +352,14 @@ public class Pinball extends BaseGame
 	protected void cleanup()
 	{
 		/* Limpieza de texturas */
-		//ts.deleteAll();
+		//TODO ts.deleteAll();
+		
+		/* Limpieza del mouse */
+		MouseInput.get().removeListeners();
+		MouseInput.destroyIfInitalized();
+		
+		/* Limpieza del teclado */
+		KeyInput.destroyIfInitalized();
 	}
 	
 	/**
@@ -267,17 +367,17 @@ public class Pinball extends BaseGame
 	 */
 	private LightState buildLighting()
 	{
-		/* Creo una luz direccional */
-	    DirectionalLight light = new DirectionalLight();
-	    light.setDiffuse(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
-	    light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-	    light.setDirection(new Vector3f(1, -1, -1));
-	    light.setEnabled(true);
-
-	      /* Uno la luz a un lightState, y el lightState a la escena */
-	    LightState lightState = display.getRenderer().createLightState();
-	    lightState.setEnabled(true);
-	    lightState.attach(light);
+		/* Luz puntual */
+        PointLight light = new PointLight();
+        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+        light.setLocation(new Vector3f(10, 10, 10));
+        light.setEnabled(true);
+        
+        /* Light state */
+        LightState lightState = display.getRenderer().createLightState();
+        lightState.setEnabled(true);
+        lightState.attach(light);
 	    
 	    return lightState;
 	}
@@ -285,19 +385,56 @@ public class Pinball extends BaseGame
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d
 		
-		// Caja para LFlipper (esto vendria de X3d)
+		// Create our box
+		Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
+		box.updateRenderState();
+		// Rotate the box 25 degrees along the x and y axes.
+		Quaternion rot = new Quaternion();
+		rot.fromAngles(FastMath.DEG_TO_RAD * 25, FastMath.DEG_TO_RAD * 25, 0.0f);
+		box.setLocalRotation(rot);
+		// Attach the box to the root node
+		scene.attachChild(box);
+		
+		/*// Caja para LFlipper (esto vendria de X3d)
 		Box b1 = new Box("LFlipper Shape", new Vector3f(), 10, 2.5f, 2.5f);
         b1.setModelBound(new BoundingBox());
         b1.updateModelBound();
         // LFlipper
         Flipper Lflipper = new Flipper("LFlipper", b1, Flipper.FlipperType.LEFT_FLIPPER);
         Lflipper.setLocalTranslation(new Vector3f(0, 0, -40));
-        inputHandlerLflipper = new FlipperInputHandler(Lflipper, settings.getRenderer());
+        inputHandlerLflipper = new FlipperInputHandler(Lflipper, pinballSettings.getRenderer());
         scene.attachChild(Lflipper);
         Lflipper.updateWorldBound();
         Lflipper.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         
-        flippers.add(Lflipper);
+        //flippers.add(Lflipper);*/
+	}
+	
+	/**
+	 * TODO Solo para debugging.
+	 */
+	public void printDebugText(String text)
+	{
+		//debugText.print(text);
 	}
 
+	public Plunger getPlunger()
+	{
+		return null; // TODO Devolver el componente del lanzador
+	}
+	
+	public List<Flipper> getFlippers()
+	{
+		return flippers;
+	}
+	
+	public Node getTiltNode()
+	{
+		return null; // TODO Devolver el nodo sobre el que se debe ejecutar la accion de tilt
+	}
+
+	public PinballSettings getPinballSettings()
+	{
+		return pinballSettings;
+	}
 }
