@@ -224,7 +224,7 @@ public class Pinball extends SimplePhysicsGame
 //	    rootNode.setRenderState(buf);
 	    
 	    /* Ilumino la escena */
-// Ya lo hace BaseSimpleGame(con una ubicacion diferente de la luz, ver si sirve, sino se agregan luces al LightState o se cambia la location) 
+// Ya lo hace BaseSimpleGame(con una ubicacion diferente de la luz, ver si sirve, sino se agregan luces al LightState o se cambian.) 
 //		rootNode.setRenderState(buildLighting());
 	    
 	    /* Optimizacion - aplico culling a todos los nodos */
