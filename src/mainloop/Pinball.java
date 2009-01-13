@@ -24,8 +24,12 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
+import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.system.JmeException;
+import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.StaticPhysicsNode;
+import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
 import components.Plunger;
@@ -172,7 +176,7 @@ public class Pinball extends SimplePhysicsGame
 		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
 		
 		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
-		Vector3f loc = new Vector3f(0.0f, 0.0f, 25.0f);
+		Vector3f loc = new Vector3f(0.0f, 4f, 105f);
 		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
 		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
 		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
@@ -194,7 +198,10 @@ public class Pinball extends SimplePhysicsGame
         CullState cs = display.getRenderer().createCullState();
         cs.setCullFace(CullState.Face.Back);
         rootNode.setRenderState(cs);
-		
+
+        /* Armo la mesa de juego */
+        buildTable(pinballSettings.getInclinationAngle());
+        
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();
 		
@@ -318,8 +325,22 @@ public class Pinball extends SimplePhysicsGame
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
 		
-		// Create our box
-		Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
+		// TODO ver donde poner esta creacion de la bola
+		/* Nodo dinamico de la bola */
+		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+        rootNode.attachChild(mainBall);
+        
+        Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 2);
+		visualMainBall.setLocalTranslation(new Vector3f(0, 20, 0));
+
+		mainBall.attachChild(visualMainBall);
+		
+		mainBall.setMaterial(Material.IRON);
+		//mainBall.computeMass();
+		
+		mainBall.generatePhysicsGeometry();
+		
+		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
 		// Rotate the box 25 degrees along the x and y axes.
 		Quaternion rot = new Quaternion();
@@ -327,7 +348,7 @@ public class Pinball extends SimplePhysicsGame
 		box.setLocalRotation(rot);
 		// Attach the box to the root node
 		rootNode.attachChild(box);
-		
+		*/
 		/*// Caja para LFlipper (esto vendria de X3d)
 		Box b1 = new Box("LFlipper Shape", new Vector3f(), 10, 2.5f, 2.5f);
         b1.setModelBound(new BoundingBox());
@@ -341,6 +362,23 @@ public class Pinball extends SimplePhysicsGame
         Lflipper.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         
         //flippers.add(Lflipper);*/
+	}
+	
+	private void buildTable(float inclinationAngle)
+	{
+		/* Nodo estatico de la mesa */
+		StaticPhysicsNode table = getPhysicsSpace().createStaticNode();
+		rootNode.attachChild(table);
+		
+		Box visualTable = new Box("Table", new Vector3f(-25, -1, -75), new Vector3f(25, 1, 75));
+		visualTable.updateRenderState();
+		Quaternion rot = new Quaternion();
+		rot.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, FastMath.DEG_TO_RAD * inclinationAngle, 0.0f);
+		visualTable.setLocalRotation(rot);
+		
+		table.attachChild(visualTable);
+		
+		table.generatePhysicsGeometry();
 	}
 	
 	/**
