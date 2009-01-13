@@ -2,7 +2,7 @@ package mainloop;
 
 public class PinballSettings
 {
-	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 1;
+	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.4f;
 	
 	private float camMoveSpeed, camTurnSpeed;
 	

@@ -14,9 +14,10 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
+
+import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
-import com.jme.light.PointLight;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
@@ -24,7 +25,6 @@ import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
 import com.jme.scene.state.CullState;
-import com.jme.scene.state.LightState;
 import com.jme.system.JmeException;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
@@ -37,17 +37,11 @@ import components.Plunger;
 public class Pinball extends SimplePhysicsGame
 {
 	private static final String GAME_NAME = "xtremme pinball";
-	private static final String GAME_VERSION = "0.1";
+	private static final String GAME_VERSION = "0.2";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(Pinball.class.getName());
     
-    /* Timer para calcular tiempos transcurridos */
-	//protected Timer timer;
-	
-	/* Camara de la escena */
-	//private Camera cam;
-	
 	/* InputHandler para el pinball */
 	private PinballInputHandler pinballInputHandler;
 	
@@ -60,9 +54,6 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Configuracion del juego */
 	private PinballSettings pinballSettings;
-	
-	/* Nodo raiz del grafo de la escena */
-	// private Node rootNode;
 	
 	/* Pantalla para FengGUI */
 	private Display fengGUIdisplay;
@@ -131,11 +122,6 @@ public class Pinball extends SimplePhysicsGame
 	 */
 	protected void simpleRender()
 	{
-		/* Limpio la pantalla y dibujo la escena via JME */
-// Esto ya lo hace el metodo render de las superclases
-//		display.getRenderer().clearBuffers();
-//		display.getRenderer().draw(rootNode);
-		
 		/* Para que la GUI se muestre bien */
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		
@@ -158,14 +144,6 @@ public class Pinball extends SimplePhysicsGame
 		// Se pisa la camara, (no el display, pq tira exception si se crean dos windows a traves de el) y settings que inicializo la superclase TODO: ver si queda asi
 		try
 		{
-			/* Creo el display */
-//			display = DisplaySystem.getDisplaySystem(pinballSettings.getRenderer());
-//			display.createWindow(pinballSettings.getWidth(), 
-//					pinballSettings.getHeight(), 
-//					pinballSettings.getDepth(), 
-//					pinballSettings.getFreq(), 
-//					pinballSettings.isFullscreen());
-
 			/* Creo la camara */
 		    cam = display.getRenderer().createCamera(pinballSettings.getWidth(), pinballSettings.getHeight());
 		} catch (JmeException e)
@@ -183,8 +161,7 @@ public class Pinball extends SimplePhysicsGame
 		/* Creo los input handlers */
 		pinballInputHandler = new PinballInputHandler(cam, this);
 		
-		//TODO Agrego el InputHandler a input (tal como lo hace SimplePhysicsGame con el FirstPersonHandler que crea)
-		input.addToAttachedHandlers(pinballInputHandler);
+		KeyBindingManager.getKeyBindingManager().remove("exit");
 		
 		/* Hago visible al cursor para poder seleccionar las opciones del menu TODO ver si esto va aca o que pasa si sale del menu (deberia desaparecer el cursor) */
 		MouseInput.get().setCursorVisible(true);
@@ -203,9 +180,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Aplicar los cambios a la camara */
 		cam.update();
-				
-		 /* Creo el timer para medir tiempos transcurridos. Ya viene creado por las superclases */
-//	     timer = Timer.getTimer();
 
 	    /* Fijo la camara al display */
 		display.getRenderer().setCamera(cam);
@@ -216,37 +190,12 @@ public class Pinball extends SimplePhysicsGame
 	 */
 	protected void simpleInitGame()
 	{
-		/* Creo un ZBuffer para mostrar los pixeles mas cercanos a la camara que estan por encima de otros objetos */
-// Ya lo hace BaseSimpleGame
-//	    ZBufferState buf = display.getRenderer().createZBufferState();
-//	    buf.setEnabled(true);
-//	    buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
-//	    rootNode.setRenderState(buf);
-	    
-	    /* Ilumino la escena */
-// Ya lo hace BaseSimpleGame(con una ubicacion diferente de la luz, ver si sirve, sino se agregan luces al LightState o se cambian.) 
-//		rootNode.setRenderState(buildLighting());
-	    
 	    /* Optimizacion - aplico culling a todos los nodos */
         CullState cs = display.getRenderer().createCullState();
         cs.setCullFace(CullState.Face.Back);
         rootNode.setRenderState(cs);
 		
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
-        /*Sphere s = new Sphere("Sphere", 30, 30, 25);
-		s.setLocalTranslation(new Vector3f(0, 0, -40));
-		s.setModelBound(new BoundingBox());
-		s.updateModelBound();*/
-
-		/*ts = display.getRenderer().createTextureState();
-		ts.setEnabled(true);
-		ts.setTexture(TextureManager.loadTexture(Pinball.class.getClassLoader()
-				.getResource("jmetest/data/images/Monkey.jpg"),
-				Texture.MinificationFilter.Trilinear, Texture.MagnificationFilter.Bilinear));
-
-		s.setRenderState(ts);*/
-
-        // TODO super temporal
         buildAndAttachComponents();
 		
 		/* Actualizo el nodo raiz */
@@ -366,27 +315,6 @@ public class Pinball extends SimplePhysicsGame
 		KeyInput.destroyIfInitalized();
 	}
 	
-	/**
-	 * Creo la luz default 
-	 */
-    // TODO volar, no se usa mas, lo mismo se hace desde una superclase
-	private LightState buildLighting()
-	{
-		/* Luz puntual */
-        PointLight light = new PointLight();
-        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-        light.setLocation(new Vector3f(10, 10, 10));
-        light.setEnabled(true);
-        
-        /* Light state */
-        LightState lightState = display.getRenderer().createLightState();
-        lightState.setEnabled(true);
-        lightState.attach(light);
-	    
-	    return lightState;
-	}
-
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
 		
