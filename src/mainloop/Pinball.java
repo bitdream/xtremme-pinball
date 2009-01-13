@@ -62,7 +62,7 @@ public class Pinball extends SimplePhysicsGame
 	private PinballSettings pinballSettings;
 	
 	/* Nodo raiz del grafo de la escena */
-	// TODO private Node rootNode;
+	// private Node rootNode;
 	
 	/* Pantalla para FengGUI */
 	private Display fengGUIdisplay;
@@ -204,8 +204,8 @@ public class Pinball extends SimplePhysicsGame
 		/* Aplicar los cambios a la camara */
 		cam.update();
 				
-		 /* Creo el timer para medir tiempos transcurridos */
-//	    //TODO timer = Timer.getTimer();
+		 /* Creo el timer para medir tiempos transcurridos. Ya viene creado por las superclases */
+//	     timer = Timer.getTimer();
 
 	    /* Fijo la camara al display */
 		display.getRenderer().setCamera(cam);
@@ -224,7 +224,7 @@ public class Pinball extends SimplePhysicsGame
 //	    rootNode.setRenderState(buf);
 	    
 	    /* Ilumino la escena */
-// Ya lo hace BaseSimpleGame(con una ubicacion diferente de la luz, ver si sirve, sino se agregan luces al LightState) 
+// Ya lo hace BaseSimpleGame(con una ubicacion diferente de la luz, ver si sirve, sino se agregan luces al LightState o se cambia la location) 
 //		rootNode.setRenderState(buildLighting());
 	    
 	    /* Optimizacion - aplico culling a todos los nodos */
