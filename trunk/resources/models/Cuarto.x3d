@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE X3D PUBLIC "ISO//Web3D//DTD X3D 3.0//EN" "http://www.web3d.org/specifications/x3d-3.0.dtd">
+<X3D version="3.0" profile="Immersive" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.0.xsd">
+<head>
+	<meta name="filename" content="Cuarto.x3d" />
+	<meta name="generator" content="Blender 246" />
+	<meta name="translator" content="X3D exporter v1.55 (2006/01/17)" />
+</head>
+<Scene>
+<NavigationInfo headlight="FALSE" visibilityLimit="0.0" type='"EXAMINE","ANY"' avatarSize="0.25, 1.75, 0.75" />
+<Background groundColor="0.057 0.221 0.4" skyColor="0.057 0.221 0.4" />
+
+
+	<Transform DEF="Marco" translation="-4.966959 3.269506 -0.539337" scale="2.648103 0.708572 0.708572" rotation="-0.000000 1.000000 0.000000 1.570796">
+	<Shape>
+		<Appearance>
+			<Material DEF="MA_MaterialMadera" diffuseColor="0.639 0.517 0.316" specularColor="0.119 0.119 0.119" emissiveColor="0.0 0.0 0.0" 
+				ambientIntensity="0.23" shininess="0.391" transparency="0.0" /><ImageTexture url='marco.jpg' /> 			
+		</Appearance>
+		<IndexedFaceSet solid="true" coordIndex="2 5 4 1 -1, 0 1 4 6 -1, 0 6 7 3 -1, 2 3 7 5 -1, ">
+			<Coordinate DEF="coord_Marco" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, 1.040986 -1.166831 -0.000000, -1.040986 -1.166831 -0.000000, 1.040986 1.166831 0.000000, -1.040986 1.166832 0.000000, " />			
+		</IndexedFaceSet>
+	</Shape>
+</Transform>
+
+
+
+<Transform DEF="CuadroITBA" translation="-4.966959 3.269506 -0.539337" scale="2.648103 0.708572 0.708572" rotation="0.000000 1.000000 0.000000 1.570796">
+<Shape>
+	<Appearance>
+		<Material DEF="MA_MaterialCuadro" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
+			ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+    <ImageTexture url='Logo_ITBA2.jpeg' />        
+	</Appearance>
+	<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+		<Coordinate DEF="coord_CuadroITBA" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />		
+	</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+<PointLight DEF="Luz1" ambientIntensity="0.0" color="1.0 1.0 1.0" intensity="0.571" radius="30.0" location="-3.613 2.662 3.961" />
+
+
+<Transform DEF="Techo" translation="0.000000 5.000000 -0.000000" scale="5.000000 5.000000 1.000000" rotation="-0.000000 -0.707107 0.707107 3.141593">
+<Shape>
+<Appearance>
+	<Material DEF="MA_MaterialTecho" diffuseColor="1.0 0.992 0.961" specularColor="1.0 0.992 0.961" emissiveColor="0.0 0.0 0.0" 
+		ambientIntensity="1.0" shininess="0.002" transparency="0.0" />	
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+	<Coordinate DEF="coord_Techo" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />	
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+
+<Transform DEF="ParedEste" translation="5.000000 2.500000 -0.000000" scale="5.000000 2.500000 1.000000" rotation="-0.707107 0.000000 0.707107 3.141593">
+<Shape>
+<Appearance>
+<Material DEF="MA_MaterialPared" diffuseColor="0.91 0.871 0.737" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
+	ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+<Coordinate DEF="coord_ParedEste" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+
+<Transform DEF="ParedOeste" translation="-5.000000 2.500000 -0.000000" scale="5.000000 2.500000 1.000000" rotation="0.707107 0.000000 0.707107 3.141593">
+<Shape>
+<Appearance>
+<Material USE="MA_MaterialPared" />
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+<Coordinate DEF="coord_ParedOeste" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+
+<Transform DEF="ParedNorte" translation="0.000000 2.500000 -5.000000" scale="5.000000 2.500000 1.000000" rotation="-1.000000 0.000000 0.000000 0.000000">
+<Shape>
+<Appearance>
+<Material USE="MA_MaterialPared" />
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+<Coordinate DEF="coord_ParedNorte" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+
+<Transform DEF="ParedSur" translation="0.000000 2.500000 5.000000" scale="5.000000 2.500000 1.000000" rotation="1.000000 0.000000 0.000000 3.141593">
+<Shape>
+<Appearance>
+<Material USE="MA_MaterialPared" />
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+<Coordinate DEF="coord_ParedSur" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+
+<Transform DEF="Piso" translation="0.000000 0.000000 0.000000" scale="5.000000 5.000000 1.000000" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Shape>
+<Appearance>
+<Material DEF="MA_MaterialPiso" diffuseColor="0.489 0.367 0.291" specularColor="0.001 0.001 0.001" emissiveColor="0.0 0.0 0.0" 
+ambientIntensity="0.167" shininess="0.338" transparency="0.0" /><ImageTexture url="parket.jpg" /><TextureTransform scale="6 6"/> 
+</Appearance>
+<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
+<Coordinate DEF="coord_Piso" 
+				point="1.000000 1.000000 0.000000, 1.000000 -1.000000 0.000000, -1.000000 -1.000000 0.000000, -1.000000 1.000000 0.000000, " />
+</IndexedFaceSet>
+</Shape>
+</Transform>
+
+
+<PointLight DEF="Luz2" ambientIntensity="0.0" color="1.0 1.0 1.0" intensity="0.571" radius="29.9999828339" location="3.867 3.862 -4.171" />
+
+<Viewpoint DEF="Camera" description="Camera" centerOfRotation="0 0 0" position="4.87 4.94 4.91" orientation="-1.09 1.86 0.55 0.93" fieldOfView="0.661" />
+
+
+</Scene>
+</X3D>
