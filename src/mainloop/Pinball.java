@@ -214,6 +214,9 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Inicializo la GUI */
 		initGUI();
+		
+		/* Muestro el menu */
+		showMenu();
 	}
 	
 	/**
@@ -233,6 +236,7 @@ public class Pinball extends SimplePhysicsGame
 		menu.setPosition(new Point(50, 200));
 		menu.getContentContainer().setLayoutManager(new RowLayout(false));
 		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
+		menu.setVisible(false);
 		this.menu = menu;
  
 		/* Boton de juego nuevo */
@@ -248,7 +252,8 @@ public class Pinball extends SimplePhysicsGame
 				/* Oculto el menu */
 				menu.setVisible(false);
 
-				// TODO Iniciar o reiniciar el juego.
+				// TODO Iniciar o reiniciar el juego. Esto de la pausa es temporal, sacarlo despues.
+				Pinball.this.pause = false; 
 			}
 		});
 		
@@ -278,6 +283,9 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Muestro el menu */
 		menu.setVisible(true);
+		
+		/* Pauseo el juego */
+		pause = true;
 	}
 
 	/**
@@ -330,7 +338,7 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
         rootNode.attachChild(mainBall);
         
-        Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 2);
+        Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
 		visualMainBall.setLocalTranslation(new Vector3f(0, 20, 0));
 
 		mainBall.attachChild(visualMainBall);
@@ -370,8 +378,7 @@ public class Pinball extends SimplePhysicsGame
 		StaticPhysicsNode table = getPhysicsSpace().createStaticNode();
 		rootNode.attachChild(table);
 		
-		Box visualTable = new Box("Table", new Vector3f(-25, -1, -75), new Vector3f(25, 1, 75));
-		visualTable.updateRenderState();
+		final Box visualTable = new Box( "Table", new Vector3f(), 30, 1, 80);
 		Quaternion rot = new Quaternion();
 		rot.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, FastMath.DEG_TO_RAD * inclinationAngle, 0.0f);
 		visualTable.setLocalRotation(rot);
