@@ -15,7 +15,7 @@
 	<Shape>
 		<Appearance>
 			<Material DEF="MA_MaterialMadera" diffuseColor="0.639 0.517 0.316" specularColor="0.119 0.119 0.119" emissiveColor="0.0 0.0 0.0" 
-				ambientIntensity="0.23" shininess="0.391" transparency="0.0" /><ImageTexture url='marco.jpg' /> 			
+				ambientIntensity="0.23" shininess="0.391" transparency="0.0" /><ImageTexture url="frame.jpg" /> 			
 		</Appearance>
 		<IndexedFaceSet solid="true" coordIndex="2 5 4 1 -1, 0 1 4 6 -1, 0 6 7 3 -1, 2 3 7 5 -1, ">
 			<Coordinate DEF="coord_Marco" 
@@ -31,7 +31,7 @@
 	<Appearance>
 		<Material DEF="MA_MaterialCuadro" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
 			ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
-    <ImageTexture url='Logo_ITBA2.jpeg' />        
+    <ImageTexture url="Logo_ITBA.jpeg" />        
 	</Appearance>
 	<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 		<Coordinate DEF="coord_CuadroITBA" 

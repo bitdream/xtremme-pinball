@@ -115,8 +115,12 @@ public class X3DLoader
 
         HashMap<String, InputStream> dtds = new HashMap<String, InputStream>();
 
-        dtds.put( "x3d-3.0.dtd", new FileInputStream( "./x3d-3.0.dtd" ) );
-        dtds.put( "x3d-3.0.xsd", new FileInputStream( "./x3d-3.0.xsd" ) );
+        dtds.put( "x3d-3.0.dtd", new FileInputStream( "./resources/models/dtd/x3d-3.0.dtd" ) );
+        dtds.put( "x3d-3.0-InputOutputFields.dtd", new FileInputStream( "./resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ) );
+        dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", new FileInputStream( "./resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ) );
+        dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", new FileInputStream( "./resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ) );
+        dtds.put( "x3d-3.0.xsd", new FileInputStream( "./resources/models/dtd/x3d-3.0.xsd" ) );
+        
 
         ret = new DTDResolver( dtds );
 
