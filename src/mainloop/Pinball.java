@@ -14,7 +14,6 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
-
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
@@ -31,6 +30,7 @@ import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.MaterialState;
 import com.jme.system.JmeException;
+import com.jmex.game.state.GameStateManager;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.MutableContactInfo;
@@ -170,6 +170,7 @@ public class Pinball extends SimplePhysicsGame
 		/* Creo los input handlers */
 		pinballInputHandler = new PinballInputHandler(cam, this);
 		
+		// Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu
 		KeyBindingManager.getKeyBindingManager().remove("exit");
 		
 		/* Hago visible al cursor para poder seleccionar las opciones del menu TODO ver si esto va aca o que pasa si sale del menu (deberia desaparecer el cursor) */
@@ -336,6 +337,8 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Limpieza del teclado */
 		KeyInput.destroyIfInitalized();
+		
+		GameStateManager.getInstance().cleanup();
 	}
 	
 	private void buildAndAttachComponents()
