@@ -22,13 +22,18 @@ import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
+import com.jme.scene.Spatial;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
+import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
+import com.jme.scene.state.MaterialState;
 import com.jme.system.JmeException;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
+import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
@@ -187,6 +192,9 @@ public class Pinball extends SimplePhysicsGame
 
 	    /* Fijo la camara al display */
 		display.getRenderer().setCamera(cam);
+		
+		// Para que la velocidad del juego sea mayor
+		this.setPhysicsSpeed(3.0f);
 	}
 
 	/**
@@ -338,15 +346,31 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
         rootNode.attachChild(mainBall);
         
-        Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
+        
+        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa de plastico
+        final Material customMaterial = new Material( "material de bola" );
+        // Es pesado
+        customMaterial.setDensity( 100.0f );
+        // Detalles de contacto con el otro material
+        MutableContactInfo contactDetails = new MutableContactInfo();
+        // Poco rebote
+        contactDetails.setBounce( 0.5f );
+        // Poco rozamiento
+        contactDetails.setMu( 0.5f );
+        customMaterial.putContactHandlingDetails( Material.PLASTIC, contactDetails );
+        
+        
+        final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
 		visualMainBall.setLocalTranslation(new Vector3f(0, 20, 0));
 
 		mainBall.attachChild(visualMainBall);
-		
-		mainBall.setMaterial(Material.IRON);
-		//mainBall.computeMass();
-		
 		mainBall.generatePhysicsGeometry();
+		mainBall.setMaterial(customMaterial);
+		
+		// Se computa la masa luego de generar la geometria fisica
+		mainBall.computeMass();
+		
+
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -382,12 +406,37 @@ public class Pinball extends SimplePhysicsGame
 		Quaternion rot = new Quaternion();
 		rot.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, FastMath.DEG_TO_RAD * inclinationAngle, 0.0f);
 		visualTable.setLocalRotation(rot);
-		
-		table.attachChild(visualTable);
-		
+	
+		table.attachChild(visualTable);		
 		table.generatePhysicsGeometry();
+		
+		// Seteo el material y el color de la mesa para dioferenciarlo de la bola
+		table.setMaterial(Material.PLASTIC);
+	    color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ) );
 	}
 	
+    /**
+     * Little helper method to color a spatial.
+     *
+     * @param spatial the spatial to be colored
+     * @param color   desired color
+     */
+    private void color( Spatial spatial, ColorRGBA color ) {
+        final MaterialState materialState = display.getRenderer().createMaterialState();
+        materialState.setDiffuse( color );
+        if ( color.a < 1 ) {
+            final BlendState blendState = display.getRenderer().createBlendState();
+            blendState.setEnabled( true );
+            blendState.setBlendEnabled( true );
+            blendState.setSourceFunction( BlendState.SourceFunction.SourceAlpha );
+            blendState.setDestinationFunction( BlendState.DestinationFunction.OneMinusSourceAlpha );
+            spatial.setRenderState( blendState );
+            spatial.setRenderQueueMode( Renderer.QUEUE_TRANSPARENT );
+        }
+        spatial.setRenderState( materialState );
+    }
+    
+    
 	/**
 	 * TODO Solo para debugging.
 	 */
