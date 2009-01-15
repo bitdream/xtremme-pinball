@@ -1,6 +1,10 @@
 package components;
 
+import mainloop.Pinball;
+
 import com.jme.scene.*;
+import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.material.Material;
 
 
 /**
@@ -9,57 +13,68 @@ import com.jme.scene.*;
 public class Flipper extends Node
 {
 	private static final long serialVersionUID = 1L;
-    
+
 	/* Tipos de flipper */
 	public enum FlipperType {LEFT_FLIPPER, RIGHT_FLIPPER};
 	
 	/* Tipo de este flipper */
 	private FlipperType flipperType;
 
-	/* Modelo grafico del flipper */
-	private Spatial model;
+    
+	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, FlipperType flipperType)
+	{
+		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
-	/* Indica si esta en su posicion de descanso */
-	private boolean restored;
-    
-    
+		// Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa de plastico
+        //final Material customMaterial = new Material( "material de bola" );
+        // Es pesado
+        //customMaterial.setDensity( 100.0f );
+        // Detalles de contacto con el otro material
+        //MutableContactInfo contactDetails = new MutableContactInfo();
+        // Poco rebote
+        //contactDetails.setBounce( 0.5f );
+        // Poco rozamiento
+        //contactDetails.setMu( 0.5f );
+        //customMaterial.putContactHandlingDetails( Material.PLASTIC, contactDetails );
+        
+		/* El material de los flippers es goma para simular la banda de goma que los rodea */
+        flipperNode.setMaterial(Material.RUBBER);
+		
+        /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
+        flipperNode.attachChild(new Flipper(name, visualModel, flipperType));
+        
+        /* Genero su fisica */
+		flipperNode.generatePhysicsGeometry();
+		
+		/* Computo su masa */
+		flipperNode.computeMass();
+		
+		
+		return flipperNode;
+	}
+	
 	/**
 	 * Toma un nombre, el tipo de flipper y su representacion grafica.
 	 */
-	public Flipper(String id, Spatial model, FlipperType flipperType)
+	public Flipper(String name, Geometry visualModel, FlipperType flipperType)
 	{
-		super(id);
-		setModel(model);
-		this.flipperType = flipperType;
-		this.restored = true;
-	}
+		super(name);
+		
+		attachChild(visualModel);
 
-	/**
-	 * Fija el modelo espacial del flipper. Remueve antes modelos anteriormente
-	 * fijados.
-     */
-    public void setModel(Spatial model)
-    {
-    	this.detachChild(this.model);
-    	this.model = model;
-    	this.attachChild(this.model);
-    }
+		this.flipperType = flipperType;
+	}
     
     /**
      * Actualizo el estado de su golpe y a su controlador
      */
     public void update(float time)
     {
-    	
+    	// TODO 
     }
 
 	public FlipperType getFlipperType()
 	{
 		return flipperType;
-	}
-
-	public boolean isRestored()
-	{
-		return restored;
 	}
 }
