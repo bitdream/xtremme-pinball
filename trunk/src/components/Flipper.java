@@ -49,10 +49,10 @@ public class Flipper extends Node
         /* Voy a fijar el flipper con un eje a la mesa */
         /*final Joint jointForFlipper = pinball.getPhysicsSpace().createJoint();
         final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
-        rotationalAxis.setDirection(new Vector3f(0, 1, 0));
+        rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // se puede calcular con el angulo
         jointForFlipper.attach(flipperNode);
-        jointForFlipper.setAnchor(new Vector3f( 9, 3, 33));
-        */
+        jointForFlipper.setAnchor(new Vector3f(10, 2, 40)); // debe ser la puntita de donde haya quedado el visual
+*/
         /* Genero su fisica */
 		flipperNode.generatePhysicsGeometry();
 		

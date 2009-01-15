@@ -232,10 +232,7 @@ public class Pinball extends SimplePhysicsGame
         buildAndAttachComponents();
 		
         /* Inclino todos los componentes a la vez desde el nodo raiz */
-        Quaternion rot = new Quaternion();
-		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
-				FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
-		rootNode.setLocalRotation(rot);
+        inclinePinball();
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -303,6 +300,14 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
 
+	}
+	
+	private void inclinePinball()
+	{
+		Quaternion rot = new Quaternion();
+		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
+				FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
+		rootNode.setLocalRotation(rot);
 	}
 	
 	public void showMenu()
@@ -410,7 +415,7 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Pongo un flipper de prueba */
 		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
-		visualFlipper.setLocalTranslation(new Vector3f(15, 3, 40));//10 3 40 z
+		visualFlipper.setLocalTranslation(new Vector3f(15, 2, 40));
 		
 		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
 		rootNode.attachChild(testFlipper);
