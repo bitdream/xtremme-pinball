@@ -7,7 +7,9 @@ import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
-
+import com.jme.math.Vector3f;
+import com.jmex.physics.DynamicPhysicsNode;
+import components.Flipper;
 
 /**
  * Es el controlador de input para el tablero de juego en si.
@@ -17,6 +19,8 @@ import com.jme.input.action.InputActionEvent;
 public class PinballInputHandler extends FirstPersonHandler
 {
 	private Pinball game;
+	
+	private static final Vector3f flipperForce = new Vector3f(0f, 0f, -60000f);
 	
 	public PinballInputHandler(Pinball game)
 	{
@@ -38,7 +42,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers izquierdos */
-		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, false);
+		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, true);
 		
 		
 		// TODO colocar las acciones que correspondan a pinball
@@ -61,15 +65,33 @@ public class PinballInputHandler extends FirstPersonHandler
 	/* Accion para golpear con flippers izquierdos */
 	private class RightFlippersAction extends InputAction
 	{
+		private final Vector3f forceToApply = new Vector3f();
 
 		public void performAction(InputActionEvent event)
 		{
+			/* Fijo la fuerza a aplicar */
+			forceToApply.set(flipperForce).multLocal(event.getTime());
+			
 			if(event.getTriggerPressed())
+			{
 				/* Presiona la tecla */
 				System.out.println("pega");
+				/* Aplico la fuerza sobre los flippers */
+
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					if (((Flipper)flipper.getChild(0)).isRightFlipper())
+						{flipper.addForce(forceToApply); System.out.println("aplica fza"); System.out.println(flipper.getLocalTranslation());}
+				}
+			}
 			else
+			{
 				/* Suelta la tecla */
 				System.out.println("suelta");
+			}
+						
+            // the really important line: apply a force to the moved node
+            //dynamicNode.addForce( forceToApply );
 			
 		}
 		
