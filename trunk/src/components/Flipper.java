@@ -2,8 +2,11 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.math.Vector3f;
 import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.Joint;
+import com.jmex.physics.RotationalJointAxis;
 import com.jmex.physics.material.Material;
 
 
@@ -38,11 +41,18 @@ public class Flipper extends Node
         //customMaterial.putContactHandlingDetails( Material.PLASTIC, contactDetails );
         
 		/* El material de los flippers es goma para simular la banda de goma que los rodea */
-        flipperNode.setMaterial(Material.RUBBER);
+        //TODO flipperNode.setMaterial(Material.RUBBER);
 		
         /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
         flipperNode.attachChild(new Flipper(name, visualModel, flipperType));
         
+        /* Voy a fijar el flipper con un eje a la mesa */
+        /*final Joint jointForFlipper = pinball.getPhysicsSpace().createJoint();
+        final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
+        rotationalAxis.setDirection(new Vector3f(0, 1, 0));
+        jointForFlipper.attach(flipperNode);
+        jointForFlipper.setAnchor(new Vector3f( 9, 3, 33));
+        */
         /* Genero su fisica */
 		flipperNode.generatePhysicsGeometry();
 		
@@ -76,5 +86,15 @@ public class Flipper extends Node
 	public FlipperType getFlipperType()
 	{
 		return flipperType;
+	}
+	
+	public boolean isRightFlipper()
+	{
+		return flipperType.equals(FlipperType.RIGHT_FLIPPER);
+	}
+	
+	public boolean isLeftFlipper()
+	{
+		return flipperType.equals(FlipperType.LEFT_FLIPPER);
 	}
 }

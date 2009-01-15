@@ -31,8 +31,9 @@ import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.MaterialState;
 import com.jme.system.JmeException;
-import com.jmex.game.state.GameStateManager;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.PhysicsSpace;
+import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
@@ -61,7 +62,7 @@ public class Pinball extends SimplePhysicsGame
 	private FengJMEInputHandler fengGUIInputHandler;
 	
 	/* Lista de los flippers del juego actual */
-	private List<Flipper> flippers;
+	private List<DynamicPhysicsNode> flippers;
 	
 	/* Configuracion del juego */
 	private PinballSettings pinballSettings;
@@ -121,8 +122,9 @@ public class Pinball extends SimplePhysicsGame
         pinballInputHandler.update(interpolation);
 		
 		/* Proceso el estado de los flippers existentes */
-       for (Flipper f : flippers)
-        	f.update(interpolation);
+        // TODO tal vez ni va
+       //for (Flipper f : flippers)
+       // 	f.update(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);
@@ -152,7 +154,8 @@ public class Pinball extends SimplePhysicsGame
 		/* Tomo las configuraciones */
 		buildSettings();
 		
-		// Se pisa la camara, (no el display, pq tira exception si se crean dos windows a traves de el) y settings que inicializo la superclase TODO: ver si queda asi
+		/* Se pisa la camara, (no el display, porque arroja exception si se crean dos windows a traves de el)
+		 * y settings que inicializo la superclase */
 		try
 		{
 			/* Creo la camara */
@@ -169,10 +172,24 @@ public class Pinball extends SimplePhysicsGame
 		/* Fijo el fondo en negro */
 		display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 		
-		/* Creo los input handlers */
+		/* Creo el input handler del pinball */
 		pinballInputHandler = new PinballInputHandler(this);
 		
-		// Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu
+		/* Quiero que ese input handler sea leido en cada paso que haga el motor de fisica,
+		 * de modo tal que las fuerzas que acciones continuas apliquen (ej: plunger) se realicen */
+		getPhysicsSpace().addToUpdateCallbacks(new PhysicsUpdateCallback() {
+			
+            public void beforeStep(PhysicsSpace space, float time)
+            {
+            	pinballInputHandler.update(time);
+            }
+            
+            public void afterStep(PhysicsSpace space, float time)
+            {
+            }
+        });
+		
+		/* Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu */
 		KeyBindingManager.getKeyBindingManager().remove("exit");
 		
 		/* Inicializo la camara */
@@ -207,19 +224,25 @@ public class Pinball extends SimplePhysicsGame
         cs.setCullFace(CullState.Face.Back);
         rootNode.setRenderState(cs);
 
+		/* Creo la lista de flippers */
+		flippers = new ArrayList<DynamicPhysicsNode>(4);
+		
         /* Armo la mesa de juego */
-        buildTable(pinballSettings.getInclinationAngle());
+        buildTable();
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();
 		
+        /* Inclino todos los componentes a la vez desde el nodo raiz */
+        Quaternion rot = new Quaternion();
+		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
+				FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
+		rootNode.setLocalRotation(rot);
+        
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
-		
-		/* Creo la lista de flippers */
-		flippers = new ArrayList<Flipper>(4);
-		
+
 		/* Inicializo la GUI */
 		initGUI();
 		
@@ -306,6 +329,7 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Oculto el cursor */
 		MouseInput.get().setCursorVisible(false);
+		//MouseInput.get().setCursorVisible(true);
 	}
 
 	/**
@@ -358,7 +382,6 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
         rootNode.attachChild(mainBall);
         
-        
         // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa de plastico
         final Material customMaterial = new Material( "material de bola" );
         // Es pesado
@@ -384,10 +407,12 @@ public class Pinball extends SimplePhysicsGame
 		
 
 		/* Pongo un flipper de prueba */
-		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5f, 1f, 2f);
-		visualFlipper.setLocalTranslation(new Vector3f(7, 2, 33));
+		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
+		visualFlipper.setLocalTranslation(new Vector3f(10, 3, 40));
 		
-		rootNode.attachChild((Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.LEFT_FLIPPER)));
+		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
+		rootNode.attachChild(testFlipper);
+		flippers.add(testFlipper);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -413,16 +438,13 @@ public class Pinball extends SimplePhysicsGame
         //flippers.add(Lflipper);*/
 	}
 	
-	private void buildTable(float inclinationAngle)
+	private void buildTable()
 	{
 		/* Nodo estatico de la mesa */
 		StaticPhysicsNode table = getPhysicsSpace().createStaticNode();
 		rootNode.attachChild(table);
 		
 		final Box visualTable = new Box( "Table", new Vector3f(), 30, 1, 80);
-		Quaternion rot = new Quaternion();
-		rot.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, FastMath.DEG_TO_RAD * inclinationAngle, 0.0f);
-		visualTable.setLocalRotation(rot);
 	
 		table.attachChild(visualTable);		
 		table.generatePhysicsGeometry();
@@ -467,7 +489,7 @@ public class Pinball extends SimplePhysicsGame
 		return null; // TODO Devolver el componente del lanzador
 	}
 	
-	public List<Flipper> getFlippers()
+	public List<DynamicPhysicsNode> getFlippers()
 	{
 		return flippers;
 	}
