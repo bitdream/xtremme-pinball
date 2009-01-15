@@ -36,7 +36,7 @@ import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
-import components.Magnet;
+//import components.Magnet;
 import components.Plunger;
 import components.Flipper.FlipperType;
 
