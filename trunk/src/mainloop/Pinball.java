@@ -20,6 +20,7 @@ import com.jme.input.MouseInput;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
+import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
@@ -38,6 +39,7 @@ import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
 import components.Plunger;
+import components.Flipper.FlipperType;
 
 /**
  * Clase principal del juego.
@@ -168,7 +170,7 @@ public class Pinball extends SimplePhysicsGame
 		display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 		
 		/* Creo los input handlers */
-		pinballInputHandler = new PinballInputHandler(cam, this);
+		pinballInputHandler = new PinballInputHandler(this);
 		
 		// Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu
 		KeyBindingManager.getKeyBindingManager().remove("exit");
@@ -374,6 +376,11 @@ public class Pinball extends SimplePhysicsGame
 		mainBall.computeMass();
 		
 
+		/* Pongo un flipper de prueba */
+		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5f, 1f, 2f);
+		visualFlipper.setLocalTranslation(new Vector3f(7, 2, 33));
+		
+		rootNode.attachChild((Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.LEFT_FLIPPER)));
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -466,5 +473,10 @@ public class Pinball extends SimplePhysicsGame
 	public PinballSettings getPinballSettings()
 	{
 		return pinballSettings;
+	}
+	
+	public Camera getCamera()
+	{
+		return cam;
 	}
 }
