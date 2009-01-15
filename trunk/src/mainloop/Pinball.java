@@ -360,7 +360,6 @@ public class Pinball extends SimplePhysicsGame
     @Override
 	protected void cleanup()
 	{
-    	System.out.println(" Hay nodos: " + this.getPhysicsSpace().getNodes().size());
 		super.cleanup();
 		/* Limpieza de texturas */
 		//TODO ts.deleteAll();
