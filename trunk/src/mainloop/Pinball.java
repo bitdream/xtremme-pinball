@@ -22,15 +22,12 @@ import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
-import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
-import com.jme.scene.Spatial;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
-import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
-import com.jme.scene.state.MaterialState;
 import com.jme.system.JmeException;
+import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
@@ -39,6 +36,7 @@ import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
+import components.Magnet;
 import components.Plunger;
 import components.Flipper.FlipperType;
 
@@ -362,6 +360,7 @@ public class Pinball extends SimplePhysicsGame
     @Override
 	protected void cleanup()
 	{
+    	System.out.println(" Hay nodos: " + this.getPhysicsSpace().getNodes().size());
 		super.cleanup();
 		/* Limpieza de texturas */
 		//TODO ts.deleteAll();
@@ -392,11 +391,15 @@ public class Pinball extends SimplePhysicsGame
         contactDetails.setBounce( 0.5f );
         // Poco rozamiento
         contactDetails.setMu( 0.5f );
-        customMaterial.putContactHandlingDetails( Material.PLASTIC, contactDetails );
+        customMaterial.putContactHandlingDetails( Material.ICE, contactDetails ); //TODO definir el material. Antes: Material.PLASTIC
         
         
         final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
 		visualMainBall.setLocalTranslation(new Vector3f(0, 20, 0));
+		
+		// Agregado de bounding volume 
+		// mainBall.setModelBound(new BoundingSphere());
+		// mainBall.updateModelBound();
 
 		mainBall.attachChild(visualMainBall);
 		mainBall.generatePhysicsGeometry();
@@ -408,7 +411,7 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Pongo un flipper de prueba */
 		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
-		visualFlipper.setLocalTranslation(new Vector3f(10, 3, 40));
+		visualFlipper.setLocalTranslation(new Vector3f(15, 3, 40));//10 3 40 z
 		
 		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
 		rootNode.attachChild(testFlipper);
@@ -436,6 +439,13 @@ public class Pinball extends SimplePhysicsGame
         Lflipper.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
         
         //flippers.add(Lflipper);*/
+		
+		/* Pongo un iman de prueba */
+		final Box visualMagnet1 = new Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
+		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
+		visualMagnet1.setLocalTranslation(new Vector3f(24, 5, 40));
+		//StaticPhysicsNode magnet1 = Magnet.create(this, "Physic magnet 1", visualMagnet1);
+		//rootNode.attachChild(magnet1);
 	}
 	
 	private void buildTable()
@@ -449,33 +459,12 @@ public class Pinball extends SimplePhysicsGame
 		table.attachChild(visualTable);		
 		table.generatePhysicsGeometry();
 		
-		// Seteo el material y el color de la mesa para dioferenciarlo de la bola
+		// Seteo el material y el color de la mesa para diferenciarlo de la bola
 		table.setMaterial(Material.PLASTIC);
-	    color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ) );
+		// Brillo al maximo
+	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
 	}
 	
-    /**
-     * Little helper method to color a spatial.
-     *
-     * @param spatial the spatial to be colored
-     * @param color   desired color
-     */
-    private void color( Spatial spatial, ColorRGBA color ) {
-        final MaterialState materialState = display.getRenderer().createMaterialState();
-        materialState.setDiffuse( color );
-        if ( color.a < 1 ) {
-            final BlendState blendState = display.getRenderer().createBlendState();
-            blendState.setEnabled( true );
-            blendState.setBlendEnabled( true );
-            blendState.setSourceFunction( BlendState.SourceFunction.SourceAlpha );
-            blendState.setDestinationFunction( BlendState.DestinationFunction.OneMinusSourceAlpha );
-            spatial.setRenderState( blendState );
-            spatial.setRenderQueueMode( Renderer.QUEUE_TRANSPARENT );
-        }
-        spatial.setRenderState( materialState );
-    }
-    
-    
 	/**
 	 * TODO Solo para debugging.
 	 */
