@@ -175,9 +175,6 @@ public class Pinball extends SimplePhysicsGame
 		// Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu
 		KeyBindingManager.getKeyBindingManager().remove("exit");
 		
-		/* Hago visible al cursor para poder seleccionar las opciones del menu TODO ver si esto va aca o que pasa si sale del menu (deberia desaparecer el cursor) */
-		MouseInput.get().setCursorVisible(true);
-		
 		/* Inicializo la camara */
 		
 		/* Perspectiva y FOV */
@@ -261,7 +258,7 @@ public class Pinball extends SimplePhysicsGame
 				pinballInputHandler.setEnabled(true);
 				
 				/* Oculto el menu */
-				menu.setVisible(false);
+				hideMenu();
 
 				// TODO Iniciar o reiniciar el juego. Esto de la pausa es temporal, sacarlo despues.
 				Pinball.this.pause = false; 
@@ -295,8 +292,20 @@ public class Pinball extends SimplePhysicsGame
 		/* Muestro el menu */
 		menu.setVisible(true);
 		
+		/* Hago visible al cursor */
+		MouseInput.get().setCursorVisible(true);
+		
 		/* Pauseo el juego */
 		pause = true;
+	}
+	
+	public void hideMenu()
+	{
+		/* Oculto el menu */
+		menu.setVisible(false);
+		
+		/* Oculto el cursor */
+		MouseInput.get().setCursorVisible(false);
 	}
 
 	/**
@@ -339,8 +348,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Limpieza del teclado */
 		KeyInput.destroyIfInitalized();
-		
-		GameStateManager.getInstance().cleanup();
 	}
 	
 	private void buildAndAttachComponents()

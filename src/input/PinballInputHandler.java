@@ -38,7 +38,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers izquierdos */
-		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, false);
+		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, false);
 		
 		
 		// TODO colocar las acciones que correspondan a pinball
@@ -59,7 +59,7 @@ public class PinballInputHandler extends FirstPersonHandler
 	}
 	
 	/* Accion para golpear con flippers izquierdos */
-	private class LeftFlippersAction extends InputAction
+	private class RightFlippersAction extends InputAction
 	{
 
 		public void performAction(InputActionEvent event)
