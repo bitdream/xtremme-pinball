@@ -20,7 +20,6 @@ public class PinballInputHandler extends FirstPersonHandler
 {
 	private Pinball game;
 	
-	private static final Vector3f flipperForce = new Vector3f(0f, 0f, -60000f);
 	
 	public PinballInputHandler(Pinball game)
 	{
@@ -35,7 +34,6 @@ public class PinballInputHandler extends FirstPersonHandler
 		setActions();
 	}
 	
-
 	private void setActions()
 	{
 		/* Abrir menu */
@@ -47,6 +45,24 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		// TODO colocar las acciones que correspondan a pinball
 		// pasarle en constructor una lista de flippers, el nodo base para hacer tilt y el plunger?... y el juego! (para finish, etc...)
+	}
+	
+	@Override
+	public void update(float time)
+	{
+		super.update(time);
+		
+		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
+		 * de recuperacion de los flippers */
+		final Vector3f forceToApply = new Vector3f();
+		
+		forceToApply.set(Flipper.flipperRestoreForce).multLocal(event.getTime());
+		
+		for (DynamicPhysicsNode flipper : game.getFlippers())
+		{
+			flipper.addForce(forceToApply);
+			//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
+		}
 	}
 	
 	/* Accion para abrir el menu de juego */
@@ -62,37 +78,28 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 	}
 	
-	/* Accion para golpear con flippers izquierdos */
+	/* Accion para golpear con flippers derechos */
 	private class RightFlippersAction extends InputAction
 	{
 		private final Vector3f forceToApply = new Vector3f();
 
 		public void performAction(InputActionEvent event)
 		{
-			/* Fijo la fuerza a aplicar */
-			forceToApply.set(flipperForce).multLocal(event.getTime());
-			
 			if(event.getTriggerPressed())
 			{
-				/* Presiona la tecla */
-				System.out.println("pega");
-				/* Aplico la fuerza sobre los flippers */
+				/* Presiona la tecla, fijo la fuerza a aplicar */
+				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
 
 				for (DynamicPhysicsNode flipper : game.getFlippers())
 				{
+					/* Aplico la fuerza sobre los flippers */
 					if (((Flipper)flipper.getChild(0)).isRightFlipper())
-						{flipper.addForce(forceToApply); System.out.println("aplica fza"); System.out.println(flipper.getLocalTranslation());}
+					{
+						flipper.addForce(forceToApply);
+						//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
+					}
 				}
 			}
-			else
-			{
-				/* Suelta la tecla */
-				System.out.println("suelta");
-			}
-						
-            // the really important line: apply a force to the moved node
-            //dynamicNode.addForce( forceToApply );
-			
 		}
 		
 	}
