@@ -16,50 +16,63 @@ import com.jmex.physics.material.Material;
 public class Flipper extends Node
 {
 	private static final long serialVersionUID = 1L;
+	
+	/* Fuerzas en los flippers */
+	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -16000000f), flipperRestoreForce = new Vector3f(0f, 0f, 1000000f);
+	
+	private static final float maxRotationalAngle = 0.4f, minRotationalAngle = -0.4f;
 
 	/* Tipos de flipper */
 	public enum FlipperType {LEFT_FLIPPER, RIGHT_FLIPPER};
 	
 	/* Tipo de este flipper */
 	private FlipperType flipperType;
+	
+	/* Modelo visual del flipper */
+	private Geometry visualModel;
+	
+	/* Joint que lo fija a la mesa */
+	private Joint joint;
 
     
 	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, FlipperType flipperType)
 	{
 		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
-		// Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa de plastico
-        //final Material customMaterial = new Material( "material de bola" );
-        // Es pesado
-        //customMaterial.setDensity( 100.0f );
-        // Detalles de contacto con el otro material
-        //MutableContactInfo contactDetails = new MutableContactInfo();
-        // Poco rebote
-        //contactDetails.setBounce( 0.5f );
-        // Poco rozamiento
-        //contactDetails.setMu( 0.5f );
-        //customMaterial.putContactHandlingDetails( Material.PLASTIC, contactDetails );
-        
 		/* El material de los flippers es goma para simular la banda de goma que los rodea */
-        //TODO flipperNode.setMaterial(Material.RUBBER);
+        flipperNode.setMaterial(Material.RUBBER);
 		
         /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
-        flipperNode.attachChild(new Flipper(name, visualModel, flipperType));
+        Flipper flipper = new Flipper(name, visualModel, flipperType);
+        flipperNode.attachChild(flipper);
         
-        /* Voy a fijar el flipper con un eje a la mesa */
-        /*final Joint jointForFlipper = pinball.getPhysicsSpace().createJoint();
-        final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
-        rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // se puede calcular con el angulo
-        jointForFlipper.attach(flipperNode);
-        jointForFlipper.setAnchor(new Vector3f(10, 2, 40)); // debe ser la puntita de donde haya quedado el visual
-*/
         /* Genero su fisica */
-		flipperNode.generatePhysicsGeometry();
-		
-		/* Computo su masa */
+        flipperNode.generatePhysicsGeometry();
+        
+        /* Computo su masa */
 		flipperNode.computeMass();
-		
-		
+        
+        /* Voy a fijar el flipper con un eje rotacional */
+        final Joint jointForFlipper = pinball.getPhysicsSpace().createJoint();
+        final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
+        
+        /* Maximos angulos de operacion de los flippers */
+        rotationalAxis.setPositionMaximum(maxRotationalAngle);
+        rotationalAxis.setPositionMinimum(minRotationalAngle);
+        
+        /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
+        rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // TODO se puede calcular con el angulo
+        
+        /* Coloco el joint sobre el nodo de flipper */
+        jointForFlipper.attach(flipperNode);
+        
+        /* Le fijo como punto de rotacion la punta del flipper */
+        jointForFlipper.setAnchor(new Vector3f(14, 3, 60)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
+        
+        /* Guardo que ese flipper tiene este joint */
+        flipper.setJoint(jointForFlipper);
+        
+        
 		return flipperNode;
 	}
 	
@@ -70,18 +83,18 @@ public class Flipper extends Node
 	{
 		super(name);
 		
+		this.visualModel = visualModel;
+		
 		attachChild(visualModel);
 
 		this.flipperType = flipperType;
 	}
-    
-    /**
-     * Actualizo el estado de su golpe y a su controlador
-     */
-    public void update(float time)
-    {
-    	// TODO 
-    }
+	
+	public void recalculateJoints()
+	{
+		/* Le asigno al joint el anchor nuevo en base a la posicion del modelo visual */
+		joint.setAnchor(visualModel.getLocalTranslation()); // TODO puntita!
+	}
 
 	public FlipperType getFlipperType()
 	{
@@ -96,5 +109,15 @@ public class Flipper extends Node
 	public boolean isLeftFlipper()
 	{
 		return flipperType.equals(FlipperType.LEFT_FLIPPER);
+	}
+
+	public Joint getJoint()
+	{
+		return joint;
+	}
+
+	public void setJoint(Joint joint)
+	{
+		this.joint = joint;
 	}
 }

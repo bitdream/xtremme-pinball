@@ -121,11 +121,6 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo los controladores de input */
         fengGUIInputHandler.update(interpolation);
         pinballInputHandler.update(interpolation);
-		
-		/* Proceso el estado de los flippers existentes */
-        // TODO tal vez ni va
-       //for (Flipper f : flippers)
-       // 	f.update(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);
@@ -173,6 +168,25 @@ public class Pinball extends SimplePhysicsGame
 		/* Fijo el fondo en negro */
 		display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 		
+		/* Inicializo la camara */
+		
+		/* Perspectiva y FOV */
+		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
+		
+		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
+		Vector3f loc = new Vector3f(0.0f, 4f, 200f);
+		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
+		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
+		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
+
+		cam.setFrame(loc, left, up, dir);
+		
+		/* Aplicar los cambios a la camara */
+		cam.update();
+
+	    /* Fijo la camara al display */
+		display.getRenderer().setCamera(cam);
+		
 		/* Creo el input handler del pinball */
 		pinballInputHandler = new PinballInputHandler(this);
 		
@@ -192,24 +206,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu */
 		KeyBindingManager.getKeyBindingManager().remove("exit");
-		
-		/* Inicializo la camara */
-		
-		/* Perspectiva y FOV */
-		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
-		
-		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
-		Vector3f loc = new Vector3f(0.0f, 4f, 230f);
-		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
-		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
-		cam.setFrame(loc, left, up, dir);
-		
-		/* Aplicar los cambios a la camara */
-		cam.update();
-
-	    /* Fijo la camara al display */
-		display.getRenderer().setCamera(cam);
 		
 		// Para que la velocidad del juego sea mayor
 		this.setPhysicsSpeed(3.0f);
@@ -233,7 +229,7 @@ public class Pinball extends SimplePhysicsGame
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();
-		
+
         /* Inclino todos los componentes a la vez desde el nodo raiz */
         inclinePinball();
         
@@ -307,12 +303,20 @@ public class Pinball extends SimplePhysicsGame
 	
 	private void inclinePinball()
 	{
+		/* Inclino desde el nodo raiz */
 		Quaternion rot = new Quaternion();
-		// Se rota toda la mesa y sus componentes en el eje x
-		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),0f, 0f);
-		//rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
-		//		FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
+		
+		/* Se rota toda la mesa y sus componentes en el eje X */
+		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0f, 0f);
 		rootNode.setLocalRotation(rot);
+		
+		/* Inclino joints fisicos y demas, recalculandolos */
+		/* TODO for (DynamicPhysicsNode flipper : getFlippers())
+		{
+			System.out.println(flipper.getChild(0).getLocalTranslation());
+			((Flipper)flipper.getChild(0)).recalculateJoints();
+			
+		}*/
 	}
 	
 	public void showMenu()
@@ -384,7 +388,7 @@ public class Pinball extends SimplePhysicsGame
 	
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
-		
+
 		// TODO ver donde poner esta creacion de la bola
 		/* Nodo dinamico de la bola */
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
@@ -420,7 +424,7 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Pongo un flipper de prueba */
 		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
-		visualFlipper.setLocalTranslation(new Vector3f(15, 2, 40));
+		visualFlipper.setLocalTranslation(new Vector3f(10, 3, 60));
 		
 		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
 		rootNode.attachChild(testFlipper);
