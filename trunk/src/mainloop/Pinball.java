@@ -14,6 +14,8 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
+
+import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
@@ -24,6 +26,7 @@ import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
+import com.jme.scene.shape.Cylinder;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.system.JmeException;
@@ -36,7 +39,7 @@ import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
 import components.Flipper;
-//import components.Magnet;
+import components.Magnet;
 import components.Plunger;
 import components.Flipper.FlipperType;
 
@@ -196,10 +199,10 @@ public class Pinball extends SimplePhysicsGame
 		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
 		
 		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
-		Vector3f loc = new Vector3f(0.0f, 4f, 105f);
+		Vector3f loc = new Vector3f(0.0f, 4f, 230f);
 		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
 		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
+		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
 		cam.setFrame(loc, left, up, dir);
 		
 		/* Aplicar los cambios a la camara */
@@ -305,8 +308,10 @@ public class Pinball extends SimplePhysicsGame
 	private void inclinePinball()
 	{
 		Quaternion rot = new Quaternion();
-		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
-				FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
+		// Se rota toda la mesa y sus componentes en el eje x
+		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),0f, 0f);
+		//rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(),
+		//		FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0.0f);
 		rootNode.setLocalRotation(rot);
 	}
 	
@@ -399,11 +404,11 @@ public class Pinball extends SimplePhysicsGame
         
         
         final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
-		visualMainBall.setLocalTranslation(new Vector3f(0, 20, 0));
+		visualMainBall.setLocalTranslation(new Vector3f(0, 20, -60));
 		
 		// Agregado de bounding volume 
-		// mainBall.setModelBound(new BoundingSphere());
-		// mainBall.updateModelBound();
+		mainBall.setModelBound(new BoundingSphere());
+		mainBall.updateModelBound();
 
 		mainBall.attachChild(visualMainBall);
 		mainBall.generatePhysicsGeometry();
@@ -444,12 +449,23 @@ public class Pinball extends SimplePhysicsGame
         
         //flippers.add(Lflipper);*/
 		
+		
+		
 		/* Pongo un iman de prueba */
 		final Box visualMagnet1 = new Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
+		
 		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
-		visualMagnet1.setLocalTranslation(new Vector3f(24, 5, 40));
-		//StaticPhysicsNode magnet1 = Magnet.create(this, "Physic magnet 1", visualMagnet1);
-		//rootNode.attachChild(magnet1);
+		visualMagnet1.setLocalTranslation(new Vector3f(15, 5, 10));
+		StaticPhysicsNode magnet1 = Magnet.create(this, "Physic magnet 1", visualMagnet1);
+		rootNode.attachChild(magnet1);
+		
+		// Agrego otro iman
+//		final Box visualMagnet2 = new Box("Visual magnet 2", new Vector3f(), 2f, 4f, 2f);
+//		visualMagnet2.setLocalTranslation(new Vector3f(15, 5, -10));
+//		StaticPhysicsNode magnet2 = Magnet.create(this, "Physic magnet 2", visualMagnet2);
+//		rootNode.attachChild(magnet2);
+		
+		// Para los bumpers con forma de hongo usar un Arrow
 	}
 	
 	private void buildTable()
