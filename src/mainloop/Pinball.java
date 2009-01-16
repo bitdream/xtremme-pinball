@@ -14,7 +14,6 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
-
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
@@ -26,7 +25,6 @@ import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
-import com.jme.scene.shape.Cylinder;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.system.JmeException;
@@ -204,7 +202,7 @@ public class Pinball extends SimplePhysicsGame
             }
         });
 		
-		/* Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y que en vez de ello muestre el menu */
+		/* Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y hacer que en vez de ello muestre el menu */
 		KeyBindingManager.getKeyBindingManager().remove("exit");
 		
 		// Para que la velocidad del juego sea mayor
@@ -457,7 +455,8 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Pongo un iman de prueba */
 		final Box visualMagnet1 = new Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
-		
+		// Le doy color al iman
+		Utils.color( visualMagnet1, new ColorRGBA( 1.0f, 0f, 0f, 1.0f ), 128 );
 		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
 		visualMagnet1.setLocalTranslation(new Vector3f(15, 5, 10));
 		StaticPhysicsNode magnet1 = Magnet.create(this, "Physic magnet 1", visualMagnet1);
@@ -470,6 +469,13 @@ public class Pinball extends SimplePhysicsGame
 //		rootNode.attachChild(magnet2);
 		
 		// Para los bumpers con forma de hongo usar un Arrow
+		//final Arrow visualBumper1 = new Arrow("Visual bumper 1", 5, 2);
+		// Le doy color al iman
+		//Utils.color( visualBumper1, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
+		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
+		//visualBumper1.setLocalTranslation(new Vector3f(0, 5, -10));
+		//DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, Bumper.JUMPER);
+		//rootNode.attachChild(bumper1);
 	}
 	
 	private void buildTable()
@@ -483,9 +489,9 @@ public class Pinball extends SimplePhysicsGame
 		table.attachChild(visualTable);		
 		table.generatePhysicsGeometry();
 		
-		// Seteo el material y el color de la mesa para diferenciarlo de la bola
+		// Seteo el material de la mesa
 		table.setMaterial(Material.PLASTIC);
-		// Brillo al maximo
+		// Seteo el color de la mesa para diferenciarlo de la bola. Brillo al maximo
 	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
 	}
 	
