@@ -36,6 +36,8 @@ import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
+
+import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
@@ -443,6 +445,16 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode testPlunger = Plunger.create(this, "Physic plunger", visualPlunger, 10);
 		rootNode.attachChild(testPlunger);
 		plunger = testPlunger;
+		
+		/* Pongo una puerta de prueba */
+		final Box visualDoor = new Box("Visual door", new Vector3f(), 3, 1, 0.1f);
+		visualDoor.setLocalTranslation(new Vector3f(25, 3, 75));
+		
+		/* Le doy color */
+		Utils.color(visualDoor, new ColorRGBA(0f, 1.0f, 1.0f, 1.0f), 128);
+		
+		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -0.8f, 0.5f);
+		rootNode.attachChild(testDoor);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
