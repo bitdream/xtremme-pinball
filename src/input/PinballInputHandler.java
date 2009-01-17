@@ -10,6 +10,7 @@ import com.jme.input.action.InputActionEvent;
 import com.jme.math.Vector3f;
 import com.jmex.physics.DynamicPhysicsNode;
 import components.Flipper;
+import components.Plunger;
 
 /**
  * Es el controlador de input para el tablero de juego en si.
@@ -42,6 +43,8 @@ public class PinballInputHandler extends FirstPersonHandler
 		/* Golpear con flippers izquierdos */
 		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, true);
 		
+		/* Retraer plunger */
+		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
 		
 		// TODO colocar las acciones que correspondan a pinball
 		// pasarle en constructor una lista de flippers, el nodo base para hacer tilt y el plunger?... y el juego! (para finish, etc...)
@@ -63,6 +66,17 @@ public class PinballInputHandler extends FirstPersonHandler
 			flipper.addForce(forceToApply);
 			//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
 		}
+		
+		/* Plunger */
+		Plunger plunger = (Plunger)game.getPlunger().getChild(0);
+		
+		if (plunger.isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
+			game.getPlunger().addForce(new Vector3f(0, 0,
+					-10 * game.getPinballSettings().getInclinationAngle()
+					-1000 * (float)Math.pow(plunger.getDistance(), 2))
+			);
+		else /* Aplico la fuerza para alejarlo del origen */
+			game.getPlunger().addForce(Plunger.plungerChargeForce);
 	}
 	
 	/* Accion para abrir el menu de juego */
@@ -99,6 +113,30 @@ public class PinballInputHandler extends FirstPersonHandler
 						//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
 					}
 				}
+			}
+		}
+		
+	}
+	
+	/* Accion para retraer el plunger */
+	private class ChargePlungerAction extends InputAction
+	{
+
+		public void performAction(InputActionEvent event)
+		{
+			Plunger plunger = (Plunger)(game.getPlunger().getChild(0));
+			
+			if(event.getTriggerPressed())
+			{
+				/* Agarro el plunger, ya no esta suelto */
+				plunger.setLoose(false);
+			}
+			else if (!event.getTriggerPressed())
+			{
+				/* Solto el plunger, guardo la posicion hasta donde llego y
+				 * lo marco como soltado */
+				plunger.setLoose(true);
+				plunger.setDistance(game.getPlunger().getLocalTranslation().z);
 			}
 		}
 		

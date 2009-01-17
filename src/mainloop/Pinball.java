@@ -63,6 +63,9 @@ public class Pinball extends SimplePhysicsGame
 	/* Lista de los flippers del juego actual */
 	private List<DynamicPhysicsNode> flippers;
 	
+	/* Plunger del juego */
+	private DynamicPhysicsNode plunger;
+	
 	/* Configuracion del juego */
 	private PinballSettings pinballSettings;
 	
@@ -339,7 +342,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Oculto el cursor */
 		MouseInput.get().setCursorVisible(false);
-		//MouseInput.get().setCursorVisible(true);
 	}
 
 	/**
@@ -424,9 +426,23 @@ public class Pinball extends SimplePhysicsGame
 		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
 		visualFlipper.setLocalTranslation(new Vector3f(10, 3, 60));
 		
+		/* Le doy color */
+		Utils.color(visualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
+		
 		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
 		rootNode.attachChild(testFlipper);
 		flippers.add(testFlipper);
+		
+		/* Pongo un plunger de prueba */
+		final Box visualPlunger = new Box("Visual plunger", new Vector3f(), 1, 1, 15);
+		visualPlunger.setLocalTranslation(new Vector3f(25, 3, 90));
+		
+		/* Le doy color */
+		Utils.color(visualPlunger, new ColorRGBA(1.0f, 1.0f, 0f, 1.0f), 128);
+		
+		DynamicPhysicsNode testPlunger = Plunger.create(this, "Physic plunger", visualPlunger, 10);
+		rootNode.attachChild(testPlunger);
+		plunger = testPlunger;
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -495,17 +511,9 @@ public class Pinball extends SimplePhysicsGame
 	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
 	}
 	
-	/**
-	 * TODO Solo para debugging.
-	 */
-	public void printDebugText(String text)
+	public DynamicPhysicsNode getPlunger()
 	{
-		//debugText.print(text);
-	}
-
-	public Plunger getPlunger()
-	{
-		return null; // TODO Devolver el componente del lanzador
+		return plunger;
 	}
 	
 	public List<DynamicPhysicsNode> getFlippers()
