@@ -34,7 +34,14 @@ public class Flipper extends Node
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 
-    
+    /**
+     * Crea un nodo dinamico de flipper.
+	 * @param pinball El juego.
+	 * @param name Nombre del nodo de flipper.
+	 * @param visualModel Modelo visual del flipper.
+	 * @param flipperType El tipo de flipper deseado, iquierdo o derecho.
+	 * @return El nodo creado.
+     */
 	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, FlipperType flipperType)
 	{
 		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
@@ -57,8 +64,16 @@ public class Flipper extends Node
         final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
         
         /* Maximos angulos de operacion de los flippers */
-        rotationalAxis.setPositionMaximum(maxRotationalAngle);
-        rotationalAxis.setPositionMinimum(minRotationalAngle);
+        if (flipper.isLeftFlipper())
+        {// TODO probar y ver
+        	rotationalAxis.setPositionMaximum(-maxRotationalAngle);
+        	rotationalAxis.setPositionMinimum(-minRotationalAngle);
+        }
+        else
+        {
+        	rotationalAxis.setPositionMaximum(maxRotationalAngle);
+        	rotationalAxis.setPositionMinimum(minRotationalAngle);
+        }
         
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
         rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // TODO se puede calcular con el angulo
