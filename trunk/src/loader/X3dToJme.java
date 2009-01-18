@@ -41,7 +41,9 @@
  */
 
 /* este archivo fue copiado y modificado para uso particular de este programa. 
- * (manejo de tags meta y algo de física) 
+ * (algo de texturas, manejo de tags meta y algo de fisica) las modificaciones
+ * se mantienen con la misma licencia, por mas que no concuerde con las del 
+ * resto del programa. Learn Spanish if you don't want to be sued :P 
  */
 
 package loader;
@@ -91,7 +93,7 @@ import com.jme.scene.SwitchNode;
 import com.jme.scene.TexCoords;
 import com.jme.scene.TriMesh;
 import com.jme.scene.shape.Box;
-import com.jme.scene.shape.Cone; // not my fault :P
+import com.jme.scene.shape.Cone;
 import com.jme.scene.shape.Cylinder;
 import com.jme.scene.shape.Disk;
 import com.jme.scene.shape.Sphere;
@@ -112,6 +114,8 @@ import com.jme.util.geom.BufferUtils;
 import com.jme.util.geom.NonIndexedNormalGenerator;
 import com.jme.util.geom.NormalGenerator;
 import com.jmex.model.converters.FormatConverter;
+import com.jmex.physics.PhysicsNode;
+import com.jmex.physics.PhysicsSpace;
 
 /**
  * A Loader class to load models from XML-encoded X3D files (see <a
@@ -266,6 +270,12 @@ public class X3dToJme extends FormatConverter {
     private boolean addToTransparentQueue = false;
 
     /**
+     * The loader's physics space (for getting static & dynamic nodes) 
+     */
+     //TODO pasarlo a property
+    private PhysicsSpace physicsSpace = null;
+    
+    /**
      * Creates the X3DLoader.
      * 
      * @throws InstantiationException
@@ -310,6 +320,11 @@ public class X3dToJme extends FormatConverter {
         documentBuilder.setEntityResolver(resolver);
     }
 
+    
+    public void setPhysicSpace(PhysicsSpace space) {
+        physicsSpace = space;
+    }
+    
     /**
      * Converts the .x3d file read from the specified InputStream to the .jme
      * format and writes it to the specified OutputStream. If the model contains
@@ -485,6 +500,7 @@ public class X3dToJme extends FormatConverter {
      */
     private Spatial parseNode(Node node) throws Exception {
         // Check for the USE attribute
+        
         Node use = node.getAttributes().getNamedItem("USE");
         if (use != null) {
             return (Spatial) getDef(use.getNodeValue());
@@ -509,11 +525,30 @@ public class X3dToJme extends FormatConverter {
             if (def != null) {
                 result.setName(def.getNodeValue());
                 CloneImportExport cloneEx = new CloneImportExport();
-                cloneEx.saveClone(result);
-                defs.put(def.getNodeValue(), cloneEx);
+                try {
+                    cloneEx.saveClone(result);
+                    defs.put(def.getNodeValue(), cloneEx);
+                } catch (RuntimeException rte) {
+                    // la fisica no lo soporta esto, asi que no se da soporte
+                    logger.info( "skipping DEF on physics node" );
+                }
+            }
+            if ( physicsSpace != null ) {
+                PhysicsNode physicsResult = null;
+                
+                // TODO diferenciar nodos dinamicos y estaticos
+                if (false /*dynamic*/) {
+                    physicsResult = this.physicsSpace.createDynamicNode();
+                } else {
+                    physicsResult = this.physicsSpace.createStaticNode();
+                }
+                physicsResult.attachChild(result);     
+                physicsResult.generatePhysicsGeometry(true);
+                
+                result = physicsResult;
             }
         }
-
+        
         return result;
     }
 
@@ -1917,8 +1952,8 @@ public class X3dToJme extends FormatConverter {
                 
                 Matrix3f rotationMatrix = new Matrix3f();
                 rotationMatrix.set(new float[][]
-                  {{(float)Math.cos(angle), -(float)Math.sin(angle), 0},
-                   {(float)Math.sin(angle), (float)Math.cos(angle), 0},
+                  {{FastMath.cos(angle), -FastMath.sin(angle), 0},
+                   {FastMath.sin(angle), FastMath.cos(angle), 0},
                    {0, 0, 0}} );
                 
                 Quaternion rotationQuaternion = new Quaternion().fromRotationMatrix(rotationMatrix);
@@ -2236,6 +2271,12 @@ public class X3dToJme extends FormatConverter {
             light.setEnabled(true);
         }
 
+//        System.out.println(light.getSpecular());
+//        System.out.println(light.getDiffuse());
+//        System.out.println(light.getAmbient());
+//        System.out.println(((SpotLight)light).getAngle());
+//        System.out.println(((SpotLight)light).getDirection());
+//        System.out.println(((SpotLight)light).getLocation());
         return lightNode;
     }
 
@@ -2262,6 +2303,7 @@ public class X3dToJme extends FormatConverter {
             } else {
                 lightNode.getLocalRotation().lookAt(direction, Vector3f.UNIT_Y);
             }
+//            System.out.println("rot[ " + x +", " + y + ", " + z + "]" );
         } else {
             lightNode.getLocalRotation().set(1, 0, 0, FastMath.PI);
         }
@@ -2291,7 +2333,9 @@ public class X3dToJme extends FormatConverter {
             float y = getFloat(split[1], 0);
             float z = getFloat(split[2], 0);
             lightNode.setLocalTranslation(x, y, z);
+//            System.out.println("loc[ " + x +", " + y + ", " + z + "]" );
         }
+        
     }
 
     /**
