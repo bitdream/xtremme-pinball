@@ -14,6 +14,7 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
+import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
@@ -36,11 +37,12 @@ import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
-
+import components.Bumper;
 import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
+import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
 
 /**
@@ -49,6 +51,8 @@ import components.Flipper.FlipperType;
  */
 public class Pinball extends SimplePhysicsGame
 {
+	
+	public static final Material pinballTableMaterial = Material.PLASTIC;
 	private static final String GAME_NAME = "xtremme pinball";
 	private static final String GAME_VERSION = "0.2";
 	
@@ -391,12 +395,7 @@ public class Pinball extends SimplePhysicsGame
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
 
-		// TODO ver donde poner esta creacion de la bola
-		/* Nodo dinamico de la bola */
-		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-        rootNode.attachChild(mainBall);
-        
-        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa de plastico
+        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
         final Material customMaterial = new Material( "material de bola" );
         // Es pesado
         customMaterial.setDensity( 100.0f );
@@ -406,23 +405,82 @@ public class Pinball extends SimplePhysicsGame
         contactDetails.setBounce( 0.5f );
         // Poco rozamiento
         contactDetails.setMu( 0.5f );
-        customMaterial.putContactHandlingDetails( Material.ICE, contactDetails ); //TODO definir el material. Antes: Material.PLASTIC
+        customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
         
         
+		// TODO ver donde poner esta creacion de la bola
+		/* Nodo dinamico de la bola */
+		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+		// El nodo fisico de todas las bolas debera llamarse "ball"
+		mainBall.setName("ball");
+        rootNode.attachChild(mainBall);
+               
         final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
 		visualMainBall.setLocalTranslation(new Vector3f(0, 20, -60));
 		
 		// Agregado de bounding volume 
-		mainBall.setModelBound(new BoundingSphere());
-		mainBall.updateModelBound();
+		visualMainBall.setModelBound(new BoundingSphere());
+		visualMainBall.updateModelBound();
 
 		mainBall.attachChild(visualMainBall);
 		mainBall.generatePhysicsGeometry();
-		mainBall.setMaterial(customMaterial);
-		
+		mainBall.setMaterial(customMaterial);		
 		// Se computa la masa luego de generar la geometria fisica
 		mainBall.computeMass();
 		
+		// Una segunda bola para probar el bumper
+		/* Nodo dinamico de la bola */
+		final DynamicPhysicsNode mainBall2 = getPhysicsSpace().createDynamicNode(); //TODO sacar final, es para debug
+		mainBall2.setName("ball");
+        rootNode.attachChild(mainBall2);
+               
+        final Sphere visualMainBall2 = new Sphere("Bola principal", 25, 25, 1);
+        visualMainBall2.setLocalTranslation(new Vector3f(25, 5, -2));
+		
+		// Agregado de bounding volume 
+		visualMainBall2.setModelBound(new BoundingSphere());
+		visualMainBall2.updateModelBound();
+
+		mainBall2.attachChild(visualMainBall2);
+		mainBall2.generatePhysicsGeometry();
+		mainBall2.setMaterial(customMaterial);		
+		// Se computa la masa luego de generar la geometria fisica
+		mainBall2.computeMass();
+		
+		// Una tercera bola para probar el iman magnet1
+		/* Nodo dinamico de la bola */
+		final DynamicPhysicsNode mainBall3 = getPhysicsSpace().createDynamicNode(); //TODO sacar final, es para debug
+		mainBall3.setName("ball");
+        rootNode.attachChild(mainBall3);
+               
+        final Sphere visualMainBall3 = new Sphere("Bola principal", 25, 25, 1);
+        visualMainBall3.setLocalTranslation(new Vector3f(-10, 5, -10));
+		
+		// Agregado de bounding volume 
+        visualMainBall3.setModelBound(new BoundingSphere());
+        visualMainBall3.updateModelBound();
+
+		mainBall3.attachChild(visualMainBall3);
+		mainBall3.generatePhysicsGeometry();
+		mainBall3.setMaterial(customMaterial);		
+		// Se computa la masa luego de generar la geometria fisica
+		mainBall3.computeMass();
+		
+		//----------------------------------------
+		//TODO quitar esto, es para debug de bumper
+		// Mover la bola dos hacia el bumper1
+		 getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
+	            public void beforeStep( PhysicsSpace space, float time ) {
+	            	/* Checkea todas las acciones para ver si alguna debe ser invocada, en tal caso invoca a performAction
+	            	 * pasandole el tiempo 'time' 
+	            	 */
+	            	mainBall2.addForce(new Vector3f(-7000f, 0f, 0f));
+	            }
+	            public void afterStep( PhysicsSpace space, float time ) {
+
+	            }
+	        } );
+		//-----------------------------------------
 
 		/* Pongo un flipper de prueba */
 		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
@@ -486,7 +544,12 @@ public class Pinball extends SimplePhysicsGame
 		// Le doy color al iman
 		Utils.color( visualMagnet1, new ColorRGBA( 1.0f, 0f, 0f, 1.0f ), 128 );
 		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
-		visualMagnet1.setLocalTranslation(new Vector3f(15, 5, 10));
+		visualMagnet1.setLocalTranslation(new Vector3f(-25, 5, 50));
+		
+		// Agregado de bounding volume 
+		visualMagnet1.setModelBound(new BoundingBox());
+		visualMagnet1.updateModelBound();
+				
 		StaticPhysicsNode magnet1 = Magnet.create(this, "Physic magnet 1", visualMagnet1);
 		rootNode.attachChild(magnet1);
 		
@@ -496,14 +559,30 @@ public class Pinball extends SimplePhysicsGame
 //		StaticPhysicsNode magnet2 = Magnet.create(this, "Physic magnet 2", visualMagnet2);
 //		rootNode.attachChild(magnet2);
 		
-		// Para los bumpers con forma de hongo usar un Arrow
-		//final Arrow visualBumper1 = new Arrow("Visual bumper 1", 5, 2);
-		// Le doy color al iman
-		//Utils.color( visualBumper1, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
-		// Es importante setear la posicion del objeto visual antes de crear el iman! (es necesaria para calcular distancia)
-		//visualBumper1.setLocalTranslation(new Vector3f(0, 5, -10));
-		//DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, Bumper.JUMPER);
-		//rootNode.attachChild(bumper1);
+
+		// Agrego un bumper
+		final Box visualBumper1 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
+		// Le doy color al bumper
+		Utils.color( visualBumper1, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
+		visualBumper1.setLocalTranslation(new Vector3f(0, 5, 0));
+		// Agregado de bounding volume 
+		visualBumper1.setModelBound(new BoundingBox());
+		visualBumper1.updateModelBound();
+		StaticPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER, pinballInputHandler);
+		rootNode.attachChild(bumper1);
+		
+		// Agrego otro bumper
+		final Box visualBumper2 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
+		// Le doy color al bumper
+		Utils.color( visualBumper2, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
+		visualBumper2.setLocalTranslation(new Vector3f(25, 5, 0));
+		// Agregado de bounding volume 
+		visualBumper2.setModelBound(new BoundingBox());
+		visualBumper2.updateModelBound();
+		//StaticPhysicsNode bumper2 = Bumper.create(this, "Physic bumper 2", visualBumper2, BumperType.JUMPER, pinballInputHandler);
+		//rootNode.attachChild(bumper2);
+		
+		
 	}
 	
 	private void buildTable()
@@ -518,7 +597,7 @@ public class Pinball extends SimplePhysicsGame
 		table.generatePhysicsGeometry();
 		
 		// Seteo el material de la mesa
-		table.setMaterial(Material.PLASTIC);
+		table.setMaterial( pinballTableMaterial );
 		// Seteo el color de la mesa para diferenciarlo de la bola. Brillo al maximo
 	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
 	}
