@@ -8,19 +8,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.jme.light.LightNode;
+import com.jme.light.SimpleLightNode;
 import com.jme.scene.Node;
+import com.jme.scene.Spatial;
+import com.jme.scene.state.LightState;
 import com.jme.util.export.binary.BinaryImporter;
 import com.jmex.model.converters.DTDResolver;
+import com.jmex.physics.PhysicsSpace;
 
+/**
+ * Una clase que wrappea el loader de jme para trabajar todos los x3d igual
+ * @author Mariano
+ */
 public class X3DLoader
 {
     private static final Logger logger = Logger.getAnonymousLogger();
 
-    public static Node loadScene( String x3dFilename, String textureDir )
+    /**
+     * Esta funcion carga el archivo especificado buscando texturas en el
+     * directorio textureDir
+     * @param x3dFilename
+     *          archivo a cargar
+     * @param textureDir
+     *          directorio de texturas
+     * @return
+     *          la escena cargada en formato jme 
+     */
+    // TODO sacar el static y hacer los parametros por setter
+    public static Node loadScene( String x3dFilename, String textureDir, LightState lightState, PhysicsSpace physicsSpace )
     {
         //logger.info( "Entering loadScene" );
         
@@ -39,7 +61,7 @@ public class X3DLoader
             return new Node();
         }
         
-        // tratamos de usar dtds locales para evitar la conexión a internet
+        // tratamos de usar dtds locales para evitar la conexion a internet
         DTDResolver dtds;
         try
         {
@@ -48,6 +70,7 @@ public class X3DLoader
         }
         catch ( FileNotFoundException e2 )
         {
+            logger.info( e2.getMessage() );
             logger.info( "Could not find local dtds, switching to remote..." );
         }
         
@@ -66,7 +89,7 @@ public class X3DLoader
         
         // seteamos la url en el conversor
         converter.setProperty( "textures", textureDirURL );        
-        
+        converter.setPhysicSpace( physicsSpace );
         InputStream IP;
         try
         {
@@ -78,37 +101,44 @@ public class X3DLoader
             return new Node();
         }
 
-        ByteArrayOutputStream BO = new ByteArrayOutputStream();
+//        ByteArrayOutputStream BO = new ByteArrayOutputStream();
 
         
         //logger.info( "Starting to convert .x3d to .jme" );
         try
         {
-            converter.convert( IP, BO );
+            node = (Node)converter.loadScene( IP, null, lightState );
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             logger.severe( "Converting " + x3dFilename + ": could not parse file." );
+            e.printStackTrace();
+            System.exit( 1 );
             return new Node();
         }
         //logger.info( "Done converting" );
 
         //logger.info( "Start Loading" );
-        try
-        {
-            node = (Node) BinaryImporter.getInstance().load( new ByteArrayInputStream( BO.toByteArray() ) );
-        }
-        catch ( IOException e )
-        {
-            logger.logp( Level.SEVERE, X3DLoader.class.toString(), "loadScene( String x3dFilename, String textureDir )", "IOException", e );
-            return new Node();
-        }
+//        try
+//        {
+//            node = (Node) BinaryImporter.getInstance().load( new ByteArrayInputStream( BO.toByteArray() ) );
+//        }
+//        catch ( IOException e )
+//        {
+//            logger.logp( Level.SEVERE, X3DLoader.class.toString(), "loadScene( String x3dFilename, String textureDir )", "IOException", e );
+//            return new Node();
+//        }
         //logger.info( "Finished loading" ) );
         
         return node;
     }
     
-    
+    /**
+     * Armamos un hash de archivos que esperamos que estén localmente para
+     * resolver los dtds más rápido.
+     * @return
+     * @throws FileNotFoundException
+     */
     private static DTDResolver getDTDResolver() throws FileNotFoundException
     {
         DTDResolver ret;
