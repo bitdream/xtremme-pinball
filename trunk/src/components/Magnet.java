@@ -25,7 +25,7 @@ public class Magnet extends Node
 	// Intensidad de la fuerza
 	private static int force = 5000;
 	
-	// Radio de alcance de la fuerza atractora
+	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
 	private static float maxRadius = 3;
 
 	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel)
@@ -44,27 +44,29 @@ public class Magnet extends Node
 			
 	        public void afterStep(PhysicsSpace space, float time) 
 	        {
-	            for (PhysicsNode n: space.getNodes()) 
+	            for (PhysicsNode node: space.getNodes()) 
 	            {	          
 	            	// TODO ver: estoy suponiendo que las bolas del flipper van a estar formadas por un nodo fisico con un 
 	            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
-	                if (n instanceof DynamicPhysicsNode && n.getChild(0) instanceof Sphere) 
+	                if (node instanceof DynamicPhysicsNode && node.getChild(0) instanceof Sphere) 
 	                {
-	                    DynamicPhysicsNode dyn = (DynamicPhysicsNode)n;
+	                    DynamicPhysicsNode ball = (DynamicPhysicsNode)node;
 	                    
 	                    // Calcular la distancia entre la bola y el iman
-	                    float distance = n.getLocalTranslation().distance(m.getVisualModel().getLocalTranslation());
-	                   //System.out.println("----------------distance: " + distance);
+	                    // IMPORTANTE: la distancia se calcula entre los centros de masa de los objetos
+	                    float distance = node.getLocalTranslation().distance(m.getVisualModel().getLocalTranslation());
+	                    //System.out.println("----------------distance: " + distance + " con el nodo " + node.getChild(0).getName());
 	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
 	                    if (distance < 40)
 	                    {
 	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
-		                     * de la bola y del iman.
+		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
 		                     */	                    
-		                    Vector3f direction = m.getVisualModel().getLocalTranslation().subtract(n.getLocalTranslation()).normalize();
+		                    Vector3f direction = m.getVisualModel().getLocalTranslation().subtract(node.getLocalTranslation()).normalize();
 		                   
 		                    // Aplicar la fuerza atractora. Formula magica. TODO ajustar la fuerza para un mejor comportamiento
-		                    dyn.addForce(direction.mult(force*dyn.getMass()).divide(100/maxRadius*distance));
+		                    // Es inversamente proporcional a la distancia
+		                    ball.addForce(direction.mult(force*ball.getMass()).divide(100/maxRadius*distance));
 	                    }
 	                    
 	                }

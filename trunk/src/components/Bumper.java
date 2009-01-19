@@ -35,8 +35,17 @@ public class Bumper extends Node
 	//private static Pinball pinballInstance;
 	
 	// Intensidad de la fuerza repulsora a aplicar sobre la bola  
-	private static float forceToBallIntensity = 500000f; //TODO hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
+	private static float forceToBallIntensity = 900f; //TODO hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
 	//Magic number probado con angulo de 15º y repele con fuerza
+	
+	// Valores de densidad, rebote y rozamiento entre el material del bumper y el de la mesa
+    // Es muy pesado
+	private static float bumperMaterialDensity = 99999999999999.0f;
+    // Nada de rebote
+	private static float bumperMaterialBounce = 0.0f;
+    // Mucho rozamiento
+	private static float bumperMaterialMu = 99999999.0f;
+	
 	
 	// Tipo de este bumper
 	private BumperType bumperType;
@@ -51,20 +60,12 @@ public class Bumper extends Node
 		bumperNode.setName("bumper");
 		//pinballInstance = pinball;
 		
+		
 		/* Crear un material que no tenga rebote con el material de la mesa y que su rozamiento sea muy grande. Ademas que sea
 		 * muy denso para que la bola no lo tire.
 		 */
-        final Material customMaterial = new Material( "material de bumper" );
-        // Es muy pesado
-        customMaterial.setDensity( 99999999999999f );
-        // Detalles de contacto con el otro material
-        MutableContactInfo contactDetails = new MutableContactInfo();
-        // Nada de rebote
-        contactDetails.setBounce( 0f );
-        // Mucho rozamiento
-        contactDetails.setMu( 99999999.0f);//
-        customMaterial.putContactHandlingDetails( Pinball.pinballTableMaterial, contactDetails );
-       		
+        final Material customMaterial = buildBumperMaterial("Material de bumper", bumperMaterialDensity, bumperMaterialBounce, bumperMaterialMu);
+        
         /* Creo un nodo de Bumper, con todas sus caracteristicas y lo fijo al nodo fisico */
         final Bumper bumper = new Bumper(name, visualModel, bumperType);
         bumperNode.attachChild(bumper);
@@ -75,7 +76,7 @@ public class Bumper extends Node
         // Setear el material del bumper
 		bumperNode.setMaterial(customMaterial);
         
-        // Calculo la masa del bumper
+        // Calculo la masa del bumper (solo si lo hago dinamico)
         //bumperNode.computeMass();
         
         // Para que el bumper quede pegado a la mesa
@@ -95,49 +96,40 @@ public class Bumper extends Node
         		// Algo colisiono con el bumper
                 final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
                 DynamicPhysicsNode ball;//, bump;
-                StaticPhysicsNode bump;
+                //StaticPhysicsNode bump;
                 // El contacto pudo haber sido bola -> bumper o bumper -> bola
                 if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getChild(0) instanceof Sphere ) {
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     //bump = (DynamicPhysicsNode) contactInfo.getNode1();
-                    bump = (StaticPhysicsNode) contactInfo.getNode1();
+                    //bump = (StaticPhysicsNode) contactInfo.getNode1();
                     sense = 1; //TODO para mi deberia ser -1, pero sino no anda
-                    System.out.println(" -------------------- 1");
+                    //System.out.println(" -------------------- 1");
                      
                 }
                 else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getChild(0) instanceof Sphere ) {
                 	// fue bola -> bumper
                     ball = (DynamicPhysicsNode) contactInfo.getNode1();
                     //bump = (DynamicPhysicsNode) contactInfo.getNode2();
-                    bump = (StaticPhysicsNode) contactInfo.getNode2();
+                    //bump = (StaticPhysicsNode) contactInfo.getNode2();
                     sense = -1; //TODO para mi deberia ser 1, pero sino no anda
-                    System.out.println(" -------------------- 2");
+                    //System.out.println(" -------------------- 2");
                 }
                 else {
                 	System.out.println("PROBLEMAS, entro en el else de Bumper.create()!!!");
                     // Colisiono el bumper contra otra cosa, no debe suceder, pero lo ignoro
                     return;
                 }
-                System.out.println(" -------------------- " + ball.getName() + " --- " + bump.getName());
                 
-                
-                
-//                Vector3f position = bump.getLocalTranslation();
-//                float distance = ball.getLocalTranslation().distance(position);            
-//                Vector3f direction2 = position.subtract(ball.getLocalTranslation()).normalize();
-//                ball.clearDynamics();
-//                ball.addForce(direction2.mult(-9999*ball.getMass()));//.divide(100/maxRadius*distance))
-                
-                
-                
-                
+                //DEBUG
+                //System.out.println(" -------------------- " + ball.getName() + " --- " + bump.getName());
+                               
                 // La fuerza aplicada sobre la bola tiene una intensidad proporcional a la velocidad que la bola tenia al momento de la colision
                 // y es en sentido opuesto.
                 Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
                 //System.out.println(" -------------------- velocidad" + direction);
                 //System.out.println(" - -------------- fuerza: " + direction.mult(forceToBallIntensity * sense));
-                Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense));
+                Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
 
                 // Aplicar la fuerza repulsora sobre la bola
                 ball.clearDynamics();
@@ -163,6 +155,23 @@ public class Bumper extends Node
     	return bumperNode;
 	}
 	
+
+
+	/**
+	 *  Crea el material con nombre, densidad, rebote y rozamiento indicados, respecto al material de la mesa del pinball 
+	 */
+	private static Material buildBumperMaterial(String name, float density, float bounce, float mu) 
+	{
+		Material material = new Material( name );
+		material.setDensity( density );
+        // Detalles de contacto con el otro material
+        MutableContactInfo contactDetails = new MutableContactInfo();
+        contactDetails.setBounce( bounce );
+        contactDetails.setMu( mu);
+        material.putContactHandlingDetails( Pinball.pinballTableMaterial, contactDetails );
+        return material;
+	}
+
 
 
 	/**

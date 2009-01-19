@@ -434,7 +434,7 @@ public class Pinball extends SimplePhysicsGame
 		mainBall2.setName("ball");
         rootNode.attachChild(mainBall2);
                
-        final Sphere visualMainBall2 = new Sphere("Bola principal", 25, 25, 1);
+        final Sphere visualMainBall2 = new Sphere("Bola 2", 25, 25, 1);
         visualMainBall2.setLocalTranslation(new Vector3f(25, 5, -2));
 		
 		// Agregado de bounding volume 
@@ -453,7 +453,7 @@ public class Pinball extends SimplePhysicsGame
 		mainBall3.setName("ball");
         rootNode.attachChild(mainBall3);
                
-        final Sphere visualMainBall3 = new Sphere("Bola principal", 25, 25, 1);
+        final Sphere visualMainBall3 = new Sphere("Bola 3", 25, 25, 1);
         visualMainBall3.setLocalTranslation(new Vector3f(-10, 5, -10));
 		
 		// Agregado de bounding volume 
