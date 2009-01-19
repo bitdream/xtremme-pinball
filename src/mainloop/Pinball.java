@@ -19,11 +19,15 @@ import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jme.input.util.SyntheticButton;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
+import com.jme.scene.CameraNode;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
@@ -34,6 +38,7 @@ import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
+import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
@@ -42,7 +47,6 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
-import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
 
 /**
@@ -129,8 +133,22 @@ public class Pinball extends SimplePhysicsGame
         fengGUIInputHandler.update(interpolation);
         pinballInputHandler.update(interpolation);
 
+        
+        // ------------------------------------ para colision de camara
+//        CameraNode n = (CameraNode)rootNode.getChild("cm");
+//        //n.updateFromCamera();
+//        n.setLocalTranslation(cam.getLocation());
+//        
+//        DynamicPhysicsNode dn = (DynamicPhysicsNode)rootNode.getChild("camPhNode");
+//        System.out.println(" -----------------------" + dn.getLocalTranslation());
+        //---------------------------------------
+        
+        
+        
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);
+        
+        
 	}
 
 	/**
@@ -230,7 +248,7 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Creo la lista de flippers */
 		flippers = new ArrayList<DynamicPhysicsNode>(4);
-		
+				
         /* Armo la mesa de juego */
         buildTable();
         
@@ -243,6 +261,57 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
+		// TODO por algun motivo no se actualizan los bounding boxes de los nodos hijos, ni se aplican las rotaciones
+		// a los joints, se estara propagando bien hacia abajo???
+		//rootNode.updateRenderState();// Creo q no es necesario llamarlo
+		//rootNode.updateWorldBound();
+		//rootNode.propagateBoundToRoot();
+		//rootNode.updateWorldData(0);
+		
+		
+		
+		
+		
+		// -------------------------- para colisiones de la camara
+		
+//		Camera cam2 = display.getRenderer().createCamera(display.getWidth(),
+//                display.getHeight());
+//		
+//		cam2.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
+//		
+//		Vector3f loc = new Vector3f(0.0f, 4f, 200f);
+//		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
+//		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
+//		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
+//
+//		cam2.setFrame(loc, left, up, dir);
+//		
+//		/* Aplicar los cambios a la camara */
+//		cam2.update();
+//
+//		CameraNode cm = new CameraNode("cm", cam);
+//		//cm.setLocalTranslation(new Vector3f(0, 5, 0));
+//
+//		cm.updateWorldData(0);
+//		//rootNode.attachChild(cm);
+//		
+//		DynamicPhysicsNode camPhNode = getPhysicsSpace().createDynamicNode();
+//		camPhNode.setAffectedByGravity(false);
+//		camPhNode.attachChild(cm);
+//		camPhNode.setName("camPhNode");
+//		rootNode.attachChild(camPhNode);
+//		final SyntheticButton collisionEventHandler = camPhNode.getCollisionEventHandler();
+//        input.addAction( new InputAction(){
+//        	
+//        	public void performAction( InputActionEvent evt ) {
+//        		
+//        			System.out.println(" detecto la colision de la camara -------------------");
+//            }        	
+//
+//        }, collisionEventHandler, false );
+        
+        //----------------------------------------------------------------
+        
 
 		/* Inicializo la GUI */
 		initGUI();
@@ -392,6 +461,7 @@ public class Pinball extends SimplePhysicsGame
 	
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
+
 
         // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
         final Material customMaterial = new Material( "material de bola" );
@@ -566,7 +636,7 @@ public class Pinball extends SimplePhysicsGame
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
-		StaticPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER, pinballInputHandler);
+		StaticPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1/*, BumperType.JUMPER*/, pinballInputHandler);
 		rootNode.attachChild(bumper1);
 		
 		// Agrego otro bumper
@@ -577,7 +647,7 @@ public class Pinball extends SimplePhysicsGame
 		// Agregado de bounding volume 
 		visualBumper2.setModelBound(new BoundingBox());
 		visualBumper2.updateModelBound();
-		//StaticPhysicsNode bumper2 = Bumper.create(this, "Physic bumper 2", visualBumper2, BumperType.JUMPER, pinballInputHandler);
+		//StaticPhysicsNode bumper2 = Bumper.create(this, "Physic bumper 2", visualBumper2/*, BumperType.JUMPER*/, pinballInputHandler);
 		//rootNode.attachChild(bumper2);
 		
 		
