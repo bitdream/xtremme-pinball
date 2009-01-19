@@ -25,8 +25,12 @@ public class Magnet extends Node
 	// Intensidad de la fuerza
 	private static int force = 5000;
 	
+	//TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa (xed final)
+	// Radio del campo de la fuerza magnetica
+	private static int forceFieldRadius = 40; // Testeado con los sig valores: bolas de radio 1 e iman un Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
+	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
-	private static float maxRadius = 3;
+	private static float maxRadius = 3; //Valor de testeo: 3 cuando las bolas son de radio 1
 
 	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel)
 	{
@@ -47,7 +51,8 @@ public class Magnet extends Node
 	            for (PhysicsNode node: space.getNodes()) 
 	            {	          
 	            	// TODO ver: estoy suponiendo que las bolas del flipper van a estar formadas por un nodo fisico con un 
-	            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
+	            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. 
+	            	// Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
 	                if (node instanceof DynamicPhysicsNode && node.getChild(0) instanceof Sphere) 
 	                {
 	                    DynamicPhysicsNode ball = (DynamicPhysicsNode)node;
@@ -57,7 +62,7 @@ public class Magnet extends Node
 	                    float distance = node.getLocalTranslation().distance(m.getVisualModel().getLocalTranslation());
 	                    //System.out.println("----------------distance: " + distance + " con el nodo " + node.getChild(0).getName());
 	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
-	                    if (distance < 40)
+	                    if (distance < forceFieldRadius)
 	                    {
 	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
 		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
