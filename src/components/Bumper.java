@@ -29,7 +29,10 @@ public class Bumper extends Node
 	// que el bumper se mOviera hacia abajo del plano inclinado.
 	// CONCLUSION: FLOR DE QUILOMBO HACERLO DINAMICO. OPTE POR DEJARLO ESTATICO DESPUES DE VARIAS HORAS DE LUCHA
 	// Tipos de bumpers
-	public enum BumperType {JUMPER, NO_JUMPER};
+	//public enum BumperType {JUMPER, NO_JUMPER};
+	// Tipo de este bumper
+	//private BumperType bumperType;
+	
 		
 	// Pinball en el que esta el flipper
 	//private static Pinball pinballInstance;
@@ -39,6 +42,7 @@ public class Bumper extends Node
 	//Magic number probado con angulo de 15º y repele con fuerza
 	
 	// Valores de densidad, rebote y rozamiento entre el material del bumper y el de la mesa
+	
     // Es muy pesado
 	private static float bumperMaterialDensity = 99999999999999.0f;
     // Nada de rebote
@@ -46,14 +50,10 @@ public class Bumper extends Node
     // Mucho rozamiento
 	private static float bumperMaterialMu = 99999999.0f;
 	
-	
-	// Tipo de este bumper
-	private BumperType bumperType;
-	
 	// Modelo visual del bumper
 	//private Geometry visualModel;
 	
-	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType, PinballInputHandler input)
+	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel, /*BumperType bumperType,*/ PinballInputHandler input)
 	{
 		final StaticPhysicsNode bumperNode = pinball.getPhysicsSpace().createStaticNode();
 		// Nombre del nodo fisico de todos los bumpers
@@ -67,7 +67,7 @@ public class Bumper extends Node
         final Material customMaterial = buildBumperMaterial("Material de bumper", bumperMaterialDensity, bumperMaterialBounce, bumperMaterialMu);
         
         /* Creo un nodo de Bumper, con todas sus caracteristicas y lo fijo al nodo fisico */
-        final Bumper bumper = new Bumper(name, visualModel, bumperType);
+        final Bumper bumper = new Bumper(name, visualModel/*, bumperType*/);
         bumperNode.attachChild(bumper);
 	
         // Genero su fisica
@@ -177,7 +177,7 @@ public class Bumper extends Node
 	/**
 	 * Toma un nombre, el tipo de bumper y su representacion grafica.
 	 */
-	public Bumper(String name, Geometry visualModel, BumperType bumperType)
+	public Bumper(String name, Geometry visualModel/*, BumperType bumperType*/)
 	{
 		super(name);
 		
@@ -185,16 +185,16 @@ public class Bumper extends Node
 		
 		attachChild(visualModel);
 
-		this.bumperType = bumperType;
+		//this.bumperType = bumperType;
 	}
 	
-	public void setBumperType(BumperType bumperType) 
-	{
-		this.bumperType = bumperType;
-	}
-	
-	public BumperType getBumperType()
-	{
-		return bumperType;
-	}
+//	public void setBumperType(BumperType bumperType) 
+//	{
+//		this.bumperType = bumperType;
+//	}
+//	
+//	public BumperType getBumperType()
+//	{
+//		return bumperType;
+//	}
 }
