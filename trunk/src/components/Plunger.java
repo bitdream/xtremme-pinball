@@ -66,7 +66,7 @@ public class Plunger extends Node
         jointForPlunger.attach(plungerNode);
         
         /* Lo fijo al centro del plunger */
-        jointForPlunger.setAnchor(new Vector3f(25, 3, 90)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
+        jointForPlunger.setAnchor(visualModel.getLocalTranslation());//new Vector3f(25, 3, 90)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
         
         
 		return plungerNode;

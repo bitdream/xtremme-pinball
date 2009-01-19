@@ -1,5 +1,8 @@
 package mainloop;
 
+import com.jme.math.FastMath;
+import com.jme.math.Quaternion;
+
 public class PinballSettings
 {
 	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 15.0f;
@@ -13,12 +16,17 @@ public class PinballSettings
 	private boolean fullscreen;
 	
 	private String renderer;
+	
+	private Quaternion inclinationQuaternion;
 
 	public PinballSettings()
 	{
 		camMoveSpeed = camMoveSpeedDefault;
 		camTurnSpeed = camTurnSpeedDefault;
 		inclinationAngle = inclinationAngleDefault;
+		
+		inclinationQuaternion = new Quaternion();
+		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, 0f, 0f);
 	}
 	
 	public void setCamMoveSpeed(float camMoveSpeed)
@@ -109,6 +117,15 @@ public class PinballSettings
 	public void setInclinationAngle(float inclinationAngle)
 	{
 		this.inclinationAngle = inclinationAngle;
+		
+		/* Recalculo el quaternion */
+		inclinationQuaternion = new Quaternion();
+		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, 0f, 0f);
+	}
+
+	public Quaternion getInclinationQuaternion()
+	{
+		return inclinationQuaternion;
 	}
 	
 }

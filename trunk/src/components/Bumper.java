@@ -29,7 +29,7 @@ public class Bumper extends Node
 	// que el bumper se mOviera hacia abajo del plano inclinado.
 	// CONCLUSION: FLOR DE QUILOMBO HACERLO DINAMICO. OPTE POR DEJARLO ESTATICO DESPUES DE VARIAS HORAS DE LUCHA
 	// Tipos de bumpers
-	//public enum BumperType {JUMPER, NO_JUMPER};
+	public enum BumperType {JUMPER, NO_JUMPER};
 	// Tipo de este bumper
 	//private BumperType bumperType;
 	
@@ -53,7 +53,7 @@ public class Bumper extends Node
 	// Modelo visual del bumper
 	//private Geometry visualModel;
 	
-	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel, /*BumperType bumperType,*/ PinballInputHandler input)
+	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType, PinballInputHandler input)
 	{
 		final StaticPhysicsNode bumperNode = pinball.getPhysicsSpace().createStaticNode();
 		// Nombre del nodo fisico de todos los bumpers
