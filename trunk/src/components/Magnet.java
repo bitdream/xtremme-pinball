@@ -54,7 +54,7 @@ public class Magnet extends Node
 	                    
 	                    // Calcular la distancia entre la bola y el iman
 	                    float distance = n.getLocalTranslation().distance(m.getVisualModel().getLocalTranslation());
-	                   System.out.println("----------------distance: " + distance);
+	                   //System.out.println("----------------distance: " + distance);
 	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
 	                    if (distance < 40)
 	                    {
