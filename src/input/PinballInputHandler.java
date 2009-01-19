@@ -7,6 +7,7 @@ import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.physics.DynamicPhysicsNode;
 import components.Flipper;
@@ -20,7 +21,6 @@ import components.Plunger;
 public class PinballInputHandler extends FirstPersonHandler
 {
 	private Pinball game;
-	
 	
 	public PinballInputHandler(Pinball game)
 	{
@@ -55,6 +55,8 @@ public class PinballInputHandler extends FirstPersonHandler
 	{
 		super.update(time);
 		
+		Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
+		
 		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
 		 * de recuperacion de los flippers */
 		final Vector3f forceToApply = new Vector3f();
@@ -63,7 +65,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		for (DynamicPhysicsNode flipper : game.getFlippers())
 		{
-			flipper.addForce(forceToApply);
+			flipper.addForce(forceToApply.rotate(rot));
 			//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
 		}
 		
@@ -96,6 +98,8 @@ public class PinballInputHandler extends FirstPersonHandler
 	private class RightFlippersAction extends InputAction
 	{
 		private final Vector3f forceToApply = new Vector3f();
+		
+		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
 
 		public void performAction(InputActionEvent event)
 		{
@@ -109,7 +113,8 @@ public class PinballInputHandler extends FirstPersonHandler
 					/* Aplico la fuerza sobre los flippers */
 					if (((Flipper)flipper.getChild(0)).isRightFlipper())
 					{
-						flipper.addForce(forceToApply);
+						//flipper.addForce(forceToApply);
+						flipper.addForce(forceToApply.rotate(rot));
 						//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
 					}
 				}

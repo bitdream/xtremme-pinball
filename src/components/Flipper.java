@@ -2,6 +2,9 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.math.FastMath;
+import com.jme.math.Quaternion;
+import com.jme.math.TransformMatrix;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -33,6 +36,22 @@ public class Flipper extends Node
 	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
+	
+	
+	public static Vector3f rotateVector3f(Vector3f anchor, Quaternion rotaa)
+    {
+		Quaternion rot = new Quaternion();
+		
+		/* Se rota toda la mesa y sus componentes en el eje X */
+		rot.fromAngles(FastMath.DEG_TO_RAD * 15f, 0f, 0f);
+		
+		System.out.println(anchor);
+			Vector3f copia = new Vector3f(anchor);
+            TransformMatrix matrix = new TransformMatrix(rot, Vector3f.ZERO);
+            matrix.multPoint(copia);
+            System.out.println(copia);
+            return copia;
+    }
 
     /**
      * Crea un nodo dinamico de flipper.
@@ -105,10 +124,19 @@ public class Flipper extends Node
 		this.flipperType = flipperType;
 	}
 	
-	public void recalculateJoints()
+	public void recalculateJoints(Pinball pinball)
 	{
+		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		
+		/* Tomo el angulo de juego e inclino el eje del joint */
+		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
+		
 		/* Le asigno al joint el anchor nuevo en base a la posicion del modelo visual */
-		joint.setAnchor(visualModel.getLocalTranslation()); // TODO puntita!
+		joint.setAnchor(visualModel.getLocalTranslation().rotate(rot)); // TODO Unirlo en la punta
+		
+		/* Roto el modelo visual como lo deberia haber rotado la rotacion general de la mesa */
+		visualModel.setLocalTranslation(visualModel.getLocalTranslation().rotate(rot));
+		visualModel.setLocalRotation(rot);
 	}
 
 	public FlipperType getFlipperType()

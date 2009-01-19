@@ -54,7 +54,7 @@ public class Pinball extends SimplePhysicsGame
 	
 	public static final Material pinballTableMaterial = Material.PLASTIC;
 	private static final String GAME_NAME = "xtremme pinball";
-	private static final String GAME_VERSION = "0.2";
+	private static final String GAME_VERSION = "0.3";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(Pinball.class.getName());
@@ -318,12 +318,10 @@ public class Pinball extends SimplePhysicsGame
 		rootNode.setLocalRotation(rot);
 		
 		/* Inclino joints fisicos y demas, recalculandolos */
-		/* TODO for (DynamicPhysicsNode flipper : getFlippers())
+		for (DynamicPhysicsNode flipper : getFlippers())
 		{
-			System.out.println(flipper.getChild(0).getLocalTranslation());
-			((Flipper)flipper.getChild(0)).recalculateJoints();
-			
-		}*/
+			((Flipper)flipper.getChild(0)).recalculateJoints(this);
+		}
 	}
 	
 	public void showMenu()
@@ -503,7 +501,7 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode testPlunger = Plunger.create(this, "Physic plunger", visualPlunger, 10);
 		rootNode.attachChild(testPlunger);
 		plunger = testPlunger;
-		
+				
 		/* Pongo una puerta de prueba */
 		final Box visualDoor = new Box("Visual door", new Vector3f(), 3, 1, 0.1f);
 		visualDoor.setLocalTranslation(new Vector3f(25, 3, 75));
