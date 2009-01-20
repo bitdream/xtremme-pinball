@@ -35,6 +35,7 @@ import com.jme.scene.state.CullState;
 import com.jme.system.JmeException;
 import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
@@ -47,6 +48,7 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
+import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
 
 /**
@@ -84,7 +86,6 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Menu de opciones */
 	private Window menu;
-	
 	
 	/**
 	 * Punto de entrada al juego
@@ -380,6 +381,15 @@ public class Pinball extends SimplePhysicsGame
 		{
 			((Flipper)flipper.getChild(0)).recalculateJoints(this);
 		}
+		
+		//TODO para testeo de joint de los bumpers
+		for (PhysicsNode node : getPhysicsSpace().getNodes())
+		{
+			if (node instanceof DynamicPhysicsNode && node.getName() != null && node.getName().equals("bumper"))
+			{
+				((Bumper)node.getChild(0)).recalculateJoints(this);
+			}
+		}
 	}
 	
 	public void showMenu()
@@ -642,7 +652,7 @@ public class Pinball extends SimplePhysicsGame
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
-		StaticPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1/*, BumperType.JUMPER*/, pinballInputHandler);
+		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER, pinballInputHandler);
 		rootNode.attachChild(bumper1);
 		
 		// Agrego otro bumper
@@ -655,7 +665,6 @@ public class Pinball extends SimplePhysicsGame
 		visualBumper2.updateModelBound();
 		//StaticPhysicsNode bumper2 = Bumper.create(this, "Physic bumper 2", visualBumper2/*, BumperType.JUMPER*/, pinballInputHandler);
 		//rootNode.attachChild(bumper2);
-		
 		
 	}
 	
@@ -672,7 +681,8 @@ public class Pinball extends SimplePhysicsGame
 		
 		// Seteo el material de la mesa
 		table.setMaterial( pinballTableMaterial );
-		// Seteo el color de la mesa para diferenciarlo de la bola. Brillo al maximo
+		
+		// Seteo el color de la mesa. Brillo al maximo
 	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
 	}
 	
