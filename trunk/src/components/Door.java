@@ -40,6 +40,8 @@ public class Door extends Node
 	{
 		DynamicPhysicsNode doorNode = pinball.getPhysicsSpace().createDynamicNode();
 		
+		doorNode.setName("Door");
+		
 		/* El material de las puertas es plastico como la mesa */
         doorNode.setMaterial(Material.PLASTIC);
 		

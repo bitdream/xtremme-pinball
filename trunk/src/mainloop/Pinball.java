@@ -539,16 +539,33 @@ public class Pinball extends SimplePhysicsGame
 	        } );
 		//-----------------------------------------
 
-		/* Pongo un flipper de prueba */
-		final Box visualFlipper = new Box("Visual flipper", new Vector3f(), 5, 1, 2);
-		visualFlipper.setLocalTranslation(new Vector3f(10, 3, 60));
+		/* Pongo flippers de prueba */
+		final Box rightVisualFlipper = new Box("Right visual flipper", new Vector3f(), 7, 1, 2);
+		rightVisualFlipper.setLocalTranslation(new Vector3f(11, 3, 70));
+		rightVisualFlipper.setModelBound(new BoundingBox());
+		rightVisualFlipper.updateModelBound();
 		
 		/* Le doy color */
-		Utils.color(visualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
+		Utils.color(rightVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
 		
-		DynamicPhysicsNode testFlipper = Flipper.create(this, "Physic flipper", visualFlipper, FlipperType.RIGHT_FLIPPER);
-		rootNode.attachChild(testFlipper);
-		flippers.add(testFlipper);
+		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER);
+		rootNode.attachChild(rightTestFlipper);
+		flippers.add(rightTestFlipper);
+		
+		final Box leftVisualFlipper = new Box("Left visual flipper", new Vector3f(), 7, 1, 2);
+		leftVisualFlipper.setLocalTranslation(new Vector3f(-11, 3, 70));
+		leftVisualFlipper.setModelBound(new BoundingBox());
+		leftVisualFlipper.updateModelBound();
+		
+		/* Le doy color */
+		Utils.color(leftVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
+		
+		DynamicPhysicsNode leftTestFlipper = Flipper.create(this, "Physic left flipper", leftVisualFlipper, FlipperType.LEFT_FLIPPER);
+		rootNode.attachChild(leftTestFlipper);
+		flippers.add(leftTestFlipper);
+
+
+		//-----------------------------------------
 		
 		/* Pongo un plunger de prueba */
 		final Box visualPlunger = new Box("Visual plunger", new Vector3f(), 1, 1, 15);

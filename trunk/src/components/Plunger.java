@@ -38,6 +38,8 @@ public class Plunger extends Node
 	{
 		DynamicPhysicsNode plungerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
+		plungerNode.setName("Plunger");
+		
 		/* El material del plunger es de goma para tener un mejor rebote */
         plungerNode.setMaterial(Material.RUBBER);
 		

@@ -40,8 +40,11 @@ public class PinballInputHandler extends FirstPersonHandler
 		/* Abrir menu */
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
-		/* Golpear con flippers izquierdos */
+		/* Golpear con flippers derechos */
 		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, true);
+		
+		/* Golpear con flippers izquierdos */
+		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, true);
 		
 		/* Retraer plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
@@ -66,7 +69,6 @@ public class PinballInputHandler extends FirstPersonHandler
 		for (DynamicPhysicsNode flipper : game.getFlippers())
 		{
 			flipper.addForce(forceToApply.rotate(rot));
-			//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
 		}
 		
 		/* Plunger */
@@ -110,12 +112,37 @@ public class PinballInputHandler extends FirstPersonHandler
 
 				for (DynamicPhysicsNode flipper : game.getFlippers())
 				{
-					/* Aplico la fuerza sobre los flippers */
+					/* Aplico la fuerza sobre los flippers derechos */
 					if (((Flipper)flipper.getChild(0)).isRightFlipper())
 					{
-						//flipper.addForce(forceToApply);
 						flipper.addForce(forceToApply.rotate(rot));
-						//flipper.addForce(forceToApply, new Vector3f(2.5f, 0, 0));
+					}
+				}
+			}
+		}
+		
+	}
+	
+	/* Accion para golpear con flippers izquierdos */
+	private class LeftFlippersAction extends InputAction
+	{
+		private final Vector3f forceToApply = new Vector3f();
+		
+		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
+
+		public void performAction(InputActionEvent event)
+		{
+			if(event.getTriggerPressed())
+			{
+				/* Presiona la tecla, fijo la fuerza a aplicar */
+				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
+
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					/* Aplico la fuerza sobre los flippers izquierdos */
+					if (((Flipper)flipper.getChild(0)).isLeftFlipper())
+					{
+						flipper.addForce(forceToApply.rotate(rot));
 					}
 				}
 			}
