@@ -341,7 +341,8 @@ public class Pinball extends SimplePhysicsGame
 			((Door)door.getChild(0)).recalculateJoints(this);
 		}
 		/* Plunger */
-		((Plunger)plunger.getChild(0)).recalculateJoints(this);
+		if (plunger != null)
+			((Plunger)plunger.getChild(0)).recalculateJoints(this);
 }
 	
 	public void showMenu()
