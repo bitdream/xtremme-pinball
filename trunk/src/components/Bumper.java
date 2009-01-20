@@ -13,7 +13,6 @@ import com.jme.scene.Node;
 import com.jme.scene.shape.Sphere;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
-import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.TranslationalJointAxis;
 import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.contact.MutableContactInfo;
@@ -50,7 +49,7 @@ public class Bumper extends Node
 	private static float bumperMaterialMu = 99999999.0f;
 	
 	// Modelo visual del bumper
-	private Geometry visualModel;
+	//private Geometry visualModel;
 	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
@@ -92,13 +91,9 @@ public class Bumper extends Node
         translationalAxis.setPositionMinimum(0);
         translationalAxis.setPositionMaximum(0.1f);
 
-        /* Vector que indica la direccion sobre la que se puede mover el bumper. Se calcula en funcion del valor de inclinacion de la mesa */
-        //translationalAxis.setDirection(new Vector3f(0, FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()), 
-        //		FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-        translationalAxis.setDirection(new Vector3f(0,1,0)); //Mesa aun horizontal, en la rotacion se actualizara el eje de movimiento vertical del joint
-        
-        // Coloco el joint sobre el nodo de bumper 
-        //jointForBumper.attach(bumperNode);
+        // Vector que indica la direccion sobre la que se puede mover el bumper. Se calcula en funcion del valor de inclinacion de la mesa
+        //Mesa aun horizontal, en la rotacion se actualizara el eje de movimiento vertical del joint
+        translationalAxis.setDirection(new Vector3f(0,1,0)); 
         
         // Lo fijo al centro de masa del bumper 
         jointForBumper.setAnchor(visualModel.getLocalTranslation());
@@ -125,18 +120,7 @@ public class Bumper extends Node
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     bump = (DynamicPhysicsNode) contactInfo.getNode1();
-                    sense = 1; //TODO para mi deberia ser -1, pero sino no anda
-                    
-                   
-                    
-                    for (PhysicsNode node : pinball.getPhysicsSpace().getNodes())
-					{
-						if (node instanceof DynamicPhysicsNode && node.getName() != null && node.getName().equals("table"))
-						{
-							((DynamicPhysicsNode)node).addForce(new Vector3f(10000f, 10000f, 10000f));
-						}
-					}
-                     
+                    sense = 1; //TODO para mi deberia ser -1, pero sino no anda         
                 }
                 else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getChild(0) instanceof Sphere ) 
                 {
@@ -150,10 +134,6 @@ public class Bumper extends Node
                     // Colisiono el bumper contra otra cosa, por ejemplo contra la mesa, lo ignoro
                     return;
                 }
-                
-                //DEBUG
-                //System.out.println(" -------------------- " + ball.getName() + " --- " + bump.getName());
-                  
                 
                 /* La fuerza aplicada sobre la bola tiene una intensidad proporcional a la velocidad que la bola tenia al momento de la colision
                  * y es en sentido opuesto.
@@ -207,7 +187,7 @@ public class Bumper extends Node
 	{
 		super(name);
 		
-		this.visualModel = visualModel;
+		//this.visualModel = visualModel;
 		
 		attachChild(visualModel);
 
@@ -244,16 +224,10 @@ public class Bumper extends Node
 		/* Tomo el angulo de juego e inclino el eje del joint */
 		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
 		
+		// Hecho a mano los calculos
 //		joint.getAxes().get(0).setDirection(new Vector3f(0, FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()), 
 //		        		FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-//		
 		
-//		/* Le asigno al joint el anchor nuevo en base a la posicion del modelo visual */
-//		joint.setAnchor(visualModel.getLocalTranslation().rotate(rot)); // TODO Unirlo en la punta
-//		
-//		/* Roto el modelo visual como lo deberia haber rotado la rotacion general de la mesa */
-//		visualModel.setLocalTranslation(visualModel.getLocalTranslation().rotate(rot));
-//		visualModel.setLocalRotation(rot);
 		
 		/* Tomo la anterior posicion del anchor y la roto */
 		joint.setAnchor(joint.getAnchor(null).rotate(rot));

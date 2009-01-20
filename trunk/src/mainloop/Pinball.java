@@ -19,15 +19,11 @@ import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
-import com.jme.input.action.InputAction;
-import com.jme.input.action.InputActionEvent;
-import com.jme.input.util.SyntheticButton;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
-import com.jme.scene.CameraNode;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
@@ -35,11 +31,9 @@ import com.jme.scene.state.CullState;
 import com.jme.system.JmeException;
 import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
-import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
-import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
 import com.jmex.physics.util.SimplePhysicsGame;
@@ -74,6 +68,9 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Lista de los flippers del juego actual */
 	private List<DynamicPhysicsNode> flippers;
+	
+	/* Lista de los bumpers del juego actual */
+	private List<DynamicPhysicsNode> bumpers;
 	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
@@ -132,18 +129,6 @@ public class Pinball extends SimplePhysicsGame
         fengGUIInputHandler.update(interpolation);
         pinballInputHandler.update(interpolation);
 
-        
-        // ------------------------------------ para colision de camara
-//        CameraNode n = (CameraNode)rootNode.getChild("cm");
-//        //n.updateFromCamera();
-//        n.setLocalTranslation(cam.getLocation());
-//        
-//        DynamicPhysicsNode dn = (DynamicPhysicsNode)rootNode.getChild("camPhNode");
-//        System.out.println(" -----------------------" + dn.getLocalTranslation());
-        //---------------------------------------
-        
-        
-        
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);
         
@@ -247,6 +232,9 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Creo la lista de flippers */
 		flippers = new ArrayList<DynamicPhysicsNode>(4);
+		
+		/* Creo la lista de bumpers */
+		bumpers = new ArrayList<DynamicPhysicsNode>(4);
 				
         /* Armo la mesa de juego */
         buildTable();
@@ -261,48 +249,6 @@ public class Pinball extends SimplePhysicsGame
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
 		
-		
-		// -------------------------- para colisiones de la camara
-		
-//		Camera cam2 = display.getRenderer().createCamera(display.getWidth(),
-//                display.getHeight());
-//		
-//		cam2.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
-//		
-//		Vector3f loc = new Vector3f(0.0f, 4f, 200f);
-//		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
-//		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-//		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
-//
-//		cam2.setFrame(loc, left, up, dir);
-//		
-//		/* Aplicar los cambios a la camara */
-//		cam2.update();
-//
-//		CameraNode cm = new CameraNode("cm", cam);
-//		//cm.setLocalTranslation(new Vector3f(0, 5, 0));
-//
-//		cm.updateWorldData(0);
-//		//rootNode.attachChild(cm);
-//		
-//		DynamicPhysicsNode camPhNode = getPhysicsSpace().createDynamicNode();
-//		camPhNode.setAffectedByGravity(false);
-//		camPhNode.attachChild(cm);
-//		camPhNode.setName("camPhNode");
-//		rootNode.attachChild(camPhNode);
-//		final SyntheticButton collisionEventHandler = camPhNode.getCollisionEventHandler();
-//        input.addAction( new InputAction(){
-//        	
-//        	public void performAction( InputActionEvent evt ) {
-//        		
-//        			System.out.println(" detecto la colision de la camara -------------------");
-//            }        	
-//
-//        }, collisionEventHandler, false );
-        
-        //----------------------------------------------------------------
-        
-
 		/* Inicializo la GUI */
 		initGUI();
 		
@@ -310,6 +256,8 @@ public class Pinball extends SimplePhysicsGame
 		showMenu();
 	}
 	
+
+
 	/**
 	 * Inicializa la GUI.
 	 */
@@ -382,15 +330,11 @@ public class Pinball extends SimplePhysicsGame
 			((Flipper)flipper.getChild(0)).recalculateJoints(this);
 		}
 		
-		//TODO para testeo de joint de los bumpers
-		for (PhysicsNode node : getPhysicsSpace().getNodes())
+		for (DynamicPhysicsNode bumper : getBumpers())
 		{
-			if (node instanceof DynamicPhysicsNode && node.getName() != null && node.getName().equals("bumper"))
-			{
-				((Bumper)node.getChild(0)).recalculateJoints(this);
-			}
+			((Bumper)bumper.getChild(0)).recalculateJoints(this);
 		}
-	}
+}
 	
 	public void showMenu()
 	{
@@ -654,6 +598,8 @@ public class Pinball extends SimplePhysicsGame
 		visualBumper1.updateModelBound();
 		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER, pinballInputHandler);
 		rootNode.attachChild(bumper1);
+		// Agrego a la lista de bumpers del juego
+		bumpers.add(bumper1);
 		
 		// Agrego otro bumper
 		final Box visualBumper2 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
@@ -665,6 +611,7 @@ public class Pinball extends SimplePhysicsGame
 		visualBumper2.updateModelBound();
 		//StaticPhysicsNode bumper2 = Bumper.create(this, "Physic bumper 2", visualBumper2/*, BumperType.JUMPER*/, pinballInputHandler);
 		//rootNode.attachChild(bumper2);
+		//bumpers.add(bumper2);
 		
 	}
 	
@@ -694,6 +641,11 @@ public class Pinball extends SimplePhysicsGame
 	public List<DynamicPhysicsNode> getFlippers()
 	{
 		return flippers;
+	}
+	
+	public List<DynamicPhysicsNode> getBumpers() 
+	{
+		return bumpers;
 	}
 	
 	public Node getTiltNode()
