@@ -7,9 +7,13 @@ import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
+import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
+import com.jme.scene.shape.Sphere;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.PhysicsNode;
+
 import components.Flipper;
 import components.Plunger;
 
@@ -48,6 +52,9 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		/* Retraer plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
+		
+		/* Hacer el tilt */
+		addAction(new tiltAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, false);
 		
 		// TODO colocar las acciones que correspondan a pinball
 		// pasarle en constructor una lista de flippers, el nodo base para hacer tilt y el plunger?... y el juego! (para finish, etc...)
@@ -176,5 +183,50 @@ public class PinballInputHandler extends FirstPersonHandler
 			}
 		}
 		
+	}
+	
+	/* Accion para realizar el tilt */
+	private class tiltAction extends InputAction
+	{
+		public void performAction(InputActionEvent event)
+		{
+			Vector3f cameraMovement = new Vector3f(3,3,3);
+			Vector3f initCameraPos = game.getCamera().getLocation();
+			
+			if(event.getTriggerPressed())
+			{
+				// Intensidad de la fuerza a aplicar
+				float forceIntensity = 500; //90000f;
+				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
+				Vector3f force = new Vector3f(/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1)) , 
+						/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1)),
+						/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);
+				
+				// Tomo cada bola de la escena y le aplico la fuerza
+				 for (PhysicsNode node: game.getPhysicsSpace().getNodes()) 
+		         {	          
+		            	// TODO ver: estoy suponiendo que las bolas del flipper van a estar formadas por un nodo fisico con un 
+		            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. 
+		            	// Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
+		                if (node instanceof DynamicPhysicsNode && node.getChild(0) instanceof Sphere) 
+		                {
+		                    DynamicPhysicsNode ball = (DynamicPhysicsNode)node;
+		                               
+		                    // Fuerza random en las tres direcciones. La bola puede saltar y colisionar contra el vidrio.
+		                    ball.addForce(force.mult(ball.getMass()));
+		                    
+		                    // Muevo la camara
+		                    game.getCamera().setLocation(initCameraPos.add(cameraMovement));		                    
+		                    
+		                }		                
+		         }
+			}
+			else if (!event.getTriggerPressed())
+			{
+				// Se solto la tecla de tilt. Vuelvo la camara a la posicion original.
+				game.getCamera().setLocation(initCameraPos.subtract(cameraMovement));
+			}
+		
+		}
 	}
 }
