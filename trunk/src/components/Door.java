@@ -2,6 +2,8 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.bounding.BoundingBox;
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -20,11 +22,15 @@ public class Door extends Node
 	/* Tipos de puerta */
 	public enum DoorType {LEFT_DOOR, RIGHT_DOOR};
 	
+	/* Para considerar extremos de las puertas */
+	private static final float xExtreme = 0.98f, zExtreme = 0.98f;
+	
 	/* Tipo de esta puerta */
 	private DoorType doorType;
+		
+	/* Joint que lo fija a la mesa */
+	private Joint joint;
 	
-	/* Modelo visual de la puerta */
-	private Geometry visualModel;
 
     /**
      * Crea un nodo dinamico de puerta.
@@ -60,28 +66,49 @@ public class Door extends Node
         final RotationalJointAxis rotationalAxis = jointForDoor.createRotationalAxis();
         
         /* Maximos angulos de operacion de la puerta */
-        if (door.isLeftDoor())
-        {// TODO probar y ver
-        	rotationalAxis.setPositionMaximum(-maxRotationalAngle);
-        	rotationalAxis.setPositionMinimum(-minRotationalAngle);
-        }
-        else
-        {
-        	rotationalAxis.setPositionMaximum(maxRotationalAngle);
-        	rotationalAxis.setPositionMinimum(minRotationalAngle);
-        }
+        rotationalAxis.setPositionMaximum(maxRotationalAngle);
+        rotationalAxis.setPositionMinimum(minRotationalAngle);
         
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
-        rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // TODO se puede calcular con el angulo
-        
-        /* Coloco el joint sobre el nodo de puerta */
-        jointForDoor.attach(doorNode);
-        
+        rotationalAxis.setDirection(new Vector3f(0, 1, 0));
+                
         /* Le fijo como punto de rotacion la punta de la puerta */
-        jointForDoor.setAnchor(new Vector3f(28, 3, 75)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
+        jointForDoor.setAnchor(locateDoorExtreme(doorType, visualModel));
+        
+        /* Guardo que esa door tiene este joint */
+        door.setJoint(jointForDoor);
         
         
 		return doorNode;
+	}
+	
+	private static Vector3f locateDoorExtreme(DoorType doorType, Geometry visualModel)
+	{
+		Vector3f extreme = new Vector3f();
+		
+		BoundingBox bBox = (BoundingBox)visualModel.getWorldBound();
+		
+		Vector3f extents = bBox.getExtent(null);
+		
+		/* En Y no va a variar, pues quiero el Y de su centro de masa */
+		extreme.setY(bBox.getCenter().getY());
+
+		/* Aproximo la punta de la puerta */
+		
+		if (doorType == DoorType.RIGHT_DOOR)
+		{
+			/* Para puertas derechas */
+			extreme.setX(bBox.getCenter().getX() + (0.5f - (1 - xExtreme)) * extents.getX());
+		}
+		else
+		{
+			/* Para puertas izquierdas */
+			extreme.setX(bBox.getCenter().getX() - (0.5f - (1 - xExtreme)) * extents.getX());
+		}
+		
+		extreme.setZ(bBox.getCenter().getZ() + (0.5f - (1 - zExtreme)) * extents.getZ());
+System.out.println(extreme); // 28 3 75
+		return extreme;
 	}
 	
 	/**
@@ -91,11 +118,24 @@ public class Door extends Node
 	{
 		super(name);
 		
-		this.visualModel = visualModel;
-		
 		attachChild(visualModel);
 
 		this.doorType = doorType;
+	}
+	
+	public void recalculateJoints(Pinball pinball)
+	{
+		
+		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		
+		/* Tomo el angulo de juego e inclino el eje del joint, que es en Y */
+		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
+		
+		/* Tomo la anterior posicion del anchor y la roto */
+		joint.setAnchor(joint.getAnchor(null).rotate(rot));
+		
+		/* Recien ahora attacheo al nodo el joint */
+		joint.attach((DynamicPhysicsNode)getParent());
 	}
 	
 	public DoorType getDoorType()
@@ -111,5 +151,15 @@ public class Door extends Node
 	public boolean isLeftDoor()
 	{
 		return doorType.equals(DoorType.LEFT_DOOR);
+	}
+
+	public Joint getJoint()
+	{
+		return joint;
+	}
+
+	public void setJoint(Joint joint)
+	{
+		this.joint = joint;
 	}
 }

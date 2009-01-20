@@ -2,6 +2,7 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -25,6 +26,10 @@ public class Plunger extends Node
 	
 	/* Distancia a su origen */
 	private float distance;
+	
+	/* Joint que lo fija a la mesa */
+	private Joint joint;
+	
 	
 	/**
 	 * Crea un nodo dinamico de plunger.
@@ -62,13 +67,13 @@ public class Plunger extends Node
         translationalAxis.setPositionMaximum(maxBackstep);
 
         /* Vector que indica la direccion sobre la que se puede mover el plunger, el eje Z */
-        translationalAxis.setDirection(new Vector3f(0, 0, 1)); // TODO se puede calcular con el angulo
-        
-        /* Coloco el joint sobre el nodo de plunger */
-        jointForPlunger.attach(plungerNode);
+        translationalAxis.setDirection(new Vector3f(0, 0, 1));
         
         /* Lo fijo al centro del plunger */
-        jointForPlunger.setAnchor(visualModel.getLocalTranslation());//new Vector3f(25, 3, 90)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
+        jointForPlunger.setAnchor(visualModel.getLocalTranslation());
+        
+        /* Guardo que ese plunger tiene este joint */
+        plunger.setJoint(jointForPlunger);
         
         
 		return plungerNode;
@@ -86,6 +91,21 @@ public class Plunger extends Node
 		setLoose(true);
 		
 		setDistance(0);
+	}
+	
+	public void recalculateJoints(Pinball pinball)
+	{
+		
+		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		
+		/* Tomo el angulo de juego e inclino el eje del joint, que es en Z */
+		joint.getAxes().get(0).setDirection(new Vector3f(0, 0, 1).rotate(rot));
+		
+		/* Tomo la anterior posicion del anchor y la roto */
+		joint.setAnchor(joint.getAnchor(null).rotate(rot));
+		
+		/* Recien ahora attacheo al nodo el joint */
+		joint.attach((DynamicPhysicsNode)getParent());
 	}
 
 	public boolean isLoose()
@@ -106,5 +126,15 @@ public class Plunger extends Node
 	public void setDistance(float distance)
 	{
 		this.distance = distance;
+	}
+	
+	public Joint getJoint()
+	{
+		return joint;
+	}
+
+	public void setJoint(Joint joint)
+	{
+		this.joint = joint;
 	}
 }

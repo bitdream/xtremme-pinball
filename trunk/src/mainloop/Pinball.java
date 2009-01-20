@@ -19,8 +19,6 @@ import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
-import com.jme.math.FastMath;
-import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
@@ -71,6 +69,9 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Lista de los bumpers del juego actual */
 	private List<DynamicPhysicsNode> bumpers;
+	
+	/* Lista de las puertas del juego actual */
+	private List<DynamicPhysicsNode> doors;
 	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
@@ -235,6 +236,9 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Creo la lista de bumpers */
 		bumpers = new ArrayList<DynamicPhysicsNode>(4);
+		
+		/* Creo la lista de puertas */
+		doors = new ArrayList<DynamicPhysicsNode>(2);
 				
         /* Armo la mesa de juego */
         buildTable();
@@ -317,23 +321,27 @@ public class Pinball extends SimplePhysicsGame
 	
 	private void inclinePinball()
 	{
-		/* Inclino desde el nodo raiz */
-		Quaternion rot = new Quaternion();
-		
 		/* Se rota toda la mesa y sus componentes en el eje X */
-		rot.fromAngles(FastMath.DEG_TO_RAD * pinballSettings.getInclinationAngle(), 0f, 0f);
-		rootNode.setLocalRotation(rot);
+		rootNode.setLocalRotation(getPinballSettings().getInclinationQuaternion());
 		
 		/* Inclino joints fisicos y demas, recalculandolos */
+		/* Flippers */
 		for (DynamicPhysicsNode flipper : getFlippers())
 		{
 			((Flipper)flipper.getChild(0)).recalculateJoints(this);
 		}
-		
+		/* Bumpers */
 		for (DynamicPhysicsNode bumper : getBumpers())
 		{
 			((Bumper)bumper.getChild(0)).recalculateJoints(this);
 		}
+		/* Doors */
+		for (DynamicPhysicsNode door : getDoors())
+		{
+			((Door)door.getChild(0)).recalculateJoints(this);
+		}
+		/* Plunger */
+		((Plunger)plunger.getChild(0)).recalculateJoints(this);
 }
 	
 	public void showMenu()
@@ -531,16 +539,22 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode testPlunger = Plunger.create(this, "Physic plunger", visualPlunger, 10);
 		rootNode.attachChild(testPlunger);
 		plunger = testPlunger;
-				
+
+		//-----------------------------------------
+		
 		/* Pongo una puerta de prueba */
 		final Box visualDoor = new Box("Visual door", new Vector3f(), 3, 1, 0.1f);
 		visualDoor.setLocalTranslation(new Vector3f(25, 3, 75));
+		visualDoor.setModelBound(new BoundingBox());
+		visualDoor.updateModelBound();
+
 		
 		/* Le doy color */
 		Utils.color(visualDoor, new ColorRGBA(0f, 1.0f, 1.0f, 1.0f), 128);
 		
-		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -0.8f, 0.5f);
+		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -1.3f, 0.5f);
 		rootNode.attachChild(testDoor);
+		doors.add(testDoor);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -565,7 +579,7 @@ public class Pinball extends SimplePhysicsGame
         
         //flippers.add(Lflipper);*/
 		
-		
+		//-----------------------------------------
 		
 		/* Pongo un iman de prueba */
 		final Box visualMagnet1 = new Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
@@ -587,6 +601,7 @@ public class Pinball extends SimplePhysicsGame
 //		StaticPhysicsNode magnet2 = Magnet.create(this, "Physic magnet 2", visualMagnet2);
 //		rootNode.attachChild(magnet2);
 		
+		//-----------------------------------------
 
 		// Agrego un bumper
 		final Box visualBumper1 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
@@ -646,6 +661,11 @@ public class Pinball extends SimplePhysicsGame
 	public List<DynamicPhysicsNode> getBumpers() 
 	{
 		return bumpers;
+	}
+	
+	public List<DynamicPhysicsNode> getDoors() 
+	{
+		return doors;
 	}
 	
 	public Node getTiltNode()

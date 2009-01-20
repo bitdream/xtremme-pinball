@@ -3,9 +3,7 @@ package components;
 import mainloop.Pinball;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
-import com.jme.math.TransformMatrix;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -40,21 +38,6 @@ public class Flipper extends Node
 	private Joint joint;
 	
 	
-	public static Vector3f rotateVector3f(Vector3f anchor, Quaternion rotaa)
-    {
-		Quaternion rot = new Quaternion();
-		
-		/* Se rota toda la mesa y sus componentes en el eje X */
-		rot.fromAngles(FastMath.DEG_TO_RAD * 15f, 0f, 0f);
-		
-		System.out.println(anchor);
-			Vector3f copia = new Vector3f(anchor);
-            TransformMatrix matrix = new TransformMatrix(rot, Vector3f.ZERO);
-            matrix.multPoint(copia);
-            System.out.println(copia);
-            return copia;
-    }
-
     /**
      * Crea un nodo dinamico de flipper.
 	 * @param pinball El juego.
