@@ -2,6 +2,7 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.TransformMatrix;
@@ -23,16 +24,17 @@ public class Flipper extends Node
 	/* Fuerzas en los flippers */
 	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -16000000f), flipperRestoreForce = new Vector3f(0f, 0f, 1000000f);
 	
+	/* Maximos angulos de rotacion de los flippers */
 	private static final float maxRotationalAngle = 0.4f, minRotationalAngle = -0.4f;
+	
+	/* Para considerar extremos de los flippers */
+	private static final float xExtreme = 0.95f, zExtreme = 0.8f;
 
 	/* Tipos de flipper */
 	public enum FlipperType {LEFT_FLIPPER, RIGHT_FLIPPER};
 	
 	/* Tipo de este flipper */
 	private FlipperType flipperType;
-	
-	/* Modelo visual del flipper */
-	private Geometry visualModel;
 	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
@@ -65,6 +67,11 @@ public class Flipper extends Node
 	{
 		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
+		flipperNode.setName("Flipper");
+		
+		/* Actualizo los vectores globales */
+		flipperNode.updateWorldVectors();
+		
 		/* El material de los flippers es goma para simular la banda de goma que los rodea */
         flipperNode.setMaterial(Material.RUBBER);
 		
@@ -83,31 +90,49 @@ public class Flipper extends Node
         final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
         
         /* Maximos angulos de operacion de los flippers */
-        if (flipper.isLeftFlipper())
-        {// TODO probar y ver
-        	rotationalAxis.setPositionMaximum(-maxRotationalAngle);
-        	rotationalAxis.setPositionMinimum(-minRotationalAngle);
-        }
-        else
-        {
-        	rotationalAxis.setPositionMaximum(maxRotationalAngle);
-        	rotationalAxis.setPositionMinimum(minRotationalAngle);
-        }
+        rotationalAxis.setPositionMaximum(maxRotationalAngle);
+        rotationalAxis.setPositionMinimum(minRotationalAngle);
         
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
-        rotationalAxis.setDirection(new Vector3f(0, 1, 0)); // TODO se puede calcular con el angulo
-        
-        /* Coloco el joint sobre el nodo de flipper */
-        jointForFlipper.attach(flipperNode);
+        rotationalAxis.setDirection(new Vector3f(0, 1, 0));
         
         /* Le fijo como punto de rotacion la punta del flipper */
-        jointForFlipper.setAnchor(new Vector3f(14, 3, 60)); // TODO debe ser la puntita de donde haya quedado el visual visualModel.getLocalTranslation() > sacar la punta
+        jointForFlipper.setAnchor(locateFlipperExtreme(flipperType, visualModel));
         
         /* Guardo que ese flipper tiene este joint */
         flipper.setJoint(jointForFlipper);
         
         
 		return flipperNode;
+	}
+	
+	private static Vector3f locateFlipperExtreme(FlipperType flipperType, Geometry visualModel)
+	{
+		Vector3f extreme = new Vector3f();
+		
+		BoundingBox bBox = (BoundingBox)visualModel.getWorldBound();
+		
+		Vector3f extents = bBox.getExtent(null);
+		
+		/* En Y no va a variar, pues quiero el Y de su centro de masa */
+		extreme.setY(bBox.getCenter().getY());
+
+		/* Aproximo la punta del flipper */
+		
+		if (flipperType == FlipperType.RIGHT_FLIPPER)
+		{
+			/* Para flippers derechos */
+			extreme.setX(bBox.getCenter().getX() + (0.5f - (1 - xExtreme)) * extents.getX());
+		}
+		else
+		{
+			/* Para flippers izquierdos */
+			extreme.setX(bBox.getCenter().getX() - (0.5f - (1 - xExtreme)) * extents.getX());
+		}
+		
+		extreme.setZ(bBox.getCenter().getZ() + (0.5f - (1 - zExtreme)) * extents.getZ());
+
+		return extreme;
 	}
 	
 	/**
@@ -117,8 +142,6 @@ public class Flipper extends Node
 	{
 		super(name);
 		
-		this.visualModel = visualModel;
-		
 		attachChild(visualModel);
 
 		this.flipperType = flipperType;
@@ -126,17 +149,17 @@ public class Flipper extends Node
 	
 	public void recalculateJoints(Pinball pinball)
 	{
+		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 		
-		/* Tomo el angulo de juego e inclino el eje del joint */
+		/* Tomo el angulo de juego e inclino el eje del joint, que es en Y */
 		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
 		
-		/* Le asigno al joint el anchor nuevo en base a la posicion del modelo visual */
-		joint.setAnchor(visualModel.getLocalTranslation().rotate(rot)); // TODO Unirlo en la punta
+		/* Tomo la anterior posicion del anchor y la roto */
+		joint.setAnchor(joint.getAnchor(null).rotate(rot));
 		
-		/* Roto el modelo visual como lo deberia haber rotado la rotacion general de la mesa */
-		visualModel.setLocalTranslation(visualModel.getLocalTranslation().rotate(rot));
-		visualModel.setLocalRotation(rot);
+		/* Recien ahora attacheo al nodo el joint */
+		joint.attach((DynamicPhysicsNode)getParent());
 	}
 
 	public FlipperType getFlipperType()
