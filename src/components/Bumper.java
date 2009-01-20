@@ -224,7 +224,7 @@ public class Bumper extends Node
 		/* Tomo el angulo de juego e inclino el eje del joint */
 		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
 		
-		// Hecho a mano los calculos
+		// Calculos hechos a mano
 //		joint.getAxes().get(0).setDirection(new Vector3f(0, FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()), 
 //		        		FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
 		
