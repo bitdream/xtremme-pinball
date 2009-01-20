@@ -65,7 +65,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		final Vector3f forceToApply = new Vector3f();
 		
 		forceToApply.set(Flipper.flipperRestoreForce).multLocal(event.getTime());
-		
+
 		for (DynamicPhysicsNode flipper : game.getFlippers())
 		{
 			flipper.addForce(forceToApply.rotate(rot));
@@ -75,12 +75,12 @@ public class PinballInputHandler extends FirstPersonHandler
 		Plunger plunger = (Plunger)game.getPlunger().getChild(0);
 		
 		if (plunger.isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
-			game.getPlunger().addForce(new Vector3f(0, 0,
+			game.getPlunger().addForce((new Vector3f(0, 0,
 					-10 * game.getPinballSettings().getInclinationAngle()
 					-1000 * (float)Math.pow(plunger.getDistance(), 2))
-			);
+			).rotate(rot));
 		else /* Aplico la fuerza para alejarlo del origen */
-			game.getPlunger().addForce(Plunger.plungerChargeForce);
+			game.getPlunger().addForce(Plunger.plungerChargeForce.rotate(rot));
 	}
 	
 	/* Accion para abrir el menu de juego */
