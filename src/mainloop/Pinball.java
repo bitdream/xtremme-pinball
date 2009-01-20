@@ -125,8 +125,6 @@ public class Pinball extends SimplePhysicsGame
 		timer.update();
 		
 		/* Pido al timer el tiempo transcurrido desde la ultima llamada */
-		/* Actualmente me deberia llegar en interpolation, pero el engine no lo hace aun
-		 * (no esta implementado) */
 		float interpolation = timer.getTimePerFrame();
 		
 		/* Actualizo los controladores de input */
@@ -261,15 +259,6 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
-		// TODO por algun motivo no se actualizan los bounding boxes de los nodos hijos, ni se aplican las rotaciones
-		// a los joints, se estara propagando bien hacia abajo???
-		//rootNode.updateRenderState();// Creo q no es necesario llamarlo
-		//rootNode.updateWorldBound();
-		//rootNode.propagateBoundToRoot();
-		//rootNode.updateWorldData(0);
-		
-		
-		
 		
 		
 		// -------------------------- para colisiones de la camara
@@ -498,7 +487,7 @@ public class Pinball extends SimplePhysicsGame
 		
 		// Una segunda bola para probar el bumper
 		/* Nodo dinamico de la bola */
-		final DynamicPhysicsNode mainBall2 = getPhysicsSpace().createDynamicNode(); //TODO sacar final, es para debug
+		final DynamicPhysicsNode mainBall2 = getPhysicsSpace().createDynamicNode(); 
 		mainBall2.setName("ball");
         rootNode.attachChild(mainBall2);
                
@@ -517,7 +506,7 @@ public class Pinball extends SimplePhysicsGame
 		
 		// Una tercera bola para probar el iman magnet1
 		/* Nodo dinamico de la bola */
-		final DynamicPhysicsNode mainBall3 = getPhysicsSpace().createDynamicNode(); //TODO sacar final, es para debug
+		final DynamicPhysicsNode mainBall3 = getPhysicsSpace().createDynamicNode();
 		mainBall3.setName("ball");
         rootNode.attachChild(mainBall3);
                
