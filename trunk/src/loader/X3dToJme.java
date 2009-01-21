@@ -48,6 +48,8 @@
 
 package loader;
 
+import input.PinballInputHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +67,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import mainloop.Pinball;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -75,6 +79,7 @@ import com.jme.bounding.BoundingBox;
 import com.jme.image.Image;
 import com.jme.image.Texture;
 import com.jme.image.Texture2D;
+import com.jme.input.FirstPersonHandler;
 import com.jme.light.DirectionalLight;
 import com.jme.light.Light;
 import com.jme.light.PointLight;
@@ -116,6 +121,14 @@ import com.jme.util.geom.NormalGenerator;
 import com.jmex.model.converters.FormatConverter;
 import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
+import components.Bumper;
+import components.Door;
+import components.Flipper;
+import components.Magnet;
+import components.Plunger;
+import components.Bumper.BumperType;
+import components.Door.DoorType;
+import components.Flipper.FlipperType;
 
 /**
  * A Loader class to load models from XML-encoded X3D files (see <a
@@ -185,7 +198,7 @@ public class X3dToJme extends FormatConverter {
 
     private static final Logger logger = Logger.getLogger(X3dToJme.class
             .getName());
-
+    
     /**
      * A regular expression that can be used in String's split-method. It causes
      * the method to split at any sequence of spaces, linefeeds or carriage
@@ -213,6 +226,14 @@ public class X3dToJme extends FormatConverter {
      */
     private static final String[] GEOMETRY_TYPES = { "Box", "IndexedFaceSet",
             "Sphere", "Cylinder", "Cone", "LineSet" };
+    
+    /**
+     * A list of metadata node types this loader understands. The most
+     * frequently used types are at the beginning of the array for performance
+     * reasons.
+     */
+    private static final String[] METADATA_TYPES = { "MetadataString", "MetadataSet",
+            "MetadataFloat", "MetadataInteger" /*, "MetadataDouble"*/ };
 
     /** The default number of samples used for jME Spheres along the Z axis */
     private static final int SPHERE_Z_SAMPLES = 16;
@@ -270,10 +291,10 @@ public class X3dToJme extends FormatConverter {
     private boolean addToTransparentQueue = false;
 
     /**
-     * The loader's physics space (for getting static & dynamic nodes) 
+     * Indicates whether the physics attributes for the currently processed 
+     * geometry should be dynamic or static
      */
-     //TODO pasarlo a property
-    private PhysicsSpace physicsSpace = null;
+    private boolean dynamic = false;
     
     /**
      * Creates the X3DLoader.
@@ -320,11 +341,6 @@ public class X3dToJme extends FormatConverter {
         documentBuilder.setEntityResolver(resolver);
     }
 
-    
-    public void setPhysicSpace(PhysicsSpace space) {
-        physicsSpace = space;
-    }
-    
     /**
      * Converts the .x3d file read from the specified InputStream to the .jme
      * format and writes it to the specified OutputStream. If the model contains
@@ -533,14 +549,17 @@ public class X3dToJme extends FormatConverter {
                     logger.info( "skipping DEF on physics node" );
                 }
             }
+            
+            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("physicsSpace");
             if ( physicsSpace != null ) {
                 PhysicsNode physicsResult = null;
                 
                 // TODO diferenciar nodos dinamicos y estaticos
-                if (false /*dynamic*/) {
-                    physicsResult = this.physicsSpace.createDynamicNode();
+                if (dynamic) {
+                    physicsResult = (PhysicsNode)result;//physicsSpace.createDynamicNode();
+                    dynamic = false;
                 } else {
-                    physicsResult = this.physicsSpace.createStaticNode();
+                    physicsResult = physicsSpace.createStaticNode();
                 }
                 physicsResult.attachChild(result);     
                 physicsResult.generatePhysicsGeometry(true);
@@ -814,12 +833,15 @@ public class X3dToJme extends FormatConverter {
         // Find the geometry and appearance nodes
         Node geometryNode = null;
         Node appearanceNode = null;
+        Node metadataNode = null;
         Node child = node.getFirstChild();
         while (child != null) {
             if (child.getNodeName().equals("Appearance")) {
                 appearanceNode = child;
             } else if (isGeometryType(child.getNodeName())) {
                 geometryNode = child;
+            } else if (isMetadataType(child.getNodeName())) {
+                metadataNode = child;
             }
             child = child.getNextSibling();
         }
@@ -876,9 +898,92 @@ public class X3dToJme extends FormatConverter {
             }
         }
 
+        // parse the metadata
+        if (metadataNode != null) {
+           Hashtable<String, Object> metadata = parseMetadata(metadataNode); 
+           if (!metadata.containsKey( "type" ))
+           {
+               return shape;
+           }
+           
+           String type = (String)metadata.get( "type" );
+           System.out.println(type);
+           if (type.equals( "Bumper" )) {
+               System.out.println("createBumper");
+               
+               String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
+               
+               BumperType bumperType = BumperType.NO_JUMPER;
+               if (typeOfBumper.equals( "jumper" ))
+               {
+                   bumperType = BumperType.JUMPER;
+               }
+               //FIXME
+               shape = Bumper.create( new Pinball(), "bumper"+bumperCounter++, geom, bumperType, new PinballInputHandler(new Pinball()) );
+               
+               dynamic = true;
+               
+           } else if (type.equals( "Door" )) {
+               System.out.println("createDoor");
+               
+               String typeOfDoor = (String)metadata.get( "doorType" ); // es obligatorio
+               float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
+               float maxRotationalAngle = (Float)metadata.get( "maxRotationalAngle" );
+               
+               DoorType doorType = DoorType.RIGHT_DOOR;
+               if (typeOfDoor.equals( "left_door" ))
+               {
+                   doorType = DoorType.LEFT_DOOR;
+               }
+               //FIXME
+               shape = Door.create( new Pinball(), "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
+               
+               dynamic = true;
+               
+           } else if (type.equals( "Flipper" )) {
+               System.out.println("createFlipper");
+               
+               String typeOfFlipper = (String)metadata.get( "flipperType" );
+               
+               FlipperType flipperType = FlipperType.RIGHT_FLIPPER;
+               if (typeOfFlipper.equals( "left_flipper" ))
+               {
+                   flipperType = FlipperType.LEFT_FLIPPER;
+               }
+               //FIXME
+               shape = Flipper.create( new Pinball(), "flipper"+flipperCounter++, geom, flipperType );
+               
+               dynamic = true;
+               
+           } else if (type.equals( "Magnet" )) {
+               System.out.println("createMagnet");
+               //FIXME
+               shape = Magnet.create( /*new Pinball()*/ (PhysicsSpace)getProperty( "physicsSpace" ), "magnet"+magnetCounter++, geom );
+
+               dynamic = true;
+               
+           } else if (type.equals( "Plunger" )) {
+               System.out.println("createPluneger");
+               
+               float maxBackstep = (Float)metadata.get( "maxBackStep" );
+               //FIXME
+               shape = Plunger.create( new Pinball(), "thePlunger", geom, maxBackstep );
+               
+               dynamic = true;
+               
+           }
+           
+               
+        }
+        
         return shape;
     }
-
+    private static int bumperCounter = 0;
+    private static int doorCounter = 0;
+    private static int flipperCounter = 0;
+    private static int magnetCounter = 0;
+    
+    
     /**
      * Checks if the given String represents one of the types of geometry nodes
      * this loader understands.
@@ -897,6 +1002,66 @@ public class X3dToJme extends FormatConverter {
         return false;
     }
 
+    /**
+     * Checks if the given String represents one of the types of metadata nodes
+     * this loader understands.
+     * 
+     * @param type
+     *            The String to check
+     * @return <code>true</code>, if the String contains a valid metadata
+     *         type, otherwise <code>false</code>
+     */    
+    private boolean isMetadataType(String type) {
+        for (String metadata : METADATA_TYPES) {
+            if (type.equals(metadata)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //FIXME return 
+    /**
+     * Parses any X3D metadata node (Set, String, Float, Integer) and does some 
+     * shit.
+     * 
+     * @param node
+     *            The X3D node
+     * @return ?????
+     * @throws Exception
+     *             In case an error occurs during parsing
+     */
+    private Hashtable<String, Object> parseMetadata(Node node) throws Exception {
+        logger.info(" entrering parseMetadata");
+        
+        String type = node.getNodeName();
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        
+        if (type.equals("MetadataString")) {
+            result.put( node.getAttributes().getNamedItem("name").getNodeValue(), 
+                node.getAttributes().getNamedItem("value").getNodeValue() );
+        } else if (type.equals("MetadataSet")) {
+            Node child = node.getFirstChild();
+            while (child != null) {
+                if (isMetadataType(child.getNodeName())) {
+                    // FIXME esto es cualquiera, pero va a funcar
+                    result.putAll( parseMetadata( child ) );
+                }
+                child = child.getNextSibling();
+            }
+        } else if (type.equals("MetadataInteger")) {
+            result.put( node.getAttributes().getNamedItem("name").getNodeValue(), 
+                getInt(node.getAttributes().getNamedItem("value").getNodeValue(), 0) );
+        } else if (type.equals("MetadataFloat")) {
+            result.put( node.getAttributes().getNamedItem("name").getNodeValue(), 
+                getFloat(node.getAttributes().getNamedItem("value").getNodeValue(), 0.0f) );
+        }
+        
+        logger.info(" ending parseMetadata");
+        return result;
+    }
+    
+    
     /**
      * Parses any X3D geometry node (Box, Cone, Cylinder, IndexedFaceSet,
      * Sphere) and creates a corresponding jME Geometry object.
@@ -1212,12 +1377,12 @@ public class X3dToJme extends FormatConverter {
             mesh.setDefaultColor(ColorRGBA.white.clone());
         }
 
-        String name = (title != null) ? title : "X3D_IndexedFaceSet";
+        String name = (title != null) ? title : "X3D_IndexedFaceSet"+ifscount++;
         mesh.setName(name);
 
         return mesh;
     }
-
+private static int  ifscount = 0;
     /**
      * Parses the values contained in the given X3D Coordinate, Color, Color3f
      * or Normal node and stores them in a float array
@@ -2270,6 +2435,7 @@ public class X3dToJme extends FormatConverter {
         } else {
             light.setEnabled(true);
         }
+        light.setShadowCaster( true );
 
 //        System.out.println(light.getSpecular());
 //        System.out.println(light.getDiffuse());
@@ -2373,4 +2539,21 @@ public class X3dToJme extends FormatConverter {
                 && FastMath.abs(vec.z) <= FastMath.ZERO_TOLERANCE && FastMath
                 .abs(vec.y) > FastMath.ZERO_TOLERANCE);
     }
+    
+//    private class Metadata extends Hashtable<String, Object>
+//    {
+//        private static final long serialVersionUID = -8931137331269225964L;
+//        
+//        private String type; 
+//        
+//        private void setType( final String type )
+//        {
+//            this.type = type;
+//        }
+//        
+//        private String getType()
+//        {
+//            return this.type;
+//        }
+//    }
 }
