@@ -37,7 +37,9 @@ public class Bumper extends Node
 	
 	// Intensidad de la fuerza repulsora a aplicar sobre la bola  
 	private static float forceToBallIntensity = 900f; //TODO hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
-	//Magic number probado con angulo de 15º y repele con fuerza
+	//Magic number probado con angulo de 15º y repele con fuerza. HACERLO EN FUNCION DEL ANGULO DE INCLINACION DE LA MESA.
+	// POSIBLE FORMULA: cte*(max_angle - pinball_angle) -> MAL
+	// OTRA OPCION: dejarlo cte al valor, despues de todo es asi en la realidad (fuerza mecanica cte)
 	
 	// Valores de densidad, rebote y rozamiento entre el material del bumper y el de la mesa
 	
@@ -54,7 +56,7 @@ public class Bumper extends Node
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
-	public static DynamicPhysicsNode create(final Pinball pinball, String name, Geometry visualModel, BumperType bumperType, PinballInputHandler input) //TODO quitar final
+	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType, PinballInputHandler input)
 	{
 		final DynamicPhysicsNode bumperNode = pinball.getPhysicsSpace().createDynamicNode();
 		// Nombre del nodo fisico de todos los bumpers
