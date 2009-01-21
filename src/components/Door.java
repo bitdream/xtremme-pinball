@@ -78,6 +78,9 @@ public class Door extends Node
         /* Guardo que esa door tiene este joint */
         door.setJoint(jointForDoor);
         
+        /* Agrego el componente a la lista del pinball */
+        pinball.addDoor(doorNode);
+        
         
 		return doorNode;
 	}

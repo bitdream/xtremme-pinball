@@ -1,5 +1,6 @@
 package mainloop;
 
+import gamelogic.GameLogic;
 import input.FengJMEInputHandler;
 import input.PinballInputHandler;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import com.jme.input.MouseInput;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
+import com.jme.scene.Text;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
@@ -72,6 +74,9 @@ public class Pinball extends SimplePhysicsGame
 	/* Lista de las puertas del juego actual */
 	private List<DynamicPhysicsNode> doors;
 	
+	/* Lista de los imanes del juego actual */
+	private List<StaticPhysicsNode> magnets;
+	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
 	
@@ -83,6 +88,15 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Menu de opciones */
 	private Window menu;
+	
+	/* Score del juego */
+	private int score = 0;
+	
+	/* Mensaje al usuario */
+	private String message = "Mensaje inicial";
+	
+	/* Logica de juego */
+	private GameLogic gameLogic;
 	
 	/**
 	 * Punto de entrada al juego
@@ -130,7 +144,13 @@ public class Pinball extends SimplePhysicsGame
         pinballInputHandler.update(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
-        rootNode.updateGeometricState(interpolation, true);        
+        rootNode.updateGeometricState(interpolation, true);
+        
+        // TODO Actualizar informacion mostrada al usuario (puntos, etc)
+        Text messager = Text.createDefaultTextLabel("text1");
+        messager.print(message);
+        Text messager2 = Text.createDefaultTextLabel("text2");
+        messager2.print(String.valueOf(score));
 	}
 
 	/**
@@ -237,9 +257,15 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Creo la lista de puertas */
 		doors = new ArrayList<DynamicPhysicsNode>(2);
-				
+		
+		/* Creo la lista de imanes */
+		magnets = new ArrayList<StaticPhysicsNode>(2);
+
         /* Armo la mesa de juego */
         buildTable();
+        
+        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
+        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();
@@ -512,7 +538,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER);
 		rootNode.attachChild(rightTestFlipper);
-		flippers.add(rightTestFlipper);
 		
 		final Box leftVisualFlipper = new Box("Left visual flipper", new Vector3f(), 7, 1, 2);
 		leftVisualFlipper.setLocalTranslation(new Vector3f(-11, 3, 70));
@@ -524,7 +549,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		DynamicPhysicsNode leftTestFlipper = Flipper.create(this, "Physic left flipper", leftVisualFlipper, FlipperType.LEFT_FLIPPER);
 		rootNode.attachChild(leftTestFlipper);
-		flippers.add(leftTestFlipper);
 
 
 		//-----------------------------------------
@@ -538,7 +562,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		DynamicPhysicsNode testPlunger = Plunger.create(this, "Physic plunger", visualPlunger, 10);
 		rootNode.attachChild(testPlunger);
-		plunger = testPlunger;
 
 		//-----------------------------------------
 		
@@ -554,7 +577,6 @@ public class Pinball extends SimplePhysicsGame
 		
 		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -1.3f, 0.5f);
 		rootNode.attachChild(testDoor);
-		doors.add(testDoor);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
@@ -611,10 +633,9 @@ public class Pinball extends SimplePhysicsGame
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
-		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER, pinballInputHandler);
+		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER);
 		rootNode.attachChild(bumper1);
 		// Agrego a la lista de bumpers del juego
-		bumpers.add(bumper1);
 		
 		// Agrego otro bumper
 		final Box visualBumper2 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
@@ -668,6 +689,11 @@ public class Pinball extends SimplePhysicsGame
 		return doors;
 	}
 	
+	public List<StaticPhysicsNode> getMagnets()
+	{
+		return magnets;
+	}
+	
 	public PinballSettings getPinballSettings()
 	{
 		return pinballSettings;
@@ -676,5 +702,50 @@ public class Pinball extends SimplePhysicsGame
 	public Camera getCamera()
 	{
 		return cam;
+	}
+
+	public PinballInputHandler getPinballInputHandler()
+	{
+		return pinballInputHandler;
+	}
+	
+	public void addBumper(DynamicPhysicsNode bumper)
+	{
+		bumpers.add(bumper);
+	}
+	
+	public void addMagnet(StaticPhysicsNode magnet)
+	{
+		magnets.add(magnet);
+	}
+
+	public void setPlunger(DynamicPhysicsNode plunger)
+	{
+		this.plunger = plunger;
+	}
+	
+	public void addDoor(DynamicPhysicsNode door)
+	{
+		doors.add(door);
+	}
+	
+	public void addFlipper(DynamicPhysicsNode flipper)
+	{
+		flippers.add(flipper);
+	}
+
+	public void setScore(int score)
+	{
+		this.score = score;
+	}
+
+	public void setMessage(String message)
+	{
+		this.message = message;
+	}
+
+	public GameLogic getGameLogic()
+	{
+		return gameLogic;
 	}
 }

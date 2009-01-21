@@ -1,6 +1,5 @@
 package components;
 
-import input.PinballInputHandler;
 import mainloop.Pinball;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
@@ -22,7 +21,7 @@ import com.jmex.physics.material.Material;
 /**
  * Componente bumper. Ejerce una fuerza repulsora cuando la bola golpea sobre el.
  */
-public class Bumper extends Node
+public class Bumper extends Node implements ActivableComponent
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -56,7 +55,7 @@ public class Bumper extends Node
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType, PinballInputHandler input)
+	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType)
 	{
 		final DynamicPhysicsNode bumperNode = pinball.getPhysicsSpace().createDynamicNode();
 		// Nombre del nodo fisico de todos los bumpers
@@ -106,7 +105,7 @@ public class Bumper extends Node
         
         // Para detectar colisiones de objetos contra los bumpers
         final SyntheticButton collisionEventHandler = bumperNode.getCollisionEventHandler();
-        input.addAction( new InputAction(){
+        pinball.getPinballInputHandler().addAction( new InputAction(){
         	
         	public void performAction( InputActionEvent evt ) {
         		
@@ -161,6 +160,9 @@ public class Bumper extends Node
             }        	
 
         }, collisionEventHandler, false );
+        
+        /* Agrego el componente a la lista del pinball */
+        pinball.addBumper(bumperNode);
         
     	return bumperNode;
 	}
@@ -236,6 +238,12 @@ public class Bumper extends Node
 		
 		/* Recien ahora attacheo al nodo el joint */
 		joint.attach((DynamicPhysicsNode)getParent());
+		
+	}
+
+	public void setActive(boolean active)
+	{
+		// TODO Auto-generated method stub
 		
 	}
 	

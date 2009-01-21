@@ -15,7 +15,7 @@ import com.jmex.physics.StaticPhysicsNode;
 /**
  * Componente magnet, actua como un iman atrayendo a la bola.
  */
-public class Magnet extends Node
+public class Magnet extends Node implements ActivableComponent
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -83,6 +83,9 @@ public class Magnet extends Node
 	        }
         } );
 		
+		/* Agrego el componente a la lista del pinball */
+        pinball.addMagnet(magnetNode);
+		
 		return magnetNode;
 	}
 	
@@ -107,5 +110,11 @@ public class Magnet extends Node
 		this.visualModel = visualModel;
 		attachChild(visualModel);
 
+	}
+
+	public void setActive(boolean active)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
