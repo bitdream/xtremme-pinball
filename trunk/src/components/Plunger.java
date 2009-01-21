@@ -75,6 +75,9 @@ public class Plunger extends Node
         /* Guardo que ese plunger tiene este joint */
         plunger.setJoint(jointForPlunger);
         
+        /* Agrego el componente al pinball */
+        pinball.setPlunger(plungerNode);
+        
         
 		return plungerNode;
 	}

@@ -919,7 +919,7 @@ public class X3dToJme extends FormatConverter {
                    bumperType = BumperType.JUMPER;
                }
                //FIXME
-               shape = Bumper.create( new Pinball(), "bumper"+bumperCounter++, geom, bumperType, new PinballInputHandler(new Pinball()) );
+               shape = Bumper.create(new Pinball(), "bumper"+bumperCounter++, geom, bumperType);
                
                dynamic = true;
                

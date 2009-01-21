@@ -15,7 +15,7 @@ import com.jmex.physics.material.Material;
 /**
  * Componente de flipper, para golpear la pelotita.
  */
-public class Flipper extends Node
+public class Flipper extends Node implements ActivableComponent
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -84,6 +84,9 @@ public class Flipper extends Node
         
         /* Guardo que ese flipper tiene este joint */
         flipper.setJoint(jointForFlipper);
+        
+        /* Agrego el componente a la lista del pinball */
+        pinball.addFlipper(flipperNode);
         
         
 		return flipperNode;
@@ -168,5 +171,11 @@ public class Flipper extends Node
 	public void setJoint(Joint joint)
 	{
 		this.joint = joint;
+	}
+
+	public void setActive(boolean active)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
