@@ -130,9 +130,7 @@ public class Pinball extends SimplePhysicsGame
         pinballInputHandler.update(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
-        rootNode.updateGeometricState(interpolation, true);
-        
-        
+        rootNode.updateGeometricState(interpolation, true);        
 	}
 
 	/**
@@ -182,11 +180,11 @@ public class Pinball extends SimplePhysicsGame
 		/* Perspectiva y FOV */
 		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
 		
-		/* Ubicacion */ // TODO: Ubicar la camara en base a donde se encuentre la mesa fija que definamos
+		/* Ubicacion */
 		Vector3f loc = new Vector3f(0.0f, 4f, 200f);
 		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
 		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f); //en z -0.5f
+		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
 
 		cam.setFrame(loc, left, up, dir);
 		
@@ -198,6 +196,7 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Creo el input handler del pinball */
 		pinballInputHandler = new PinballInputHandler(this);
+	
 		
 		/* Quiero que ese input handler sea leido en cada paso que haga el motor de fisica,
 		 * de modo tal que las fuerzas que acciones continuas apliquen (ej: plunger) se realicen */
