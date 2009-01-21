@@ -153,7 +153,7 @@ public class Bumper extends Node
                 {
                 	bump.clearDynamics();
                 	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
-                								   (bump.getMass() + 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
+                								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
                 }
                 
             }        	

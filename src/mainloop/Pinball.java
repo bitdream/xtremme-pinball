@@ -22,7 +22,6 @@ import com.jme.input.MouseInput;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
-import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
@@ -670,11 +669,6 @@ public class Pinball extends SimplePhysicsGame
 		return doors;
 	}
 	
-	public Node getTiltNode()
-	{
-		return null; // TODO Devolver el nodo sobre el que se debe ejecutar la accion de tilt
-	}
-
 	public PinballSettings getPinballSettings()
 	{
 		return pinballSettings;
