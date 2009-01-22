@@ -138,8 +138,8 @@ public class Flipper extends Node implements ActivableComponent
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 		
-		/* Tomo el angulo de juego e inclino el eje del joint, que es en Y */
-		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
+		/* Tomo el angulo de juego e inclino el eje del joint */
+		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot));
 		
 		/* Tomo la anterior posicion del anchor y la roto */
 		joint.setAnchor(joint.getAnchor(null).rotate(rot));

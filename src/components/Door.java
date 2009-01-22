@@ -110,7 +110,7 @@ public class Door extends Node
 		}
 		
 		extreme.setZ(bBox.getCenter().getZ() + (0.5f - (1 - zExtreme)) * extents.getZ());
-System.out.println(extreme); // 28 3 75
+
 		return extreme;
 	}
 	
@@ -131,8 +131,8 @@ System.out.println(extreme); // 28 3 75
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 		
-		/* Tomo el angulo de juego e inclino el eje del joint, que es en Y */
-		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
+		/* Tomo el angulo de juego e inclino el eje anterior del joint */
+		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot));
 		
 		/* Tomo la anterior posicion del anchor y la roto */
 		joint.setAnchor(joint.getAnchor(null).rotate(rot));

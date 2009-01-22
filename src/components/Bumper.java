@@ -225,8 +225,8 @@ public class Bumper extends Node implements ActivableComponent
 	{
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 
-		/* Tomo el angulo de juego e inclino el eje del joint */
-		joint.getAxes().get(0).setDirection(new Vector3f(0, 1, 0).rotate(rot));
+		/* Tomo el angulo de juego e inclino el eje anterior del joint */
+		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot));
 		
 		// Calculos hechos a mano
 //		joint.getAxes().get(0).setDirection(new Vector3f(0, FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()), 
