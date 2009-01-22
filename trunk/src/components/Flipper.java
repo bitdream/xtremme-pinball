@@ -37,6 +37,9 @@ public class Flipper extends Node implements ActivableComponent
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
+	/* Juego que lo contiene */
+	private Pinball pinball;
+	
 	
     /**
      * Crea un nodo dinamico de flipper.
@@ -84,6 +87,9 @@ public class Flipper extends Node implements ActivableComponent
         
         /* Guardo que ese flipper tiene este joint */
         flipper.setJoint(jointForFlipper);
+        
+        /* Guardo el juego en el componente */
+        flipper.setPinball(pinball);
         
         /* Agrego el componente a la lista del pinball */
         pinball.addFlipper(flipperNode);
@@ -177,5 +183,23 @@ public class Flipper extends Node implements ActivableComponent
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setPinball(Pinball pinball)
+	{
+		this.pinball = pinball;
+	}
+	
+	public void update(float time)
+	{
+		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		
+		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
+		 * de recuperacion de los flippers */
+		final Vector3f forceToApply = new Vector3f();
+		
+		forceToApply.set(flipperRestoreForce).multLocal(time);
+
+		((DynamicPhysicsNode)getParent()).addForce(forceToApply.rotate(rot));
 	}
 }

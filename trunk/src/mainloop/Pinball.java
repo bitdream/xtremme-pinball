@@ -135,7 +135,7 @@ public class Pinball extends SimplePhysicsGame
 	/**
 	 * Se debe actualizar la fisica, el puntaje, el tiempo, todo lo relacionado al juego en si.
 	 */
-	protected void simpleUpdate() //float interpolation
+	protected void simpleUpdate()
 	{
 		/* Actualizo el timer */
 		timer.update();
@@ -146,6 +146,9 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo los controladores de input */
         fengGUIInputHandler.update(interpolation);
         pinballInputHandler.update(interpolation);
+        
+        /* Actualizo los componentes que asi lo requieren */
+        updateComponents(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);
@@ -155,6 +158,27 @@ public class Pinball extends SimplePhysicsGame
         messager.print(message);
         Text messager2 = Text.createDefaultTextLabel("text2");
         messager2.print(String.valueOf(score));
+        
+        
+	}
+
+	private void updateComponents(float interpolation)
+	{
+		/* Flippers */
+		for (DynamicPhysicsNode flipper : getFlippers())
+		{
+			((Flipper)flipper.getChild(0)).update(interpolation);
+		}
+		
+		/* Plunger */
+		if (plunger != null)
+			((Plunger)plunger.getChild(0)).update(interpolation);
+		
+		/* Spinners */
+		for (DynamicPhysicsNode spinner : getSpinners())
+		{
+			((Spinner)spinner.getChild(0)).update(interpolation);
+		}
 	}
 
 	/**
@@ -524,6 +548,7 @@ public class Pinball extends SimplePhysicsGame
 		mainBall3.computeMass();
 		
 		//----------------------------------------
+		
 		//TODO quitar esto, es para debug de bumper
 		// Mover la bola dos hacia el bumper1
 		 getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
@@ -537,6 +562,7 @@ public class Pinball extends SimplePhysicsGame
 
 	            }
 	        } );
+		 
 		//-----------------------------------------
 
 		/* Pongo flippers de prueba */
@@ -561,6 +587,17 @@ public class Pinball extends SimplePhysicsGame
 		
 		DynamicPhysicsNode leftTestFlipper = Flipper.create(this, "Physic left flipper", leftVisualFlipper, FlipperType.LEFT_FLIPPER);
 		rootNode.attachChild(leftTestFlipper);
+		
+		final Box leftSmallVisualFlipper = new Box("Left small visual flipper", new Vector3f(), 3.5f, 0.5f, 1);
+		leftSmallVisualFlipper.setLocalTranslation(new Vector3f(-19, 3, -20));
+		leftSmallVisualFlipper.setModelBound(new BoundingBox());
+		leftSmallVisualFlipper.updateModelBound();
+		
+		/* Le doy color */
+		Utils.color(leftSmallVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
+		
+		DynamicPhysicsNode leftSmallTestFlipper = Flipper.create(this, "Physic small left flipper", leftSmallVisualFlipper, FlipperType.LEFT_FLIPPER);
+		rootNode.attachChild(leftSmallTestFlipper);
 
 
 		//-----------------------------------------

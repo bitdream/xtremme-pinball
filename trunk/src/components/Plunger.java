@@ -30,6 +30,9 @@ public class Plunger extends Node
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
+	/* Juego que lo contiene */
+	private Pinball pinball;
+	
 	
 	/**
 	 * Crea un nodo dinamico de plunger.
@@ -75,6 +78,9 @@ public class Plunger extends Node
         /* Guardo que ese plunger tiene este joint */
         plunger.setJoint(jointForPlunger);
         
+        /* Guardo el juego en el componente */
+        plunger.setPinball(pinball);
+        
         /* Agrego el componente al pinball */
         pinball.setPlunger(plungerNode);
         
@@ -91,9 +97,11 @@ public class Plunger extends Node
 		
 		attachChild(visualModel);
 		
+		/* Empieza suelto */
 		setLoose(true);
 		
-		setDistance(0);
+		/* Empieza al lado del origen */
+		setDistance(1);
 	}
 	
 	public void recalculateJoints(Pinball pinball)
@@ -139,5 +147,25 @@ public class Plunger extends Node
 	public void setJoint(Joint joint)
 	{
 		this.joint = joint;
+	}
+
+	public void setPinball(Pinball pinball)
+	{
+		this.pinball = pinball;
+	}
+	
+	public void update(float time)
+	{
+		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		
+		DynamicPhysicsNode parentNode = (DynamicPhysicsNode)getParent();
+		
+		if (isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
+			parentNode.addForce((new Vector3f(0, 0,
+					-10 * pinball.getPinballSettings().getInclinationAngle()
+					-1000 * (float)Math.pow(getDistance(), 2))
+			).rotate(rot));
+		else /* Aplico la fuerza para alejarlo del origen */
+			parentNode.addForce(plungerChargeForce.rotate(rot));
 	}
 }
