@@ -53,44 +53,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
 		
 		/* Hacer el tilt */
-		addAction(new tiltAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, false);
-		
-		// TODO colocar las acciones que correspondan a pinball
-		// pasarle en constructor una lista de flippers, el nodo base para hacer tilt y el plunger?... y el juego! (para finish, etc...)
-	}
-	
-	@Override
-	public void update(float time)
-	{
-		super.update(time);
-		
-		Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
-		
-		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
-		 * de recuperacion de los flippers */
-		final Vector3f forceToApply = new Vector3f();
-		
-		forceToApply.set(Flipper.flipperRestoreForce).multLocal(event.getTime());
-
-		for (DynamicPhysicsNode flipper : game.getFlippers())
-		{
-			flipper.addForce(forceToApply.rotate(rot));
-		}
-		
-		/* Plunger */
-		Plunger plunger;
-		if (game.getPlunger() != null)
-		{
-			 plunger = (Plunger)game.getPlunger().getChild(0);
-		
-			if (plunger.isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
-				game.getPlunger().addForce((new Vector3f(0, 0,
-						-10 * game.getPinballSettings().getInclinationAngle()
-						-1000 * (float)Math.pow(plunger.getDistance(), 2))
-				).rotate(rot));
-			else /* Aplico la fuerza para alejarlo del origen */
-				game.getPlunger().addForce(Plunger.plungerChargeForce.rotate(rot));
-		}
+		addAction(new tiltAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_SPACE, InputHandler.AXIS_NONE, false);
 	}
 	
 	/* Accion para abrir el menu de juego */
@@ -170,7 +133,7 @@ public class PinballInputHandler extends FirstPersonHandler
 			
 			if(event.getTriggerPressed())
 			{
-				/* Agarro el plunger, ya no esta suelto */
+				/* El jugador agarro el plunger, ya no esta suelto */
 				plunger.setLoose(false);
 			}
 			else if (!event.getTriggerPressed())

@@ -18,6 +18,8 @@ public class Spinner extends Node
 {
 	private static final long serialVersionUID = 1L;
 	
+	private static float speedDecreasePercentageX = 0.995f, speedDecreasePercentageY = 0.995f;
+	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
@@ -47,7 +49,7 @@ public class Spinner extends Node
         
         /* Genero su fisica */
         spinnerNode.generatePhysicsGeometry();
-        
+
         /* Computo su masa */
 		spinnerNode.computeMass();
         
@@ -87,7 +89,7 @@ public class Spinner extends Node
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 		
 		/* Tomo el angulo de juego e inclino el eje anterior del joint */
-		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot)); // TODO hacerlo en todos asi
+		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot));
 		
 		/* Tomo la anterior posicion del anchor y la roto */
 		joint.setAnchor(joint.getAnchor(null).rotate(rot));
@@ -104,5 +106,15 @@ public class Spinner extends Node
 	public void setJoint(Joint joint)
 	{
 		this.joint = joint;
+	}
+	
+	public void update(float time)
+	{
+		DynamicPhysicsNode parentNode = (DynamicPhysicsNode)getParent();
+
+		parentNode.setAngularVelocity(new Vector3f(
+				parentNode.getAngularVelocity(null).x * speedDecreasePercentageX, 
+				parentNode.getAngularVelocity(null).y * speedDecreasePercentageY, 
+				parentNode.getAngularVelocity(null).z));
 	}
 }
