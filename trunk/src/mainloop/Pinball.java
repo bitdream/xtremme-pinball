@@ -41,6 +41,7 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
+import components.Spinner;
 import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
 
@@ -73,6 +74,9 @@ public class Pinball extends SimplePhysicsGame
 	
 	/* Lista de las puertas del juego actual */
 	private List<DynamicPhysicsNode> doors;
+	
+	/* Lista de los molinetes del juego actual */
+	private List<DynamicPhysicsNode> spinners;
 	
 	/* Lista de los imanes del juego actual */
 	private List<StaticPhysicsNode> magnets;
@@ -258,6 +262,9 @@ public class Pinball extends SimplePhysicsGame
 		/* Creo la lista de puertas */
 		doors = new ArrayList<DynamicPhysicsNode>(2);
 		
+		/* Creo la lista de molinetes */
+		spinners = new ArrayList<DynamicPhysicsNode>(4);
+		
 		/* Creo la lista de imanes */
 		magnets = new ArrayList<StaticPhysicsNode>(2);
 
@@ -363,6 +370,11 @@ public class Pinball extends SimplePhysicsGame
 		for (DynamicPhysicsNode door : getDoors())
 		{
 			((Door)door.getChild(0)).recalculateJoints(this);
+		}
+		/* Spinners */
+		for (DynamicPhysicsNode spinner : getSpinners())
+		{
+			((Spinner)spinner.getChild(0)).recalculateJoints(this);
 		}
 		/* Plunger */
 		if (plunger != null)
@@ -578,6 +590,21 @@ public class Pinball extends SimplePhysicsGame
 		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -1.3f, 0.5f);
 		rootNode.attachChild(testDoor);
 		
+		//-----------------------------------------
+		
+		/* Pongo un molinete de prueba */
+		final Box visualSpinner = new Box("Visual spinner", new Vector3f(), 1.25f, 2.5f, 0.1f);
+		visualSpinner.setLocalTranslation(new Vector3f(-12, 4, 30));
+		visualSpinner.setModelBound(new BoundingBox());
+		visualSpinner.updateModelBound();
+
+		
+		/* Le doy color */
+		Utils.color(visualSpinner, new ColorRGBA(1f, 0.3f, 0.5f, 1.0f), 128);
+		
+		DynamicPhysicsNode testSpinner = Spinner.create(this, "Physic spinner", visualSpinner);
+		rootNode.attachChild(testSpinner);
+		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
 		box.updateRenderState();
 		// Rotate the box 25 degrees along the x and y axes.
@@ -689,6 +716,11 @@ public class Pinball extends SimplePhysicsGame
 		return doors;
 	}
 	
+	public List<DynamicPhysicsNode> getSpinners() 
+	{
+		return spinners;
+	}
+	
 	public List<StaticPhysicsNode> getMagnets()
 	{
 		return magnets;
@@ -732,6 +764,11 @@ public class Pinball extends SimplePhysicsGame
 	public void addFlipper(DynamicPhysicsNode flipper)
 	{
 		flippers.add(flipper);
+	}
+	
+	public void addSpinner(DynamicPhysicsNode spinner)
+	{
+		spinners.add(spinner);
 	}
 
 	public void setScore(int score)

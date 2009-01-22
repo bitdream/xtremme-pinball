@@ -101,8 +101,8 @@ public class Plunger extends Node
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 		
-		/* Tomo el angulo de juego e inclino el eje del joint, que es en Z */
-		joint.getAxes().get(0).setDirection(new Vector3f(0, 0, 1).rotate(rot));
+		/* Tomo el angulo de juego e inclino el eje anterior del joint */
+		joint.getAxes().get(0).setDirection(joint.getAxes().get(0).getDirection(null).rotate(rot));
 		
 		/* Tomo la anterior posicion del anchor y la roto */
 		joint.setAnchor(joint.getAnchor(null).rotate(rot));
