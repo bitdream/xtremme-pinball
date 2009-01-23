@@ -55,7 +55,7 @@ public class Flipper extends Node implements ActivableComponent
 	 * @param pinball El juego.
 	 * @param name Nombre del nodo de flipper.
 	 * @param visualModel Modelo visual del flipper.
-	 * @param flipperType El tipo de flipper deseado, iquierdo o derecho.
+	 * @param flipperType El tipo de flipper deseado, izquierdo o derecho.
 	 * @return El nodo creado.
      */
 	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, FlipperType flipperType)
