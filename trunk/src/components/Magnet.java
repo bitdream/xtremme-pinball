@@ -4,9 +4,7 @@ import mainloop.Pinball;
 import com.jme.math.Vector3f;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
-import com.jme.scene.shape.Sphere;
 import com.jmex.physics.DynamicPhysicsNode;
-import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
@@ -31,14 +29,17 @@ public class Magnet extends Node implements ActivableComponent
 	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
 	private static float maxRadius = 3; //Valor de testeo: 3 cuando las bolas son de radio 1
+	
+	// Esta activo este magnet?
+	public boolean active = true;
 
-	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel)
+	public static StaticPhysicsNode create(final Pinball pinball, String name, Geometry visualModel)
 	{
 		StaticPhysicsNode magnetNode = pinball.getPhysicsSpace().createStaticNode();
 		
-		final Magnet m = new Magnet(name, visualModel);
+		final Magnet magnet = new Magnet(name, visualModel);
         // Creo un nodo de Magnet, con todas sus caracteristicas y lo fijo al nodo fisico
-		magnetNode.attachChild(m);
+		magnetNode.attachChild(magnet);
         
         // Genero su fisica 
 		magnetNode.generatePhysicsGeometry();
@@ -48,34 +49,37 @@ public class Magnet extends Node implements ActivableComponent
 			
 	        public void afterStep(PhysicsSpace space, float time) 
 	        {
-	            for (PhysicsNode node: space.getNodes()) 
-	            {	          
-	            	// TODO ver: estoy suponiendo que las bolas del flipper van a estar formadas por un nodo fisico con un 
-	            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. 
-	            	// Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
-	                if (node instanceof DynamicPhysicsNode && node.getChild(0) instanceof Sphere) 
-	                {
-	                    DynamicPhysicsNode ball = (DynamicPhysicsNode)node;
-	                    
-	                    // Calcular la distancia entre la bola y el iman
-	                    // IMPORTANTE: la distancia se calcula entre los centros de masa de los objetos
-	                    float distance = node.getLocalTranslation().distance(m.getVisualModel().getLocalTranslation());
-	                    //System.out.println("----------------distance: " + distance + " con el nodo " + node.getChild(0).getName());
-	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
-	                    if (distance < forceFieldRadius)
-	                    {
-	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
-		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
-		                     */	                    
-		                    Vector3f direction = m.getVisualModel().getLocalTranslation().subtract(node.getLocalTranslation()).normalize();
-		                   
-		                    // Aplicar la fuerza atractora. Formula magica. TODO ajustar la fuerza para un mejor comportamiento
-		                    // Es inversamente proporcional a la distancia
-		                    ball.addForce(direction.mult(force*ball.getMass()).divide(100/maxRadius*distance));
-	                    }
-	                    
-	                }
-	            }
+	        	// Solo se aplica la fuerza sobre las bolas si el iman esta activo
+	        	if (magnet.isActive())
+	        	{
+	        		 for (DynamicPhysicsNode ball: pinball.getBalls()) 
+	 	            {	          
+	 	                    // Calcular la distancia entre la bola y el iman
+	 	                    // IMPORTANTE: la distancia se calcula entre los centros de masa de los objetos
+	 	                    float distance = ball.getLocalTranslation().distance(magnet.getVisualModel().getLocalTranslation());
+
+	 	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
+	 	                    if (distance < forceFieldRadius)
+	 	                    {
+	 	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
+	 		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
+	 		                     */	 
+	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getLocalTranslation()).normalize();			                          	
+	 	                    	
+	 	                    	// Calculo la distancia sobre el plano de la mesa, para ello llevo los valores de Y a cero en las posiciones de la bola y el iman
+//	 	                    	Vector3f magnetTranslationOverTable = magnet.getVisualModel().getLocalTranslation();
+//	 	                    	magnetTranslationOverTable.setY(0);//	                    	
+//	 	                    	Vector3f ballTranslationOverTable = ball.getLocalTranslation();
+//	 	                    	ballTranslationOverTable.setY(0);//	                    	
+//	 	                    	Vector3f direction = magnetTranslationOverTable.subtract(ballTranslationOverTable).normalize();
+	 		                    
+	 		                    
+	 		                    // Aplicar la fuerza atractora. Formula magica. TODO ajustar la fuerza para un mejor comportamiento
+	 		                    // Es inversamente proporcional a la distancia
+	 		                    ball.addForce(direction.mult(force*ball.getMass()).divide(100/maxRadius*distance));              
+	 	                    }
+	 	            }
+	        	}	           
 	        }
 	        public void beforeStep(PhysicsSpace space, float time) 
 	        {
@@ -114,7 +118,12 @@ public class Magnet extends Node implements ActivableComponent
 
 	public void setActive(boolean active)
 	{
-		// TODO Auto-generated method stub
+		this.active = active; 
 		
+	}
+	
+	public boolean isActive()
+	{
+		return this.active;
 	}
 }

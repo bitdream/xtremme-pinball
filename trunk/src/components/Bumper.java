@@ -40,8 +40,7 @@ public class Bumper extends Node implements ActivableComponent
 	// POSIBLE FORMULA: cte*(max_angle - pinball_angle) -> MAL
 	// OTRA OPCION: dejarlo cte al valor, despues de todo es asi en la realidad (fuerza mecanica cte)
 	
-	// Valores de densidad, rebote y rozamiento entre el material del bumper y el de la mesa
-	
+	// Valores de densidad, rebote y rozamiento entre el material del bumper y el de la mesa	
     // Es pesado, pero no tanto como para hundirse en el material de la mesa.
 	private static float bumperMaterialDensity = 999;
     // Nada de rebote
@@ -49,11 +48,11 @@ public class Bumper extends Node implements ActivableComponent
     // Mucho rozamiento
 	private static float bumperMaterialMu = 99999999.0f;
 	
-	// Modelo visual del bumper
-	//private Geometry visualModel;
-	
-	/* Joint que lo fija a la mesa */
+	// Joint que lo fija a la mesa
 	private Joint joint;
+	
+	// Esta activo este bumper?
+	public boolean active = true;
 	
 	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType)
 	{
@@ -81,9 +80,6 @@ public class Bumper extends Node implements ActivableComponent
         // Calculo la masa del bumper (solo si lo hago dinamico)
         bumperNode.computeMass();
         
-        // Para que el bumper quede pegado a la mesa
-        // bumperNode.setAffectedByGravity(false);  		
-		
         // Voy a fijar el bumper con un eje translacional 
         final Joint jointForBumper = pinball.getPhysicsSpace().createJoint();
         final TranslationalJointAxis translationalAxis = jointForBumper.createTranslationalAxis();
@@ -136,27 +132,30 @@ public class Bumper extends Node implements ActivableComponent
                     return;
                 }
                 
-                /* La fuerza aplicada sobre la bola tiene una intensidad proporcional a la velocidad que la bola tenia al momento de la colision
-                 * y es en sentido opuesto.
-                 */
-                Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
-                Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
-                
-                //System.out.println(" -------------------- velocidad" + direction);
-                //System.out.println(" - -------------- fuerza: " + direction.mult(forceToBallIntensity * sense));
-
-                // Aplicar la fuerza repulsora sobre la bola
-                ball.clearDynamics();
-                ball.addForce( appliedForce );
-                
-                // Aplicarle fuerza para hacer saltar a aquellos bumpers que sean saltarines (honguitos). La misma debe ser paralela a la mesa, no exclusiva en Y
-                if (bumper.getBumperType().equals(BumperType.JUMPER))
+                // Solo si el bumper esta activo debe ejercer la fuerza sobre la bola y saltar (si es saltarin)
+                if (((Bumper)bump.getChild(0)).isActive())
                 {
-                	bump.clearDynamics();
-                	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
-                								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-                }
-                
+                    /* La fuerza aplicada sobre la bola tiene una intensidad proporcional a la velocidad que la bola tenia al momento de la colision
+                     * y es en sentido opuesto.
+                     */
+                    Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
+                    Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
+                    
+                    //System.out.println(" -------------------- velocidad" + direction);
+                    //System.out.println(" - -------------- fuerza: " + direction.mult(forceToBallIntensity * sense));
+
+                    // Aplicar la fuerza repulsora sobre la bola
+                    ball.clearDynamics();
+                    ball.addForce( appliedForce );
+                    
+                    // Aplicarle fuerza para hacer saltar a aquellos bumpers que sean saltarines (honguitos). La misma debe ser paralela a la mesa, no exclusiva en Y
+                    if (bumper.getBumperType().equals(BumperType.JUMPER))
+                    {
+                    	bump.clearDynamics();
+                    	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
+                    								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
+                    }
+                }                
             }        	
 
         }, collisionEventHandler, false );
@@ -243,8 +242,13 @@ public class Bumper extends Node implements ActivableComponent
 
 	public void setActive(boolean active)
 	{
-		// TODO Auto-generated method stub
+		this.active = active; 
 		
+	}
+	
+	public boolean isActive()
+	{
+		return this.active;
 	}
 	
 }

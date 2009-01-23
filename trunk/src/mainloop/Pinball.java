@@ -83,6 +83,9 @@ public class Pinball extends SimplePhysicsGame
 	/* Lista de los imanes del juego actual */
 	private List<StaticPhysicsNode> magnets;
 	
+	/* Bolas del juego */
+	private List<DynamicPhysicsNode> balls;
+	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
 	
@@ -297,6 +300,9 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Creo la lista de imanes */
 		magnets = new ArrayList<StaticPhysicsNode>(2);
+		
+		/* Creo la lista de bolas */
+		balls = new ArrayList<DynamicPhysicsNode>(4);
 
         /* Armo la mesa de juego */
         buildTable();
@@ -529,6 +535,9 @@ public class Pinball extends SimplePhysicsGame
 		// Se computa la masa luego de generar la geometria fisica
 		mainBall.computeMass();
 		
+		// La agrego a la lista de bolas
+		balls.add(mainBall);
+		
 		// Una segunda bola para probar el bumper
 		/* Nodo dinamico de la bola */
 		final DynamicPhysicsNode mainBall2 = getPhysicsSpace().createDynamicNode(); 
@@ -548,6 +557,9 @@ public class Pinball extends SimplePhysicsGame
 		// Se computa la masa luego de generar la geometria fisica
 		mainBall2.computeMass();
 		
+		// La agrego a la lista de bolas
+		balls.add(mainBall2);
+		
 		// Una tercera bola para probar el iman magnet1
 		/* Nodo dinamico de la bola */
 		final DynamicPhysicsNode mainBall3 = getPhysicsSpace().createDynamicNode();
@@ -566,6 +578,9 @@ public class Pinball extends SimplePhysicsGame
 		mainBall3.setMaterial(customMaterial);		
 		// Se computa la masa luego de generar la geometria fisica
 		mainBall3.computeMass();
+		
+		// La agrego a la lista de bolas
+		balls.add(mainBall3);
 		
 		//----------------------------------------
 		
@@ -841,5 +856,10 @@ public class Pinball extends SimplePhysicsGame
 	public GameLogic getGameLogic()
 	{
 		return gameLogic;
+	}
+	
+	public List<DynamicPhysicsNode> getBalls()
+	{
+		return balls;
 	}
 }
