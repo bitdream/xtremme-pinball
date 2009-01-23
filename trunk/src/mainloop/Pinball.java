@@ -23,6 +23,8 @@ import com.jme.input.MouseInput;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.Renderer;
+import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
@@ -96,8 +98,14 @@ public class Pinball extends SimplePhysicsGame
 	/* Score del juego */
 	private int score = 0;
 	
+	/* Texto con el score para mostrar al usuario */
+	private Text scoreText;
+	
 	/* Mensaje al usuario */
 	private String message = "Mensaje inicial";
+	
+	/* Mensaje para mostrar al usuario */
+	private Text messageText;
 	
 	/* Logica de juego */
 	private GameLogic gameLogic;
@@ -151,13 +159,11 @@ public class Pinball extends SimplePhysicsGame
         updateComponents(interpolation);
 
 		/* Se modifico la escena, entonces actualizo el grafo */
-        rootNode.updateGeometricState(interpolation, true);
+        rootNode.updateGeometricState(interpolation, true);        
         
-        // TODO Actualizar informacion mostrada al usuario (puntos, etc)
-        Text messager = Text.createDefaultTextLabel("text1");
-        messager.print(message);
-        Text messager2 = Text.createDefaultTextLabel("text2");
-        messager2.print(String.valueOf(score));
+        // TODO Actualizar el score y el mensaje
+        scoreText.getText().replace(0, scoreText.getText().length(), "score: " + score);
+        messageText.getText().replace(0, messageText.getText().length(), "" + message);
         
         
 	}
@@ -313,6 +319,20 @@ public class Pinball extends SimplePhysicsGame
 		
 		/* Muestro el menu */
 		showMenu();
+		
+		
+		// Cateles con el puntaje y los mensajes al usuario
+        scoreText = Text.createDefaultTextLabel("scoreText", "Score: 0");
+        scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3/4, 5, 1));
+        rootNode.attachChild(scoreText);
+        
+        messageText = Text.createDefaultTextLabel("messageText", "Mensaje");
+        messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
+        rootNode.attachChild(messageText);
 	}
 	
 
