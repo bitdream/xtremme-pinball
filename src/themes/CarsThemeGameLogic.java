@@ -10,6 +10,7 @@ import gamelogic.GameLogic;
 
 public class CarsThemeGameLogic extends GameLogic
 {
+	private int bumperCollisionCnt = 0;
 
 	public CarsThemeGameLogic(Pinball pinball)
 	{
@@ -19,8 +20,26 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void bumperCollision(Bumper bumper)
 	{
-		// TODO Auto-generated method stub
-
+		// Si el bumper esta activo, se hace la suma de puntos y de colisiones contra bumpers
+		if (bumper.isActive())
+		{
+			// TODO por cada colision entra 4 veces aca, es acorde al tiempo que dure la colision, asi que no es bug
+			// pero hay que notar que cada colision "visible" al ojo humano sumara 40 ptos
+			score+=10;
+			
+			// Se actualiza los datos de pantalla de usuario
+			showScore();
+			showMessage("Colision con bumper!");
+			bumperCollisionCnt ++;
+			
+			// Si colisiono mas de x veces lo desactivo. Solo para testeo! TODO
+//			if (bumperCollisionCnt > 0)
+//			{
+//				bumper.setActive(false);
+//			}
+		}
+		
+		//TODO agregando en cada instancia de bumper un cnt de colisiones puedo dar bonus por X colisiones contra el mismo bumper.
 	}
 
 	@Override

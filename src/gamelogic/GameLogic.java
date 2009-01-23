@@ -9,9 +9,9 @@ import mainloop.Pinball;
 
 public abstract class GameLogic
 {
-	private int score;
+	protected int score;
 	
-	private Pinball pinball;
+	protected Pinball pinball;
 	
 	public GameLogic(Pinball pinball)
 	{
