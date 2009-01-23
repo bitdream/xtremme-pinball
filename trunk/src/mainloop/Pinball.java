@@ -49,6 +49,7 @@ import components.Plunger;
 import components.Spinner;
 import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
+import components.Spinner.SpinnerType;
 
 /**
  * Clase principal del juego.
@@ -678,7 +679,7 @@ public class Pinball extends SimplePhysicsGame
 		/* Le doy color */
 		Utils.color(visualSpinner, new ColorRGBA(1f, 0.3f, 0.5f, 1.0f), 128);
 		
-		DynamicPhysicsNode testSpinner = Spinner.create(this, "Physic spinner", visualSpinner);
+		DynamicPhysicsNode testSpinner = Spinner.create(this, "Physic spinner", visualSpinner, SpinnerType.NORMAL_SPINNER);
 		rootNode.attachChild(testSpinner);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));

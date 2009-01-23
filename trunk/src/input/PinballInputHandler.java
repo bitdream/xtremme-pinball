@@ -85,8 +85,9 @@ public class PinballInputHandler extends FirstPersonHandler
 
 				for (DynamicPhysicsNode flipper : game.getFlippers())
 				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
 					/* Aplico la fuerza sobre los flippers derechos */
-					if (((Flipper)flipper.getChild(0)).isRightFlipper())
+					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
 					{
 						flipper.addForce(forceToApply.rotate(rot));
 					}
@@ -112,8 +113,9 @@ public class PinballInputHandler extends FirstPersonHandler
 
 				for (DynamicPhysicsNode flipper : game.getFlippers())
 				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
 					/* Aplico la fuerza sobre los flippers izquierdos */
-					if (((Flipper)flipper.getChild(0)).isLeftFlipper())
+					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
 					{
 						flipper.addForce(forceToApply.rotate(rot));
 					}

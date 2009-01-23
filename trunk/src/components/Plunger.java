@@ -2,6 +2,9 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jme.input.util.SyntheticButton;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
@@ -33,6 +36,9 @@ public class Plunger extends Node
 	/* Juego que lo contiene */
 	private Pinball pinball;
 	
+	/* Pinball en el que esta */
+	private static Pinball pinballInstance;
+	
 	
 	/**
 	 * Crea un nodo dinamico de plunger.
@@ -48,11 +54,13 @@ public class Plunger extends Node
 		
 		plungerNode.setName("Plunger");
 		
+		pinballInstance = pinball;
+		
 		/* El material del plunger es de goma para tener un mejor rebote */
         plungerNode.setMaterial(Material.RUBBER);
 		
         /* Creo un nodo de Plunger, con todas sus caracteristicas y lo fijo al nodo fisico */
-        Plunger plunger = new Plunger(name, visualModel);
+        final Plunger plunger = new Plunger(name, visualModel);
         plungerNode.attachChild(plunger);
         
         /* Genero su fisica */
@@ -83,6 +91,20 @@ public class Plunger extends Node
         
         /* Agrego el componente al pinball */
         pinball.setPlunger(plungerNode);
+        
+        /* Para detectar colisiones de objetos */
+        final SyntheticButton collisionEventHandler = plungerNode.getCollisionEventHandler();
+        
+        /* Agrego la accion al controlador de pinball */
+        pinball.getPinballInputHandler().addAction(new InputAction() {
+        	
+        	public void performAction(InputActionEvent evt) {
+        		
+                /* Llamo a la logica del juego */
+        		pinballInstance.getGameLogic().plungerCollision(plunger);
+            }
+
+        }, collisionEventHandler, false);
         
         
 		return plungerNode;

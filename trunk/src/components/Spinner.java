@@ -2,6 +2,9 @@ package components;
 
 import mainloop.Pinball;
 
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jme.input.util.SyntheticButton;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
@@ -20,8 +23,17 @@ public class Spinner extends Node
 	
 	private static float speedDecreasePercentageX = 0.995f, speedDecreasePercentageY = 0.995f;
 	
+	/* Tipos de spinner */
+	public enum SpinnerType {NORMAL_SPINNER, RAMP_EXIT_SPINNER, RAMP_ENTRANCE_SPINNER};
+	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
+	
+	/* Tipo de spinner */
+	private SpinnerType spinnerType;
+	
+	/* Pinball en el que esta */
+	private static Pinball pinballInstance;
 	
 
     /**
@@ -31,7 +43,7 @@ public class Spinner extends Node
 	 * @param visualModel Modelo visual del molinete.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel)
+	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, SpinnerType spinnerType)
 	{
 		DynamicPhysicsNode spinnerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -40,12 +52,17 @@ public class Spinner extends Node
 		
 		spinnerNode.setName("Spinner");
 		
+		pinballInstance = pinball;
+		
 		/* El material de los spinners es plastico como la mesa */
         spinnerNode.setMaterial(Material.PLASTIC);
 		
         /* Creo un nodo de spinner, con todas sus caracteristicas y lo fijo al nodo fisico */
-        Spinner spinner = new Spinner(name, visualModel);
+        final Spinner spinner = new Spinner(name, visualModel);
         spinnerNode.attachChild(spinner);
+        
+        /* Le asigno el tipo */
+        spinner.setSpinnerType(spinnerType);
         
         /* Genero su fisica */
         spinnerNode.generatePhysicsGeometry();
@@ -68,6 +85,25 @@ public class Spinner extends Node
         
         /* Agrego el componente a la lista del pinball */
         pinball.addSpinner(spinnerNode);
+        
+        /* Para detectar colisiones de objetos */
+        final SyntheticButton collisionEventHandler = spinnerNode.getCollisionEventHandler();
+        
+        /* Agrego la accion al controlador de pinball */
+        pinball.getPinballInputHandler().addAction(new InputAction() {
+        	
+        	public void performAction(InputActionEvent evt) {
+        		
+                /* Llamo a la logica del juego */
+        		if (spinner.getSpinnerType() == SpinnerType.NORMAL_SPINNER)
+        			pinballInstance.getGameLogic().spinnerNormalCollision(spinner);
+        		else if (spinner.getSpinnerType() == SpinnerType.RAMP_ENTRANCE_SPINNER)
+        			pinballInstance.getGameLogic().spinnerRampEntranceCollision(spinner);
+        		else
+        			pinballInstance.getGameLogic().spinnerRampExitCollision(spinner);
+            }
+
+        }, collisionEventHandler, false);
         
         
 		return spinnerNode;
@@ -116,5 +152,15 @@ public class Spinner extends Node
 				parentNode.getAngularVelocity(null).x * speedDecreasePercentageX, 
 				parentNode.getAngularVelocity(null).y * speedDecreasePercentageY, 
 				parentNode.getAngularVelocity(null).z));
+	}
+
+	public SpinnerType getSpinnerType()
+	{
+		return spinnerType;
+	}
+
+	public void setSpinnerType(SpinnerType spinnerType)
+	{
+		this.spinnerType = spinnerType;
 	}
 }

@@ -3,6 +3,9 @@ package components;
 import mainloop.Pinball;
 
 import com.jme.bounding.BoundingBox;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jme.input.util.SyntheticButton;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
@@ -31,6 +34,9 @@ public class Door extends Node
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
+	/* Pinball en el que esta */
+	private static Pinball pinballInstance;
+	
 
     /**
      * Crea un nodo dinamico de puerta.
@@ -48,11 +54,13 @@ public class Door extends Node
 		
 		doorNode.setName("Door");
 		
+		pinballInstance = pinball;
+		
 		/* El material de las puertas es plastico como la mesa */
         doorNode.setMaterial(Material.PLASTIC);
 		
         /* Creo un nodo de puerta, con todas sus caracteristicas y lo fijo al nodo fisico */
-        Door door = new Door(name, visualModel, doorType);
+        final Door door = new Door(name, visualModel, doorType);
         doorNode.attachChild(door);
         
         /* Genero su fisica */
@@ -80,6 +88,20 @@ public class Door extends Node
         
         /* Agrego el componente a la lista del pinball */
         pinball.addDoor(doorNode);
+        
+        /* Para detectar colisiones de objetos */
+        final SyntheticButton collisionEventHandler = doorNode.getCollisionEventHandler();
+        
+        /* Agrego la accion al controlador de pinball */
+        pinball.getPinballInputHandler().addAction(new InputAction() {
+        	
+        	public void performAction(InputActionEvent evt) {
+        		
+                /* Llamo a la logica del juego */
+                pinballInstance.getGameLogic().doorCollision(door);
+            }        	
+
+        }, collisionEventHandler, false);
         
         
 		return doorNode;

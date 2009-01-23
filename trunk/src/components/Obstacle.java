@@ -17,6 +17,8 @@ public class Obstacle extends Node
 	{
 		StaticPhysicsNode obstacleNode = pinball.getPhysicsSpace().createStaticNode();
 		
+		obstacleNode.setName("Obstacle");
+		
 		final Obstacle m = new Obstacle(name, visualModel);
 		
         /* Creo un nodo de Obstacle, con todas sus caracteristicas y lo fijo al nodo fisico */
