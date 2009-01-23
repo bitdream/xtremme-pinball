@@ -162,7 +162,7 @@ public class Pinball extends SimplePhysicsGame
         rootNode.updateGeometricState(interpolation, true);        
         
         // TODO Actualizar el score y el mensaje
-        scoreText.getText().replace(0, scoreText.getText().length(), "score: " + score);
+        scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
         
         
@@ -322,13 +322,13 @@ public class Pinball extends SimplePhysicsGame
 		
 		
 		// Cateles con el puntaje y los mensajes al usuario
-        scoreText = Text.createDefaultTextLabel("scoreText", "Score: 0");
+        scoreText = Text.createDefaultTextLabel("scoreText", "Score: " + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
         scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3/4, 5, 1));
         rootNode.attachChild(scoreText);
         
-        messageText = Text.createDefaultTextLabel("messageText", "Mensaje");
+        messageText = Text.createDefaultTextLabel("messageText", message);
         messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
