@@ -1,9 +1,12 @@
 package themes;
 
+import com.jmex.physics.StaticPhysicsNode;
+
 import mainloop.Pinball;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
+import components.Magnet;
 import components.Plunger;
 
 import gamelogic.GameLogic;
@@ -32,11 +35,16 @@ public class CarsThemeGameLogic extends GameLogic
 			showMessage("Colision con bumper!");
 			bumperCollisionCnt ++;
 			
-			// Si colisiono mas de x veces lo desactivo. Solo para testeo! TODO
-//			if (bumperCollisionCnt > 0)
-//			{
-//				bumper.setActive(false);
-//			}
+			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo! TODO
+			if (bumperCollisionCnt > 0)
+			{
+				//bumper.setActive(false);
+				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+				{
+					Magnet m = (Magnet)magnet.getChild(0);
+					m.setActive(false);
+				}
+			}
 		}
 		
 		//TODO agregando en cada instancia de bumper un cnt de colisiones puedo dar bonus por X colisiones contra el mismo bumper.
