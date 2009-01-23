@@ -15,6 +15,9 @@ import org.fenggui.layout.RowLayout;
 import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
+
+import themes.CarsThemeGameLogic;
+
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.KeyBindingManager;
@@ -309,6 +312,7 @@ public class Pinball extends SimplePhysicsGame
         
         // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
         // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
+        gameLogic = new CarsThemeGameLogic(this);
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();

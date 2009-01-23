@@ -132,6 +132,9 @@ public class Bumper extends Node implements ActivableComponent
                     return;
                 }
                 
+                // Llamo a la logica del juego. Lo hago por mas que el bumper no este activo, ya que ella determinara que hacer.
+                pinballInstance.getGameLogic().bumperCollision(bumper);
+                
                 // Solo si el bumper esta activo debe ejercer la fuerza sobre la bola y saltar (si es saltarin)
                 if (((Bumper)bump.getChild(0)).isActive())
                 {
