@@ -4,6 +4,7 @@ import components.Bumper;
 import components.Door;
 import components.Flipper;
 import components.Plunger;
+import components.Spinner;
 
 import mainloop.Pinball;
 
@@ -25,6 +26,12 @@ public abstract class GameLogic
 	public abstract void flipperCollision(Flipper flipper);
 	
 	public abstract void plungerCollision(Plunger plunger);
+	
+	public abstract void spinnerRampEntranceCollision(Spinner spinner);
+	
+	public abstract void spinnerRampExitCollision(Spinner spinner);
+	
+	public abstract void spinnerNormalCollision(Spinner spinner);
 	
 	public void showScore()
 	{

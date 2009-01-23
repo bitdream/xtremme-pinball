@@ -8,11 +8,14 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
+import components.Spinner;
 
 import gamelogic.GameLogic;
 
 public class CarsThemeGameLogic extends GameLogic
 {
+	private static final int bumperScore = 10, spinnerScore = 5;
+	
 	private int bumperCollisionCnt = 0;
 
 	public CarsThemeGameLogic(Pinball pinball)
@@ -28,7 +31,7 @@ public class CarsThemeGameLogic extends GameLogic
 		{
 			// TODO por cada colision entra 4 veces aca, es acorde al tiempo que dure la colision, asi que no es bug
 			// pero hay que notar que cada colision "visible" al ojo humano sumara 40 ptos
-			score+=10;
+			score += bumperScore;
 			
 			// Se actualiza los datos de pantalla de usuario
 			showScore();
@@ -53,22 +56,43 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void doorCollision(Door door)
 	{
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void flipperCollision(Flipper flipper)
 	{
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void plungerCollision(Plunger plunger)
 	{
-		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void spinnerNormalCollision(Spinner spinner)
+	{
+		score += spinnerScore;
+		
+		showMessage("Colision con molinete!");
+	}
+
+	@Override
+	public void spinnerRampEntranceCollision(Spinner spinner)
+	{
+		score += spinnerScore;
+		
+		showMessage("Colision con molinete!");
+	}
+
+	@Override
+	public void spinnerRampExitCollision(Spinner spinner)
+	{
+		score += spinnerScore;
+		
+		showMessage("Colision con molinete!");
 	}
 
 }

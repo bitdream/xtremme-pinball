@@ -37,6 +37,8 @@ public class Magnet extends Node implements ActivableComponent
 	{
 		StaticPhysicsNode magnetNode = pinball.getPhysicsSpace().createStaticNode();
 		
+		magnetNode.setName("Magnet");
+		
 		final Magnet magnet = new Magnet(name, visualModel);
         // Creo un nodo de Magnet, con todas sus caracteristicas y lo fijo al nodo fisico
 		magnetNode.attachChild(magnet);

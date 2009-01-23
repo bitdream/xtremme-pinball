@@ -57,8 +57,9 @@ public class Bumper extends Node implements ActivableComponent
 	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType)
 	{
 		final DynamicPhysicsNode bumperNode = pinball.getPhysicsSpace().createDynamicNode();
+		
 		// Nombre del nodo fisico de todos los bumpers
-		bumperNode.setName("bumper");
+		bumperNode.setName("Bumper");
 		
 		pinballInstance = pinball;		
 		

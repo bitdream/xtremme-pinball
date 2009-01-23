@@ -3,6 +3,9 @@ package components;
 import mainloop.Pinball;
 
 import com.jme.bounding.BoundingBox;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
+import com.jme.input.util.SyntheticButton;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.*;
@@ -40,6 +43,12 @@ public class Flipper extends Node implements ActivableComponent
 	/* Juego que lo contiene */
 	private Pinball pinball;
 	
+	/* Esta activo? */
+	public boolean active;
+	
+	/* Pinball en el que esta */
+	private static Pinball pinballInstance;
+	
 	
     /**
      * Crea un nodo dinamico de flipper.
@@ -55,6 +64,8 @@ public class Flipper extends Node implements ActivableComponent
 		
 		flipperNode.setName("Flipper");
 		
+		pinballInstance = pinball;
+		
 		/* Actualizo los vectores globales */
 		flipperNode.updateWorldVectors();
 		
@@ -62,7 +73,8 @@ public class Flipper extends Node implements ActivableComponent
         flipperNode.setMaterial(Material.RUBBER);
 		
         /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
-        Flipper flipper = new Flipper(name, visualModel, flipperType);
+        final Flipper flipper = new Flipper(name, visualModel, flipperType);
+        flipper.setActive(true);
         flipperNode.attachChild(flipper);
         
         /* Genero su fisica */
@@ -93,6 +105,20 @@ public class Flipper extends Node implements ActivableComponent
         
         /* Agrego el componente a la lista del pinball */
         pinball.addFlipper(flipperNode);
+        
+        /* Para detectar colisiones de objetos */
+        final SyntheticButton collisionEventHandler = flipperNode.getCollisionEventHandler();
+        
+        /* Agrego la accion al controlador de pinball */
+        pinball.getPinballInputHandler().addAction(new InputAction() {
+        	
+        	public void performAction(InputActionEvent evt) {
+        		
+                /* Llamo a la logica del juego */
+                pinballInstance.getGameLogic().flipperCollision(flipper);
+            }        	
+
+        }, collisionEventHandler, false);
         
         
 		return flipperNode;
@@ -179,12 +205,6 @@ public class Flipper extends Node implements ActivableComponent
 		this.joint = joint;
 	}
 
-	public void setActive(boolean active)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
 	public void setPinball(Pinball pinball)
 	{
 		this.pinball = pinball;
@@ -201,5 +221,16 @@ public class Flipper extends Node implements ActivableComponent
 		forceToApply.set(flipperRestoreForce).multLocal(time);
 
 		((DynamicPhysicsNode)getParent()).addForce(forceToApply.rotate(rot));
+	}
+	
+	public void setActive(boolean active)
+	{
+		this.active = active; 
+		
+	}
+	
+	public boolean isActive()
+	{
+		return this.active;
 	}
 }
