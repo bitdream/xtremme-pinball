@@ -1,5 +1,6 @@
 package themes;
 
+import com.jmex.audio.AudioTrack;
 import com.jmex.physics.StaticPhysicsNode;
 
 import mainloop.Pinball;
@@ -17,15 +18,20 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int bumperScore = 10, spinnerScore = 5;
 	
 	private int bumperCollisionCnt = 0;
-
+	
 	public CarsThemeGameLogic(Pinball pinball)
 	{
 		super(pinball);
+		
+		/* Preparo las pistas de audio que voy a usar */ // TODO falta poner las especificas del tema de autos
+		//bumpSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/bump.wav"), false);
 	}
 
 	@Override
 	public void bumperCollision(Bumper bumper)
 	{
+		super.bumperCollision(bumper);
+		
 		// Si el bumper esta activo, se hace la suma de puntos y de colisiones contra bumpers
 		if (bumper.isActive())
 		{
@@ -74,6 +80,8 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void spinnerNormalCollision(Spinner spinner)
 	{
+		super.spinnerNormalCollision(spinner);
+		
 		score += spinnerScore;
 		
 		showMessage("Colision con molinete!");
@@ -82,6 +90,8 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void spinnerRampEntranceCollision(Spinner spinner)
 	{
+		super.spinnerRampEntranceCollision(spinner);
+		
 		score += spinnerScore;
 		
 		showMessage("Colision con molinete!");
@@ -90,9 +100,17 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void spinnerRampExitCollision(Spinner spinner)
 	{
+		super.spinnerRampExitCollision(spinner);
+		
 		score += spinnerScore;
 		
 		showMessage("Colision con molinete!");
 	}
 
+	@Override
+	public void tilt()
+	{
+		super.tilt();
+		// TODO Agregar logica de control de tilts
+	}
 }

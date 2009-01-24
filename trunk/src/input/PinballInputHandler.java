@@ -45,11 +45,13 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		/* Golpear con flippers derechos */
 		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, true);
+		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers izquierdos */
 		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, true);
+		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, false);
 		
-		/* Retraer plunger */
+		/* Activar plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
 		
 		/* Hacer el tilt */
@@ -97,6 +99,27 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 	}
 	
+	/* Accion para golpear con flippers derechos por unica vez */
+	private class RightFlippersActionOnce extends InputAction
+	{
+		public void performAction(InputActionEvent event)
+		{
+			if(event.getTriggerPressed())
+			{
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+				
+					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
+					{
+						/* Aviso a la logica de juego */
+						game.getGameLogic().rightFlipperMove(actualFlipper);
+					}
+				}
+			}
+		}
+	}
+	
 	/* Accion para golpear con flippers izquierdos */
 	private class LeftFlippersAction extends InputAction
 	{
@@ -125,6 +148,28 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 	}
 	
+	/* Accion para golpear con flippers izquierdos por unica vez */
+	private class LeftFlippersActionOnce extends InputAction
+	{
+		public void performAction(InputActionEvent event)
+		{
+			if(event.getTriggerPressed())
+			{
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+					/* Aplico la fuerza sobre los flippers izquierdos */
+					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
+					{
+						/* Aviso a la logica de juego */
+						game.getGameLogic().leftFlipperMove(actualFlipper);
+					}
+				}
+			}
+		}
+		
+	}
+	
 	/* Accion para retraer el plunger */
 	private class ChargePlungerAction extends InputAction
 	{
@@ -137,6 +182,9 @@ public class PinballInputHandler extends FirstPersonHandler
 			{
 				/* El jugador agarro el plunger, ya no esta suelto */
 				plunger.setLoose(false);
+				
+				/* Aviso a la logica de juego */
+				game.getGameLogic().plungerCharge(plunger);
 			}
 			else if (!event.getTriggerPressed())
 			{
@@ -144,6 +192,9 @@ public class PinballInputHandler extends FirstPersonHandler
 				 * lo marco como soltado */
 				plunger.setLoose(true);
 				plunger.setDistance(game.getPlunger().getLocalTranslation().z);
+				
+				/* Aviso a la logica de juego */
+				game.getGameLogic().plungerRelease(plunger);
 			}
 		}
 		
@@ -184,6 +235,9 @@ public class PinballInputHandler extends FirstPersonHandler
 		                    
 		                }		                
 		         }
+				 
+				 /* Aviso a la logica de juego */
+				 game.getGameLogic().tilt();
 			}
 			else if (!event.getTriggerPressed())
 			{
