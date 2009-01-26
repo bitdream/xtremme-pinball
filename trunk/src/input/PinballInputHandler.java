@@ -44,12 +44,12 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers derechos */
-		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, true);
-		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RSHIFT, InputHandler.AXIS_NONE, false);
+		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
+		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, false); //KeyInput.KEY_RSHIFT
 		
 		/* Golpear con flippers izquierdos */
-		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, true);
-		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LSHIFT, InputHandler.AXIS_NONE, false);
+		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_X, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
+		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_X, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
 		
 		/* Activar plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
