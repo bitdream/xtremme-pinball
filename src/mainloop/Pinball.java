@@ -59,6 +59,10 @@ public class Pinball extends SimplePhysicsGame
 {
 	
 	public static final Material pinballTableMaterial = Material.PLASTIC;
+	
+	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
+	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
+	
 	private static final String GAME_NAME = "xtremme pinball";
 	private static final String GAME_VERSION = "0.3";
 	
@@ -420,6 +424,7 @@ public class Pinball extends SimplePhysicsGame
 		for (DynamicPhysicsNode bumper : getBumpers())
 		{
 			((Bumper)bumper.getChild(0)).recalculateJoints(this);
+			//((Box)(bumper.getChild(0))).getModelBound().transform(getPinballSettings().getInclinationQuaternion(), new Vector3f(0,0,0), new Vector3f(1,1,1)); //TODO ver esto 
 		}
 		/* Doors */
 		for (DynamicPhysicsNode door : getDoors())
@@ -739,7 +744,6 @@ public class Pinball extends SimplePhysicsGame
 		visualBumper1.updateModelBound();
 		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER);
 		rootNode.attachChild(bumper1);
-		// Agrego a la lista de bumpers del juego
 		
 		// Agrego otro bumper
 		final Box visualBumper2 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);

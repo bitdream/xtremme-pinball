@@ -9,7 +9,6 @@ import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
-import com.jme.scene.shape.Sphere;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.TranslationalJointAxis;
@@ -61,7 +60,7 @@ public class Bumper extends Node implements ActivableComponent
 		// Nombre del nodo fisico de todos los bumpers
 		bumperNode.setName("Bumper");
 		
-		pinballInstance = pinball;		
+		pinballInstance = pinball;	
 		
 		/* Crear un material que no tenga rebote con el material de la mesa y que su rozamiento sea muy grande. Ademas que sea
 		 * muy denso para que la bola no lo tire.
@@ -114,13 +113,13 @@ public class Bumper extends Node implements ActivableComponent
                 DynamicPhysicsNode ball, bump;
 
                 // El contacto pudo haber sido bola -> bumper o bumper -> bola
-                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getChild(0) instanceof Sphere ) {
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && /*contactInfo.getNode2().getChild(0) instanceof Sphere*/ contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(Pinball.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     bump = (DynamicPhysicsNode) contactInfo.getNode1();
                     sense = 1; //TODO para mi deberia ser -1, pero sino no anda         
                 }
-                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getChild(0) instanceof Sphere ) 
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && /*contactInfo.getNode1().getChild(0) instanceof Sphere*/ contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(Pinball.PHYSIC_NODE_NAME_FOR_BALLS) ) 
                 {
                 	// fue bola -> bumper
                     ball = (DynamicPhysicsNode) contactInfo.getNode1();
