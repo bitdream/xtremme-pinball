@@ -1,8 +1,6 @@
 package themes;
 
-import com.jmex.audio.AudioTrack;
 import com.jmex.physics.StaticPhysicsNode;
-
 import mainloop.Pinball;
 import components.Bumper;
 import components.Door;
@@ -45,7 +43,7 @@ public class CarsThemeGameLogic extends GameLogic
 			bumperCollisionCnt ++;
 			
 			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo! TODO
-			if (bumperCollisionCnt > 0)
+			if (bumperCollisionCnt > 5)
 			{
 				//bumper.setActive(false);
 				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
@@ -111,6 +109,6 @@ public class CarsThemeGameLogic extends GameLogic
 	public void tilt()
 	{
 		super.tilt();
-		// TODO Agregar logica de control de tilts
+		// TODO Agregar logica de control de tilts -> creo q es respecto al abuso de uso de los mismos, el tema es que no se controla desde aca sino desde el input handler.
 	}
 }
