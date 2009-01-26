@@ -66,15 +66,7 @@ public class Magnet extends Node implements ActivableComponent
 	 	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
 	 		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
 	 		                     */	 
-	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getLocalTranslation()).normalize();			                          	
-	 	                    	
-	 	                    	// Calculo la distancia sobre el plano de la mesa, para ello llevo los valores de Y a cero en las posiciones de la bola y el iman
-//	 	                    	Vector3f magnetTranslationOverTable = magnet.getVisualModel().getLocalTranslation();
-//	 	                    	magnetTranslationOverTable.setY(0);//	                    	
-//	 	                    	Vector3f ballTranslationOverTable = ball.getLocalTranslation();
-//	 	                    	ballTranslationOverTable.setY(0);//	                    	
-//	 	                    	Vector3f direction = magnetTranslationOverTable.subtract(ballTranslationOverTable).normalize();
-	 		                    
+	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getLocalTranslation()).normalize();	         
 	 		                    
 	 		                    // Aplicar la fuerza atractora. Formula magica. TODO ajustar la fuerza para un mejor comportamiento
 	 		                    // Es inversamente proporcional a la distancia
