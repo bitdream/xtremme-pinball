@@ -238,6 +238,8 @@ public class PinballInputHandler extends FirstPersonHandler
 				 
 				 /* Aviso a la logica de juego */
 				 game.getGameLogic().tilt();
+				 
+				 //TODO detectar abuso y llamar a abuseTilt()
 			}
 			else if (!event.getTriggerPressed())
 			{

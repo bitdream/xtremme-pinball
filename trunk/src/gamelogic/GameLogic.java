@@ -138,7 +138,14 @@ public abstract class GameLogic
 		flipperMoveSounds.get(rand.nextInt(flipperMoveSoundQty)).play();
 	}
 	
+	// Invocado cuando el usuario hace tilt
 	public void tilt()
+	{
+		tiltSound.play();
+	}
+	
+	// Invocado cuando el usuario hizo abuso del uso de tilt
+	public void abuseTilt()
 	{
 		tiltSound.play();
 	}

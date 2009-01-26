@@ -109,6 +109,13 @@ public class CarsThemeGameLogic extends GameLogic
 	public void tilt()
 	{
 		super.tilt();
+	}
+	
+	@Override
+	public void abuseTilt()
+	{
+		super.abuseTilt();
 		// TODO Agregar logica de control de tilts -> creo q es respecto al abuso de uso de los mismos, el tema es que no se controla desde aca sino desde el input handler.
+		// Imprimir en pantalla un cartel que avise el abuso de tilts y desactivar los flippers
 	}
 }
