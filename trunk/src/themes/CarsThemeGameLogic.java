@@ -109,6 +109,7 @@ public class CarsThemeGameLogic extends GameLogic
 	public void tilt()
 	{
 		super.tilt();
+		showMessage("Tilt! Cuidado, no abuse de su uso!");
 	}
 	
 	@Override

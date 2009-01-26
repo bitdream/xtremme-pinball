@@ -10,9 +10,7 @@ import com.jme.input.action.InputActionEvent;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
-import com.jme.scene.shape.Sphere;
 import com.jmex.physics.DynamicPhysicsNode;
-import com.jmex.physics.PhysicsNode;
 import components.Flipper;
 import components.Plunger;
 
@@ -213,27 +211,18 @@ public class PinballInputHandler extends FirstPersonHandler
 				// Intensidad de la fuerza a aplicar
 				float forceIntensity = 500; //90000f;
 				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
-				Vector3f force = new Vector3f(/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1)) , 
-						/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1)),
-						/*FastMath.nextRandomFloat() * */FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);
+				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)) , 
+						FastMath.sign(FastMath.nextRandomInt(-1, 1)),
+						FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);
 				
 				// Tomo cada bola de la escena y le aplico la fuerza
-				 for (PhysicsNode node: game.getPhysicsSpace().getNodes()) 
-		         {	          
-		            	// TODO ver: estoy suponiendo que las bolas del flipper van a estar formadas por un nodo fisico con un 
-		            	// unico nodo visual attacheado. Y que dicho nodo visual sera una esfera. 
-		            	// Otra forma de identificarlo: el nombre del nodo fisico por convencion el "ball"
-		                if (node instanceof DynamicPhysicsNode && node.getChild(0) instanceof Sphere) 
-		                {
-		                    DynamicPhysicsNode ball = (DynamicPhysicsNode)node;
-		                               
-		                    // Fuerza random en las tres direcciones. La bola puede saltar y colisionar contra el vidrio.
-		                    ball.addForce(force.mult(ball.getMass()));
-		                    
-		                    // Muevo la camara
-		                    game.getCamera().setLocation(initCameraPos.add(cameraMovement));		                    
-		                    
-		                }		                
+				 for (DynamicPhysicsNode ball: game.getBalls()) 
+		         {		                                       
+                    // Fuerza random en las tres direcciones. La bola puede saltar y colisionar contra el vidrio.
+                    ball.addForce(force.mult(ball.getMass()));
+                    
+                    // Muevo la camara
+                    game.getCamera().setLocation(initCameraPos.add(cameraMovement));	            	                
 		         }
 				 
 				 /* Aviso a la logica de juego */
