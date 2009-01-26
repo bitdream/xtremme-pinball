@@ -9,6 +9,7 @@ import java.util.logging.*;
 import org.fenggui.*;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.composite.Window;
+import org.fenggui.Display;
 import org.fenggui.event.ButtonPressedEvent;
 import org.fenggui.event.IButtonPressedListener;
 import org.fenggui.layout.RowLayout;
@@ -20,13 +21,18 @@ import themes.CarsThemeGameLogic;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
+import com.jme.bounding.BoundingVolume;
 import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+import com.jme.math.FastMath;
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
+import com.jme.scene.Geometry;
+import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Box;
@@ -172,7 +178,7 @@ public class Pinball extends SimplePhysicsGame
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);        
         
-        // TODO Actualizar el score y el mensaje
+        // Se actualiza la info que se presenta en pantalla (score y mensajes)
         scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
         
@@ -333,7 +339,7 @@ public class Pinball extends SimplePhysicsGame
 		initGUI();
 		
 		/* Muestro el menu */
-		showMenu();
+    	showMenu();
 		
 		
 		// Cateles con el puntaje y los mensajes al usuario
@@ -424,7 +430,14 @@ public class Pinball extends SimplePhysicsGame
 		for (DynamicPhysicsNode bumper : getBumpers())
 		{
 			((Bumper)bumper.getChild(0)).recalculateJoints(this);
-			//((Box)(bumper.getChild(0))).getModelBound().transform(getPinballSettings().getInclinationQuaternion(), new Vector3f(0,0,0), new Vector3f(1,1,1)); //TODO ver esto 
+//			BoundingVolume b;
+//			Quaternion q = new Quaternion();
+//			q.fromAngles(FastMath.DEG_TO_RAD * 15f, 0f, 0f);
+//			b = ((Geometry)((Node)bumper.getChild(0)).getChild(0)).getModelBound().transform(/*getPinballSettings().getInclinationQuaternion()*/ q, new Vector3f(0,0,0), new Vector3f(1,1,1)); //TODO ver esto 
+//			((Geometry)((Node)bumper.getChild(0)).getChild(0)).setModelBound(b);
+//			((Geometry)((Node)bumper.getChild(0)).getChild(0)).updateModelBound();
+//			
+//			System.out.println( ((Node)bumper.getChild(0)).getChild(0).getClass().getName()  + "   -------    " + b.distanceTo(new Vector3f(1,1,1)) + "  ----   " + q.getRotationColumn(1));
 		}
 		/* Doors */
 		for (DynamicPhysicsNode door : getDoors())
@@ -528,7 +541,7 @@ public class Pinball extends SimplePhysicsGame
 		// TODO ver donde poner esta creacion de la bola
 		/* Nodo dinamico de la bola */
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-		// El nodo fisico de todas las bolas debera llamarse "ball"
+		// El nodo fisico de todas las bolas debera llamarse "ball" -> POR CONVENCION!
 		mainBall.setName("ball");
         rootNode.attachChild(mainBall);
                
@@ -738,7 +751,7 @@ public class Pinball extends SimplePhysicsGame
 		final Box visualBumper1 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
 		// Le doy color al bumper
 		Utils.color( visualBumper1, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
-		visualBumper1.setLocalTranslation(new Vector3f(0, 5, 0));
+		visualBumper1.setLocalTranslation(new Vector3f(0, 5.6f, 0));
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
