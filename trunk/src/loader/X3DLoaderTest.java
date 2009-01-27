@@ -73,7 +73,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
 
         /* Gravedad */
         // para testear con más fuerza
-        //getPhysicsSpace().setDirectionalGravity(new Vector3f(1, -9.80f, 1));
+        getPhysicsSpace().setDirectionalGravity(new Vector3f(0, -9.76f, 0.85f));
         /* Iluminacion */
         // test de spot, no se aplica
         SpotLight sl = new SpotLight();
@@ -97,29 +97,29 @@ public class X3DLoaderTest extends SimplePhysicsGame
         /* cargamos y attacheamos la habitacion */
         try
         {
-            loader = new X3DLoader( "./resources/models/Room3.x3d" );
+            loader = new X3DLoader( X3DLoader.class.getClassLoader().getResource("resources/models/Room.x3d") );
 
             /* agregamos la fisica */
-            loader.setPhysicsSpace( getPhysicsSpace() );
+            loader.setPinball( getPhysicsSpace() );
 
             /* agregamos el lightState */
             loader.setLightState( lightState );
 
             /* cargamos y attacheamos la habitacion */
-            //rootNode.attachChild( loader.loadScene() );
+            rootNode.attachChild( loader.loadScene() );
         }
         catch ( FileNotFoundException e )
         {
             e.printStackTrace();
         }
         
-        /* cargamos y attacheamos la mesa */
+        /* cargamos y attacheamos la maquina */
         try
         {
-            loader = new X3DLoader( "./resources/models/MachineTest.x3d" );
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource("resources/models/Machine.x3d" ) );
 
             /* agregamos la fisica */
-            loader.setPhysicsSpace( getPhysicsSpace() );
+            loader.setPinball( getPhysicsSpace() );
 
             /* agregamos el lightState */
             loader.setLightState( lightState );
@@ -134,6 +134,29 @@ public class X3DLoaderTest extends SimplePhysicsGame
         {
             e.printStackTrace();
         }
+        
+        /* cargamos y attacheamos la mesa */
+        try
+        {
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
+
+            /* agregamos la fisica */
+            loader.setPinball( getPhysicsSpace() );
+
+            /* agregamos el lightState */
+            loader.setLightState( lightState );
+
+            Spatial scene = loader.loadScene();
+
+            //occluders.attachChild( scene );
+            /* cargamos y attacheamos la habitacion */
+            rootNode.attachChild( scene );
+        }
+        catch ( FileNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+        
         
         //super.simpleInitGame(); //descomentar si se extiende de pinball 
 
@@ -158,7 +181,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
         /* forma */
         // forma, ubicacion y attacheo a la fisica de la pelotita
         final Sphere visualMainBall = new Sphere( "Bola principal", 25, 25, 1 );
-        mainBall.setLocalTranslation( new Vector3f( 1, 100, -65 ) );
+        mainBall.setLocalTranslation( new Vector3f(this.ballStartUp ));
         mainBall.attachChild( visualMainBall );
 
         /* boundingBox */
@@ -198,7 +221,9 @@ public class X3DLoaderTest extends SimplePhysicsGame
         /* Camara */
 
         /* ubicacion  y orientacion */
-        cam.setLocation( new Vector3f( 0.0f, 90.0f, 0.0f ) ); // 100 son 2mts, y seria lineal
+        cam.setLocation( new Vector3f( 0.0f, 102.5f, 0.0f ) ); // 100 son 2mts, y seria lineal
+        
+        // mejorar esto
         cam.lookAt( new Vector3f( 0.0f, 0.0f, -100.0f ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
 
         /* aplicar los cambios a la camara */
@@ -232,6 +257,8 @@ public class X3DLoaderTest extends SimplePhysicsGame
 //        rootNode.attachChild( cnphys );
 
     }
+    private Vector3f ballStartUp =new Vector3f( 1, 50, -65 );
+
 
     @Override
     protected void simpleUpdate()
@@ -248,7 +275,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
         if ( KeyBindingManager.getKeyBindingManager().isValidCommand( "comm_restart", false ) )
         {
             mainBall.clearDynamics();
-            mainBall.setLocalTranslation( new Vector3f( 1, 100, -65 ) );
+            mainBall.setLocalTranslation( new Vector3f(this.ballStartUp) );
             mainBall.setLocalRotation( new Quaternion() );
             mainBall.updateGeometricState( 0, false );
         }
