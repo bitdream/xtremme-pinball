@@ -1,5 +1,6 @@
 package themes;
 
+import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
 import mainloop.Pinball;
 import components.Bumper;
@@ -116,7 +117,15 @@ public class CarsThemeGameLogic extends GameLogic
 	public void abuseTilt()
 	{
 		super.abuseTilt();
-		// TODO Agregar logica de control de tilts -> creo q es respecto al abuso de uso de los mismos, el tema es que no se controla desde aca sino desde el input handler.
-		// Imprimir en pantalla un cartel que avise el abuso de tilts y desactivar los flippers
+		
+		// Imprimir en pantalla un cartel que avise el abuso de tilts 
+		showMessage("Abuso de tilt! Bola perdida");
+		
+		// Desactivar los flippers
+		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+		{
+			((Flipper)flipper.getChild(0)).setActive(false);
+		}
+		
 	}
 }
