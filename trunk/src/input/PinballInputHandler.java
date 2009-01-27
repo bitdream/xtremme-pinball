@@ -1,7 +1,6 @@
 package input;
 
 import mainloop.Pinball;
-
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
@@ -22,6 +21,14 @@ import components.Plunger;
 public class PinballInputHandler extends FirstPersonHandler
 {
 	private Pinball game;
+	
+	// Para la accion de tilt
+	// Cantidad maxima de tilts permitidos dentro del intervalo de tiempo especificado
+	private static int tiltsAllowed = 5;
+	// Intervalo de timepo en milisegundos
+	private static long tiltPenalizationTimeInterval = 5000; // Son 5 segundos	
+	//Intervalo de tiempo luego del cual se blanquearan los tilts anteriores y se podra seguir usandolo sin penalizacion
+	private static long tiltFreeTimeInterval = 5000; // Son 5 segundos
 	
 	public PinballInputHandler(Pinball game)
 	{
@@ -201,10 +208,20 @@ public class PinballInputHandler extends FirstPersonHandler
 	/* Accion para realizar el tilt */
 	private class tiltAction extends InputAction
 	{
+		// Cantidad de tiempos actualmente cargados en el arreglo de tiempos
+		int actualTiltArrayElems = 0;
+		
+		// Arreglo de tiempos
+		long [] tiltArrayTimes = new long[tiltsAllowed]; 
+		
+		//Ultimo tiempo en que se hizo tilt
+		long lastTiltTime = 0;
+		
 		public void performAction(InputActionEvent event)
 		{
 			Vector3f cameraMovement = new Vector3f(3,3,3);
 			Vector3f initCameraPos = game.getCamera().getLocation();
+
 			
 			if(event.getTriggerPressed())
 			{
@@ -215,7 +232,7 @@ public class PinballInputHandler extends FirstPersonHandler
 						FastMath.sign(FastMath.nextRandomInt(-1, 1)),
 						FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);
 				
-				// Tomo cada bola de la escena y le aplico la fuerza
+				 // Tomo cada bola de la escena y le aplico la fuerza
 				 for (DynamicPhysicsNode ball: game.getBalls()) 
 		         {		                                       
                     // Fuerza random en las tres direcciones. La bola puede saltar y colisionar contra el vidrio.
@@ -225,10 +242,57 @@ public class PinballInputHandler extends FirstPersonHandler
                     game.getCamera().setLocation(initCameraPos.add(cameraMovement));	            	                
 		         }
 				 
-				 /* Aviso a la logica de juego */
-				 game.getGameLogic().tilt();
+				 // Agregado de la logica necesaria para la deteccion del uso abusivo de tilt
 				 
-				 //TODO detectar abuso y llamar a abuseTilt()
+				 // TODO debug
+				 //System.out.println("Antes: ");
+				 //printArr(tiltArrayTimes);				 
+				 
+				 // Tiempo actual
+				 long now = System.currentTimeMillis();
+				 
+				 // Si la diferencia entre el ultimo tilt y el actual es mayor a tiltFreeTimeInterval seg, blanqueo el arreglo. Ademas debe haber habido al menos 1 tilt anterior
+				 if (now - lastTiltTime > tiltFreeTimeInterval && lastTiltTime != 0)
+				 {
+					 // Poner en cero los elementos
+					for (int i=0; i<tiltArrayTimes.length;i++)
+					{
+						tiltArrayTimes[i] = 0;
+					}
+					
+					// Inicializar variables
+					actualTiltArrayElems = 0;
+					lastTiltTime = 0;					
+				 }				 
+				 
+				 // Shifteo, almaceno el tiempo actual en el arreglo y actualizo variables
+				 shiftLeft(tiltArrayTimes);
+				 tiltArrayTimes[tiltsAllowed - 1] = now;
+				 lastTiltTime = tiltArrayTimes[tiltsAllowed - 1];
+				 
+				 // Actualizar la cantidad de elementos en el arreglo de tiempo (como maximo siempre habra tiltsAllowed)
+				 if (actualTiltArrayElems < tiltsAllowed )
+				 {
+					 actualTiltArrayElems++;
+				 }					 
+				 
+				 // Si la diferencia entre el tiempo mas viejo almacenado y el ultimo es menor a tiltsAllowed seg, invocar abuseTilt()
+				 // Se realizo tilt tiltsAllowed veces o mas durante un lapso de tiltPenalizationTimeInterval milisegundos
+				 if (lastTiltTime - tiltArrayTimes[0] < tiltPenalizationTimeInterval && actualTiltArrayElems == tiltsAllowed)
+				 {
+					 /* Aviso a la logica de juego */
+					 game.getGameLogic().abuseTilt();
+				 }
+				 else
+				 {
+					 /* Aviso a la logica de juego */
+					 game.getGameLogic().tilt();
+				 }			
+				 
+				 //TODO debug
+				 //System.out.println("Luego: ");
+				 //printArr(tiltArrayTimes);
+
 			}
 			else if (!event.getTriggerPressed())
 			{
@@ -236,6 +300,24 @@ public class PinballInputHandler extends FirstPersonHandler
 				game.getCamera().setLocation(initCameraPos.subtract(cameraMovement));
 			}
 		
+		}
+		
+		private void shiftLeft(long[] arr)
+		{
+			for(int i=0; i<arr.length-1;i++)
+			{
+				arr[i] = arr[i+1];
+			}
+		}
+		
+		
+		// TODO qutar, es para debug
+		private void printArr(long[] arr)
+		{
+			for(int i=0; i<arr.length;i++)
+			{
+				System.out.println(arr[i]);
+			}
 		}
 	}
 }
