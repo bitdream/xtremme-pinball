@@ -48,8 +48,6 @@
 
 package loader;
 
-import input.PinballInputHandler;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +77,6 @@ import com.jme.bounding.BoundingBox;
 import com.jme.image.Image;
 import com.jme.image.Texture;
 import com.jme.image.Texture2D;
-import com.jme.input.FirstPersonHandler;
 import com.jme.light.DirectionalLight;
 import com.jme.light.Light;
 import com.jme.light.PointLight;
@@ -290,12 +287,6 @@ public class X3dToJme extends FormatConverter {
      */
     private boolean addToTransparentQueue = false;
 
-    /**
-     * Indicates whether the physics attributes for the currently processed 
-     * geometry should be dynamic or static
-     */
-    private boolean dynamic = false;
-    
     /**
      * Creates the X3DLoader.
      * 
@@ -549,8 +540,8 @@ public class X3dToJme extends FormatConverter {
                     logger.info( "skipping DEF on physics node" );
                 }
             }
-            
-            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("physicsSpace");
+            boolean dynamic = false;
+            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("pinball");
             if ( physicsSpace != null ) {
                 PhysicsNode physicsResult = null;
                 
@@ -858,6 +849,112 @@ public class X3dToJme extends FormatConverter {
             }
         }
 
+        // XXX volaria
+        boolean dynamic = false;
+        
+        // yo creo que esto apesta lo suficiente como para anotarlo, pero no 
+        // tanto como para cambiarlo, tal vez lo pase al wrapper que va a ser mas
+        // prolijo
+
+        // parse the metadata
+        if (metadataNode != null) {
+            Object pinball = (Pinball) getProperty("pinball");
+           Hashtable<String, Object> metadata = parseMetadata(metadataNode); 
+           if (metadata.containsKey( "type" ))
+           {
+               shape.detachAllChildren();
+               String type = (String)metadata.get( "type" );
+               System.out.println(type);
+               if (type.equals( "Bumper" )) {
+                   System.out.println("createBumper");
+                   
+                   String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
+                   
+                   BumperType bumperType = BumperType.NO_JUMPER;
+                   if (typeOfBumper.equals( "jumper" ))
+                   {
+                       bumperType = BumperType.JUMPER;
+                   }
+                   //FIXME
+                   shape = Bumper.create( (Pinball)pinball, "bumper"+bumperCounter++, geom, bumperType );
+                   
+                   dynamic = true;
+                   
+               } else if (type.equals( "Door" )) {
+                   System.out.println("createDoor");
+                   
+                   String typeOfDoor = (String)metadata.get( "doorType" ); // es obligatorio
+                   float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
+                   float maxRotationalAngle = (Float)metadata.get( "maxRotationalAngle" );
+                   
+                   DoorType doorType = DoorType.RIGHT_DOOR;
+                   if (typeOfDoor.equals( "left_door" ))
+                   {
+                       doorType = DoorType.LEFT_DOOR;
+                   }
+                   //FIXME
+                   shape = Door.create( (Pinball)pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
+                   
+                   dynamic = true;
+                   
+               } else if (type.equals( "Flipper" )) {
+                   System.out.println("createFlipper");
+                   
+                   String typeOfFlipper = (String)metadata.get( "flipperType" );
+                   
+                   FlipperType flipperType = FlipperType.RIGHT_FLIPPER;
+                   if (typeOfFlipper.equals( "left_flipper" ))
+                   {
+                       flipperType = FlipperType.LEFT_FLIPPER;
+                   }
+                   //FIXME
+                   shape = Flipper.create( (Pinball)pinball, "flipper"+flipperCounter++, geom, flipperType );
+                   
+                   dynamic = true;
+                   
+               } else if (type.equals( "Magnet" )) {
+                   System.out.println("createMagnet");
+                   
+/* TADADADADADADADADADADADAAA!!!!!!!!! my magic */
+                   geom.updateModelBound();
+                   
+                   
+                   //FIXME
+                   shape = Magnet.create( (Pinball)pinball, "magnet"+magnetCounter++, geom );
+    
+                   dynamic = true;
+                   
+               } else if (type.equals( "Plunger" )) {
+                   System.out.println("createPluneger");
+                   
+                   float maxBackstep = (Float)metadata.get( "maxBackStep" );
+                   //FIXME
+                   shape = Plunger.create( (Pinball)pinball, "thePlunger", geom, maxBackstep );
+                   
+                   dynamic = true;
+                   
+               }
+               
+                   
+            }
+        }
+        else
+        {
+            //shape = new obstacle bla bla bla y a otra cosa 
+            // TODO volar
+            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("physicsSpace");
+            if ( physicsSpace != null && !dynamic ) {
+                PhysicsNode physicsResult = null;
+
+                physicsResult = physicsSpace.createStaticNode();
+
+                physicsResult.attachChild(shape);     
+                physicsResult.generatePhysicsGeometry(true);
+                
+                shape = physicsResult;
+            }
+        }
+        
         // Parse and set the appearance properties, if available
         createBumpController = false; // Reset the create controller flag
         addToTransparentQueue = false;
@@ -898,91 +995,12 @@ public class X3dToJme extends FormatConverter {
             }
         }
 
-        // parse the metadata
-        if (metadataNode != null) {
-           Hashtable<String, Object> metadata = parseMetadata(metadataNode); 
-           if (!metadata.containsKey( "type" ))
-           {
-               return shape;
-           }
-           
-           String type = (String)metadata.get( "type" );
-           System.out.println(type);
-           if (type.equals( "Bumper" )) {
-               System.out.println("createBumper");
-               
-               String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
-               
-               BumperType bumperType = BumperType.NO_JUMPER;
-               if (typeOfBumper.equals( "jumper" ))
-               {
-                   bumperType = BumperType.JUMPER;
-               }
-               //FIXME
-               shape = Bumper.create(new Pinball(), "bumper"+bumperCounter++, geom, bumperType);
-               
-               dynamic = true;
-               
-           } else if (type.equals( "Door" )) {
-               System.out.println("createDoor");
-               
-               String typeOfDoor = (String)metadata.get( "doorType" ); // es obligatorio
-               float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
-               float maxRotationalAngle = (Float)metadata.get( "maxRotationalAngle" );
-               
-               DoorType doorType = DoorType.RIGHT_DOOR;
-               if (typeOfDoor.equals( "left_door" ))
-               {
-                   doorType = DoorType.LEFT_DOOR;
-               }
-               //FIXME
-               shape = Door.create( new Pinball(), "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
-               
-               dynamic = true;
-               
-           } else if (type.equals( "Flipper" )) {
-               System.out.println("createFlipper");
-               
-               String typeOfFlipper = (String)metadata.get( "flipperType" );
-               
-               FlipperType flipperType = FlipperType.RIGHT_FLIPPER;
-               if (typeOfFlipper.equals( "left_flipper" ))
-               {
-                   flipperType = FlipperType.LEFT_FLIPPER;
-               }
-               //FIXME
-               shape = Flipper.create( new Pinball(), "flipper"+flipperCounter++, geom, flipperType );
-               
-               dynamic = true;
-               
-           } else if (type.equals( "Magnet" )) {
-               System.out.println("createMagnet");
-               //FIXME
-               shape = Magnet.create( /*new Pinball()*/ (PhysicsSpace)getProperty( "physicsSpace" ), "magnet"+magnetCounter++, geom );
-
-               dynamic = true;
-               
-           } else if (type.equals( "Plunger" )) {
-               System.out.println("createPluneger");
-               
-               float maxBackstep = (Float)metadata.get( "maxBackStep" );
-               //FIXME
-               shape = Plunger.create( new Pinball(), "thePlunger", geom, maxBackstep );
-               
-               dynamic = true;
-               
-           }
-           
-               
-        }
-        
         return shape;
     }
     private static int bumperCounter = 0;
     private static int doorCounter = 0;
     private static int flipperCounter = 0;
     private static int magnetCounter = 0;
-    
     
     /**
      * Checks if the given String represents one of the types of geometry nodes

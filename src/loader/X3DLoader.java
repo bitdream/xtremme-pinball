@@ -2,6 +2,7 @@ package loader;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,18 +31,23 @@ public class X3DLoader
 
     private Map<String, InputStream> dtds          = null;
 
-    private PhysicsSpace             physicsSpace  = null;
+    private PhysicsSpace             pinball  = null;
 
     private LightState               lightState    = null;
 
     private String                   x3dFileName   = null;
 
-    public X3DLoader( String x3dFilename ) throws FileNotFoundException
+    public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
+        //        System.out.println(x3dFilename.getFile());
+        //        System.out.println(x3dFilename.getPath());
+        //        try{System.out.println(x3dFilename.toURI());}catch(URISyntaxException e){e.printStackTrace();}
+        //        try{System.out.println(x3dFilename.getContent());}catch(Exception e) {e.printStackTrace();}
+
         try
         {
-            this.x3d = new FileInputStream( x3dFilename );
-            this.x3dFileName = x3dFilename;
+            this.x3d = new FileInputStream( x3dFilename.getFile() );
+            this.x3dFileName = x3dFilename.getPath();
         }
         catch ( FileNotFoundException e )
         {
@@ -101,7 +107,7 @@ public class X3DLoader
         {
             converter.setProperty( "textures", X3DLoader.getStandardTextureDir() );
         }
-        converter.setProperty( "physicsSpace", physicsSpace );
+        converter.setProperty( "pinball", pinball );
 
         //logger.info( "Starting to convert .x3d to .jme" );
         try
@@ -119,14 +125,14 @@ public class X3DLoader
         return node;
     }
 
-    public PhysicsSpace getPhysicsSpace()
+    public PhysicsSpace getPinball()
     {
-        return physicsSpace;
+        return pinball;
     }
 
-    public void setPhysicsSpace( PhysicsSpace physicsSpace )
+    public void setPinball( PhysicsSpace pinball )
     {
-        this.physicsSpace = physicsSpace;
+        this.pinball = pinball;
     }
 
     public LightState getLightState()
@@ -169,13 +175,20 @@ public class X3DLoader
      * @throws FileNotFoundException
      *             si no encuentra el archivo lanza file not found
      */
-    public void putDTD( String key, String path ) throws FileNotFoundException
+    public void putDTD( String key, URL path ) throws FileNotFoundException
     {
         if ( this.dtds == null )
         {
             this.dtds = new HashMap<String, InputStream>();
         }
-        this.dtds.put( key, new FileInputStream( path ) );
+        try
+        {
+            this.dtds.put( key, (InputStream)path.getContent() );
+        }
+        catch (IOException e)
+        {
+            throw new FileNotFoundException(e.getMessage());
+        }
     }
 
     /**
@@ -183,9 +196,9 @@ public class X3DLoader
      * 
      * @param path
      */
-    public void setTextureDir( String path ) throws MalformedURLException
+    public void setTextureDir( URL path )
     {
-        this.textureDirURL = new URL( "file://" + path + '/' );
+        this.textureDirURL = path;
     }
 
     /**
@@ -200,14 +213,23 @@ public class X3DLoader
 
         HashMap<String, InputStream> dtds = new HashMap<String, InputStream>();
 
-        dtds.put( "x3d-3.0.dtd", new FileInputStream( "./resources/models/dtd/x3d-3.0.dtd" ) );
-        dtds.put( "x3d-3.0-InputOutputFields.dtd", new FileInputStream(
-            "./resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ) );
-        dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", new FileInputStream(
-            "./resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ) );
-        dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", new FileInputStream(
-            "./resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ) );
-        dtds.put( "x3d-3.0.xsd", new FileInputStream( "./resources/models/dtd/x3d-3.0.xsd" ) );
+        try
+        {
+            dtds.put( "x3d-3.0.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                "resources/models/dtd/x3d-3.0.dtd" ).getContent() );
+            dtds.put( "x3d-3.0-InputOutputFields.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                "resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ).getContent() );
+            dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                "resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ).getContent() );
+            dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                "resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ).getContent() );
+            dtds.put( "x3d-3.0.xsd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                "resources/models/dtd/x3d-3.0.xsd" ).getContent() );
+        }
+        catch ( IOException e )
+        {
+            throw new FileNotFoundException(e.getMessage());
+        }
 
         ret = new DTDResolver( dtds );
 
@@ -221,15 +243,8 @@ public class X3DLoader
      */
     public static URL getStandardTextureDir()
     {
-        String texDir = "file://" + System.getProperty( "user.dir" ) + "/resources/textures/";
-        try
-        {
-            return new URL( texDir );
-        }
-        catch ( MalformedURLException e )
-        {
-            return null;
-        }
+        //System.out.println( X3DLoader.class.getClassLoader().getResource( "resources/textures/" ) );
+        return X3DLoader.class.getClassLoader().getResource( "resources/textures/" );
     }
 
 }
