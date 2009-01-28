@@ -207,35 +207,44 @@ public class X3DLoader
      * @return
      * @throws FileNotFoundException
      */
-    public static DTDResolver getStandardDTDResolver() throws FileNotFoundException
+    public synchronized static DTDResolver getStandardDTDResolver() throws FileNotFoundException
     {
         DTDResolver ret;
 
-        HashMap<String, InputStream> dtds = new HashMap<String, InputStream>();
-
-        try
+        if ( standardDTDResolver == null )
         {
-            dtds.put( "x3d-3.0.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                "resources/models/dtd/x3d-3.0.dtd" ).getContent() );
-            dtds.put( "x3d-3.0-InputOutputFields.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                "resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ).getContent() );
-            dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                "resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ).getContent() );
-            dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                "resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ).getContent() );
-            dtds.put( "x3d-3.0.xsd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                "resources/models/dtd/x3d-3.0.xsd" ).getContent() );
-        }
-        catch ( IOException e )
-        {
-            throw new FileNotFoundException(e.getMessage());
+            HashMap<String, InputStream> dtds = new HashMap<String, InputStream>();
+
+            try
+            {
+                dtds.put( "x3d-3.0.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                    "resources/models/dtd/x3d-3.0.dtd" ).getContent() );
+                dtds.put( "x3d-3.0-InputOutputFields.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                    "resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ).getContent() );
+                dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                    "resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ).getContent() );
+                dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                    "resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ).getContent() );
+                dtds.put( "x3d-3.0.xsd", (InputStream) X3DLoader.class.getClassLoader().getResource(
+                    "resources/models/dtd/x3d-3.0.xsd" ).getContent() );
+            }
+            catch ( IOException e )
+            {
+                throw new FileNotFoundException(e.getMessage());
+            }
+
+            standardDTDResolver = new DTDResolver( dtds );
+            
         }
 
-        ret = new DTDResolver( dtds );
+        ret = standardDTDResolver;
+
 
         return ret;
     }
 
+    private static DTDResolver standardDTDResolver = null;
+    
     /**
      * Retorna los el directorio default para las texturas
      * 

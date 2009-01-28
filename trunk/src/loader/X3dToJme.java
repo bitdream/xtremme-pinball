@@ -412,6 +412,21 @@ public class X3dToJme extends FormatConverter {
             logger.info("No X3D document root!");
             return new com.jme.scene.Node();
         }
+        
+        // Parse header
+        Node header = getChildNode(nodes.item(0), "head");
+        String pinballTheme = null;
+        if (header != null) {
+            pinballTheme = getThemeFromHeader(header);
+            if (pinballTheme == null) {
+                // ojo aca puede venir la habitacion o la maquina.
+                pinballTheme = "noTheme";
+            }
+        }
+        //FIXME
+System.out.println(pinballTheme);
+        
+        
         Node scene = getChildNode(nodes.item(0), "Scene");
         com.jme.scene.Node sceneRoot = new com.jme.scene.Node();
 
@@ -477,6 +492,28 @@ public class X3dToJme extends FormatConverter {
         return sceneRoot;
     }
 
+    private String getThemeFromHeader(Node header) {
+        String theme = null;
+        
+        // Process all child nodes
+        Node child = header.getFirstChild();
+        while (child != null) {
+            short type = child.getNodeType();
+            if (type != Node.COMMENT_NODE) {
+                String name = child.getNodeName();
+                if (name.equals("meta")) {
+               		boolean isTheme = child.getAttributes().getNamedItem("name").getNodeValue().equals( "theme" ); 
+                    if (isTheme)
+                        theme = child.getAttributes().getNamedItem("content").getNodeValue();
+                }
+
+            }
+            child = child.getNextSibling();
+        }
+        
+        return theme;
+    }
+    
     /**
      * Gets the child node with the specified name from the specified node.
      * 
@@ -858,7 +895,7 @@ public class X3dToJme extends FormatConverter {
 
         // parse the metadata
         if (metadataNode != null) {
-            Object pinball = (Pinball) getProperty("pinball");
+           Pinball pinball = (Pinball) getProperty("pinball");
            Hashtable<String, Object> metadata = parseMetadata(metadataNode); 
            if (metadata.containsKey( "type" ))
            {
@@ -875,8 +912,7 @@ public class X3dToJme extends FormatConverter {
                    {
                        bumperType = BumperType.JUMPER;
                    }
-                   //FIXME
-                   shape = Bumper.create( (Pinball)pinball, "bumper"+bumperCounter++, geom, bumperType );
+                   shape = Bumper.create( pinball, "bumper"+bumperCounter++, geom, bumperType );
                    
                    dynamic = true;
                    
@@ -892,8 +928,7 @@ public class X3dToJme extends FormatConverter {
                    {
                        doorType = DoorType.LEFT_DOOR;
                    }
-                   //FIXME
-                   shape = Door.create( (Pinball)pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
+                   shape = Door.create( pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
                    
                    dynamic = true;
                    
@@ -907,20 +942,17 @@ public class X3dToJme extends FormatConverter {
                    {
                        flipperType = FlipperType.LEFT_FLIPPER;
                    }
-                   //FIXME
-                   shape = Flipper.create( (Pinball)pinball, "flipper"+flipperCounter++, geom, flipperType );
+                   shape = Flipper.create( pinball, "flipper"+flipperCounter++, geom, flipperType );
                    
                    dynamic = true;
                    
                } else if (type.equals( "Magnet" )) {
                    System.out.println("createMagnet");
                    
-/* TADADADADADADADADADADADAAA!!!!!!!!! my magic */
+/* TARAAAA!!!!!!!!! my magic */
                    geom.updateModelBound();
                    
-                   
-                   //FIXME
-                   shape = Magnet.create( (Pinball)pinball, "magnet"+magnetCounter++, geom );
+                   shape = Magnet.create( pinball, "magnet"+magnetCounter++, geom );
     
                    dynamic = true;
                    
@@ -928,8 +960,7 @@ public class X3dToJme extends FormatConverter {
                    System.out.println("createPluneger");
                    
                    float maxBackstep = (Float)metadata.get( "maxBackStep" );
-                   //FIXME
-                   shape = Plunger.create( (Pinball)pinball, "thePlunger", geom, maxBackstep );
+                   shape = Plunger.create( pinball, "thePlunger", geom, maxBackstep );
                    
                    dynamic = true;
                    
@@ -1038,14 +1069,14 @@ public class X3dToJme extends FormatConverter {
         return false;
     }
 
-    //FIXME return 
     /**
      * Parses any X3D metadata node (Set, String, Float, Integer) and does some 
      * shit.
      * 
      * @param node
      *            The X3D node
-     * @return ?????
+     * @return Hashtable
+     *            A hashtable with the values parsed from metadata
      * @throws Exception
      *             In case an error occurs during parsing
      */
@@ -1062,7 +1093,7 @@ public class X3dToJme extends FormatConverter {
             Node child = node.getFirstChild();
             while (child != null) {
                 if (isMetadataType(child.getNodeName())) {
-                    // FIXME esto es cualquiera, pero va a funcar
+                    // XXX esto es cualquiera, pero va a funcar
                     result.putAll( parseMetadata( child ) );
                 }
                 child = child.getNextSibling();
@@ -1090,7 +1121,7 @@ public class X3dToJme extends FormatConverter {
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private Geometry parseGeometry(Node node) throws Exception {
+    private synchronized Geometry parseGeometry(Node node) throws Exception {
         // Check for the USE attribute
         Node use = node.getAttributes().getNamedItem("USE");
         if (use != null) {
@@ -1290,7 +1321,7 @@ public class X3dToJme extends FormatConverter {
                 "creaseAngle").getNodeValue().trim(), 0);
 
         // Parse the texture coordinates
-        // TODO: Enable MultiTextureCoordinate parsing!
+        // TO DO: Enable MultiTextureCoordinate parsing!
         float[] texCoordValues = null;
         Node texCoords = getChildNode(node, "TextureCoordinate");
         if (texCoords != null) {
@@ -1681,7 +1712,7 @@ private static int  ifscount = 0;
      * @return The jME Cylinder
      */
     private Cylinder parseCylinder(Node node, String title) {
-        // TODO: Implement the possibility to fully use the "top", "bottom" and
+        // TO DO: Implement the possibility to fully use the "top", "bottom" and
         // "side" attributes
 
         Cylinder cylinder = null;
@@ -1849,7 +1880,7 @@ private static int  ifscount = 0;
      *            The X3D Appearance node
      * @return An array containing the created RenderStates
      */
-    private RenderState[] parseAppearance(Node node) {
+    private synchronized RenderState[] parseAppearance(Node node) {
 
         // Check for the USE attribute
         Node use = node.getAttributes().getNamedItem("USE");
@@ -1965,7 +1996,7 @@ private static int  ifscount = 0;
      *            The X3D Material node
      * @return An array containing the generated states
      */
-    private RenderState[] parseMaterial(Node node) {
+    private synchronized RenderState[] parseMaterial(Node node) {
 
         // Check for the USE attribute
         Node use = node.getAttributes().getNamedItem("USE");
@@ -2300,7 +2331,7 @@ private static int  ifscount = 0;
      *            The X3D MultiTexture nodes
      * @return The TextureState
      */
-    private TextureState parseMultiTexture(Node node) {
+    private synchronized TextureState parseMultiTexture(Node node) {
 
         // Check for the USE attribute
         Node use = node.getAttributes().getNamedItem("USE");

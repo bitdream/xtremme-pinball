@@ -93,7 +93,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
         /* X3D */
 
         X3DLoader loader;
-
+//        long time=System.currentTimeMillis();
         /* cargamos y attacheamos la habitacion */
         try
         {
@@ -105,8 +105,9 @@ public class X3DLoaderTest extends SimplePhysicsGame
             /* agregamos el lightState */
             loader.setLightState( lightState );
 
+            Spatial scene = loader.loadScene();
             /* cargamos y attacheamos la habitacion */
-            rootNode.attachChild( loader.loadScene() );
+            rootNode.attachChild( scene );
         }
         catch ( FileNotFoundException e )
         {
@@ -157,7 +158,23 @@ public class X3DLoaderTest extends SimplePhysicsGame
             e.printStackTrace();
         }
         
-        
+//        Thread load = new Thread(new LoadThread( "resources/models/Room.x3d" ));
+//        load.start();
+//        Thread load1 = new Thread(new LoadThread( "resources/models/Machine.x3d" ));
+//        load1.start();
+//        Thread load2 = new Thread(new LoadThread( "resources/models/Table.x3d" ));
+//        load2.start();
+//
+//        try {
+//            load.join();
+//            load1.join();
+//            load2.join();
+//        }
+//        catch(Exception e)
+//        {
+//            
+//        }
+//        System.out.println("time is "+(System.currentTimeMillis()-time));
         //super.simpleInitGame(); //descomentar si se extiende de pinball 
 
         /* Bola */
@@ -257,8 +274,9 @@ public class X3DLoaderTest extends SimplePhysicsGame
 //        rootNode.attachChild( cnphys );
 
     }
+    
     private Vector3f ballStartUp =new Vector3f( 1, 50, -65 );
-
+    //private Vector3f ballStartUp =new Vector3f( -2, 40, -85.4f );
 
     @Override
     protected void simpleUpdate()
@@ -298,5 +316,43 @@ public class X3DLoaderTest extends SimplePhysicsGame
 //        /** Have the PassManager render. */
 //        pManager.renderPasses( display.getRenderer() );
 //    }
-    
+//    
+//    private class LoadThread implements Runnable {
+//
+//        private String filename;
+//        
+//        @Override
+//        public void run()
+//        {
+//            try
+//            {
+//                X3DLoader loader = new X3DLoader( X3DLoader.class.getClassLoader().getResource( this.filename ) );
+//    
+//                /* agregamos la fisica */
+//                loader.setPinball( getPhysicsSpace() );
+//    
+//                /* agregamos el lightState */
+//                loader.setLightState( lightState );
+//    
+//                Spatial scene = loader.loadScene();
+//                
+//                synchronized ( rootNode )
+//                {
+//                    /* cargamos y attacheamos la habitacion */
+//                    rootNode.attachChild( scene );    
+//                }
+//                
+//            }
+//            catch ( FileNotFoundException e )
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//        
+//        public LoadThread( String filename )
+//        {
+//            this.filename = filename;
+//        }
+//        
+//    }
 }
