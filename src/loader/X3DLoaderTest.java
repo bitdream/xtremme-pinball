@@ -275,8 +275,8 @@ public class X3DLoaderTest extends SimplePhysicsGame
 
     }
     
-    private Vector3f ballStartUp =new Vector3f( 1, 50, -65 );
-    //private Vector3f ballStartUp =new Vector3f( -2, 40, -85.4f );
+    //private Vector3f ballStartUp =new Vector3f( 1, 50, -65 );
+    private Vector3f ballStartUp =new Vector3f( -2, 40, -85.4f );
 
     @Override
     protected void simpleUpdate()

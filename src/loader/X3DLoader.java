@@ -4,13 +4,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import mainloop.Pinball;
+
 import com.jme.scene.Node;
+import com.jme.scene.shape.Pyramid;
 import com.jme.scene.state.LightState;
 import com.jmex.model.converters.DTDResolver;
 import com.jmex.physics.PhysicsSpace;
@@ -31,7 +33,9 @@ public class X3DLoader
 
     private Map<String, InputStream> dtds          = null;
 
-    private PhysicsSpace             pinball  = null;
+    private PhysicsSpace             physicsSpace = null;
+    
+    private Pinball                  pinball  = null;
 
     private LightState               lightState    = null;
 
@@ -107,7 +111,9 @@ public class X3DLoader
         {
             converter.setProperty( "textures", X3DLoader.getStandardTextureDir() );
         }
-        converter.setProperty( "pinball", pinball );
+        
+        converter.setProperty( "pinball", physicsSpace );
+        //converter.setProperty( "pinball", pinball );
 
         //logger.info( "Starting to convert .x3d to .jme" );
         try
@@ -125,14 +131,19 @@ public class X3DLoader
         return node;
     }
 
-    public PhysicsSpace getPinball()
+    public Pinball getPinball()
     {
         return pinball;
     }
 
-    public void setPinball( PhysicsSpace pinball )
+    public void setPinball( Pinball pinball )
     {
         this.pinball = pinball;
+    }
+    
+    public void setPinball( PhysicsSpace physicsSpace )
+    {
+        this.physicsSpace = physicsSpace;
     }
 
     public LightState getLightState()
