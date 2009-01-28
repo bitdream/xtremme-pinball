@@ -1,5 +1,6 @@
 package input;
 
+import main.Main;
 import mainloop.Pinball;
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
@@ -37,9 +38,6 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		this.game = game;
 		
-		/* Comienza deshabilitado */
-		setEnabled(false);
-		
 		setActions();
 	}
 	
@@ -49,12 +47,12 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers derechos */
-		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
-		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, false); //KeyInput.KEY_RSHIFT
+		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
+		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, false); //KeyInput.KEY_RSHIFT
 		
 		/* Golpear con flippers izquierdos */
-		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_X, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
-		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_X, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
+		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
+		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
 		
 		/* Activar plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
@@ -70,8 +68,10 @@ public class PinballInputHandler extends FirstPersonHandler
 		public void performAction(InputActionEvent event)
 		{
 			if(event.getTriggerPressed())
-				game.showMenu();
-			
+			{
+				Main.pauseCurrentPinballGame();
+				Main.activateMenu();
+			}
 		}
 		
 	}
