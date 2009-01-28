@@ -3,6 +3,7 @@ package gamestates;
 import com.jme.renderer.Camera;
 import com.jme.renderer.Renderer;
 import com.jme.scene.state.LightState;
+import com.jme.scene.state.WireframeState;
 import com.jme.system.DisplaySystem;
 import com.jme.util.geom.Debugger;
 import com.jmex.physics.PhysicsDebugger;
@@ -11,7 +12,8 @@ import com.jmex.physics.util.states.PhysicsGameState;
 
 public class PhysicsEnhancedGameState extends PhysicsGameState
 {
-
+    protected WireframeState wireState;
+    
 	protected DisplaySystem display;
 	
 	protected Camera cam;
@@ -31,6 +33,10 @@ public class PhysicsEnhancedGameState extends PhysicsGameState
         lightState.setEnabled( true );
         
         rootNode.setRenderState( lightState );
+        
+        wireState = display.getRenderer().createWireframeState();
+        wireState.setEnabled( false );
+        rootNode.setRenderState( wireState ); 
 		
 		rootNode.updateRenderState();
 	}
