@@ -425,7 +425,7 @@ public class X3dToJme extends FormatConverter {
             }
         }
         //FIXME
-System.out.println(pinballTheme);
+//System.out.println(pinballTheme);
         
         
         Node scene = getChildNode(nodes.item(0), "Scene");
@@ -579,7 +579,7 @@ System.out.println(pinballTheme);
                 }
             }
             boolean dynamic = false;
-            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("pinball");
+            PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
             if ( physicsSpace != null ) {
                 PhysicsNode physicsResult = null;
                 
@@ -974,7 +974,7 @@ System.out.println(pinballTheme);
         {
             //shape = new obstacle bla bla bla y a otra cosa 
             // TODO volar
-            PhysicsSpace physicsSpace = (PhysicsSpace) getProperty("physicsSpace");
+            PhysicsSpace physicsSpace = ((PinballGameState)getProperty("pinball")).getPhysicsSpace();
             if ( physicsSpace != null && !dynamic ) {
                 PhysicsNode physicsResult = null;
 

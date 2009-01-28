@@ -2,9 +2,13 @@ package gamestates;
 
 import gamelogic.GameLogic;
 import input.PinballInputHandler;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.*;
+
+import loader.X3DLoader;
 
 import themes.CarsThemeGameLogic;
 
@@ -105,6 +109,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Timer para los FPS */
 	protected Timer timer;
 
+	private Vector3f ballStartUp =new Vector3f( 1, 100, -65 );
 	
 	/**
 	 * Crea un estado de juego nuevo.
@@ -174,27 +179,42 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
 		
-		/* Inicializo la camara */
+		/* Inicializo al jugador */
 		
+		// inicializo cabeza
 		/* Perspectiva y FOV */
 		cam.setFrustumPerspective(45.0f, (float)pinballSettings.getWidth() / (float)pinballSettings.getHeight(), 1, 1000);
 		
 		/* Ubicacion */
-		Vector3f loc = new Vector3f(0.0f, 4f, 200f);
+		Vector3f loc = new Vector3f(0.0f, 0.0f, 0.0f);
 		Vector3f left = new Vector3f(-1.0f, 0.0f, 0.0f);
 		Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
+		Vector3f dir = new Vector3f(0.0f, 0f, 1.0f);
 
 		cam.setFrame(loc, left, up, dir);
+		
+        /* aplicar los cambios a la cabeza */
+        cam.update();
 
-		/* Aplicar los cambios a la camara */
-		cam.update();
-
+        // le pego los ojos
 	    /* Fijo la camara al display */
 		display.getRenderer().setCamera(cam);
 		
+		// le agrego las extremidades
 		/* Creo el input handler del pinball */
 		pinballInputHandler = new PinballInputHandler(this);
+		
+		// y lo ubico en el espacio
+        /* seteo ubicacion del jugador */
+        cam.setLocation( new Vector3f( 0.0f, 102.5f, 0.0f ) ); // 100 son 2mts, y seria lineal
+
+        // seteo la miradad del jugador 
+        cam.lookAt( new Vector3f( 0.0f, 0.0f, -100.0f ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
+
+        /* Aplicar los cambios al jugador */
+        cam.update();
+        
+        
 	
 		/* Quiero que ese input handler sea leido en cada paso que haga el motor de fisica,
 		 * de modo tal que las fuerzas que acciones continuas apliquen (ej: plunger) se realicen */
@@ -240,19 +260,29 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		balls = new ArrayList<DynamicPhysicsNode>(4);
 
         /* Armo la mesa de juego */
-        buildTable();
+        //buildTable();
         
         // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
         // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
         gameLogic = new CarsThemeGameLogic(this);
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
-        buildAndAttachComponents();
+        //buildAndAttachComponents();
         
-        buildLighting();
+        //buildLighting();
+        //buildTable();
 
+        
+        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
+        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
+        gameLogic = new CarsThemeGameLogic(this);
+
+        loadEnvironment();
+        loadTable();
+        setUpBall();
+        
         /* Inclino todos los componentes a la vez desde el nodo raiz */
-        inclinePinball();
+        //inclinePinball(); lo hago en el loadTable
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -280,12 +310,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	    light.setLocation( new Vector3f( 100, 100, 100 ) );
 	    light.setEnabled( true );
 	    
-	    /** Attach the light to a lightState and the lightState to rootNode. */
-	    LightState lightState = display.getRenderer().createLightState();
-	    lightState.setEnabled( true );
 	    lightState.attach( light );
-	    
-	    rootNode.setRenderState( lightState );
 	}
 	
 	private void updateComponents(float interpolation)
@@ -730,4 +755,159 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	{
 		return balls;
 	}
+	
+	private void setUpBall()
+	{
+	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
+
+        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
+        final Material customMaterial = new Material( "material de bola" );
+        // Es pesado
+        customMaterial.setDensity( 100.0f );
+        // Detalles de contacto con el otro material
+        MutableContactInfo contactDetails = new MutableContactInfo();
+        // Poco rebote
+        contactDetails.setBounce( 0.5f );
+        // Poco rozamiento
+        contactDetails.setMu( 0.5f );
+        customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
+
+        /* Nodo dinamico de la bola */
+        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+        mainBall.setName( "ball" );
+        rootNode.attachChild( mainBall );
+
+        final Sphere visualMainBall3 = new Sphere( "Bola", 25, 25, 1 );
+        visualMainBall3.setLocalTranslation( new Vector3f( this.ballStartUp ) );
+
+        // Agregado de bounding volume 
+        visualMainBall3.setModelBound( new BoundingSphere() );
+        visualMainBall3.updateModelBound();
+
+        mainBall.attachChild( visualMainBall3 );
+        mainBall.generatePhysicsGeometry();
+        mainBall.setMaterial( customMaterial );
+        // Se computa la masa luego de generar la geometria fisica
+        mainBall.computeMass();
+
+        // La agrego a la lista de bolas
+        balls.add( mainBall );
+	}
+	
+	private void loadEnvironment()
+    {
+        /* Iluminacion */
+
+        /* borramos todas las luces default */
+        lightState.detachAll();
+
+        /* X3D */
+
+        X3DLoader loader;
+        /* cargamos y attacheamos la habitacion */
+        try
+        {
+            loader = new X3DLoader( X3DLoader.class.getClassLoader().getResource("resources/models/Room.x3d") );
+
+            /* agregamos la fisica */
+            loader.setPinball( this );
+
+            /* agregamos el lightState */
+            loader.setLightState( lightState );
+
+            Spatial room = loader.loadScene();
+            
+            /* cargamos y attacheamos la habitacion */
+            rootNode.attachChild( room );
+        }
+        catch ( FileNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+        
+        /* cargamos y attacheamos la maquina */
+        try
+        {
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource("resources/models/Machine.x3d" ) );
+
+            /* agregamos la fisica */
+            loader.setPinball( this );
+
+            /* agregamos el lightState */
+            loader.setLightState( lightState );
+
+            Spatial machine = loader.loadScene();
+
+            /* cargamos y attacheamos la maquina */
+            rootNode.attachChild( machine );
+        }
+        catch ( FileNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadTable()
+    {
+        X3DLoader loader;
+
+        /* cargamos y attacheamos la mesa */
+        try
+        {
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
+
+            /* agregamos la fisica */
+            loader.setPinball( this );
+
+            /* agregamos el lightState */
+            loader.setLightState( lightState );
+
+            Spatial table = loader.loadScene();
+
+            inclinePinball( table );
+            
+            /* cargamos y attacheamos la tabla */
+            rootNode.attachChild( table );
+        }
+        catch ( FileNotFoundException e )
+        {
+            e.printStackTrace();
+        }
+        
+        //FIXME
+        // this.gameLogic = loader.getTheme();
+        this.gameLogic = new CarsThemeGameLogic(this);
+    }
+    
+    private void inclinePinball( Spatial table )
+    {
+        /* Se rota toda la mesa y sus componentes en el eje X */
+        table.setLocalRotation(getPinballSettings().getInclinationQuaternion());
+        
+        /* Inclino joints fisicos y demas, recalculandolos */
+        /* Flippers */
+        for (DynamicPhysicsNode flipper : getFlippers())
+        {
+            ((Flipper)flipper.getChild(0)).recalculateJoints(this);
+        }
+        /* Bumpers */
+        for (DynamicPhysicsNode bumper : getBumpers())
+        {
+            ((Bumper)bumper.getChild(0)).recalculateJoints(this);
+        }
+        /* Doors */
+        for (DynamicPhysicsNode door : getDoors())
+        {
+            ((Door)door.getChild(0)).recalculateJoints(this);
+        }
+        /* Spinners */
+        for (DynamicPhysicsNode spinner : getSpinners())
+        {
+            ((Spinner)spinner.getChild(0)).recalculateJoints(this);
+        }
+        /* Plunger */
+        if (plunger != null)
+            ((Plunger)plunger.getChild(0)).recalculateJoints(this);
+            
+    }
 }
