@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import com.jme.scene.Node;
 import com.jme.scene.shape.Pyramid;
@@ -35,7 +35,7 @@ public class X3DLoader
 
     private PhysicsSpace             physicsSpace = null;
     
-    private Pinball                  pinball  = null;
+    private PinballGameState                  pinball  = null;
 
     private LightState               lightState    = null;
 
@@ -131,12 +131,12 @@ public class X3DLoader
         return node;
     }
 
-    public Pinball getPinball()
+    public PinballGameState getPinball()
     {
         return pinball;
     }
 
-    public void setPinball( Pinball pinball )
+    public void setPinball( PinballGameState pinball )
     {
         this.pinball = pinball;
     }

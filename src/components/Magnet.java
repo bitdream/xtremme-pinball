@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 import com.jme.math.Vector3f;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
@@ -33,7 +33,7 @@ public class Magnet extends Node implements ActivableComponent
 	// Esta activo este magnet?
 	public boolean active = true;
 
-	public static StaticPhysicsNode create(final Pinball pinball, String name, Geometry visualModel)
+	public static StaticPhysicsNode create(final PinballGameState pinball, String name, Geometry visualModel)
 	{
 		StaticPhysicsNode magnetNode = pinball.getPhysicsSpace().createStaticNode();
 		

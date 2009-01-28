@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
@@ -34,10 +34,10 @@ public class Plunger extends Node
 	private Joint joint;
 	
 	/* Juego que lo contiene */
-	private Pinball pinball;
+	private PinballGameState pinball;
 	
 	/* Pinball en el que esta */
-	private static Pinball pinballInstance;
+	private static PinballGameState pinballInstance;
 	
 	
 	/**
@@ -48,7 +48,7 @@ public class Plunger extends Node
 	 * @param maxBackstep Maxima distancia permitida hacia atras para tomar fuerza.
 	 * @return El nodo creado.
 	 */
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, float maxBackstep)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, float maxBackstep)
 	{
 		DynamicPhysicsNode plungerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -126,7 +126,7 @@ public class Plunger extends Node
 		setDistance(1);
 	}
 	
-	public void recalculateJoints(Pinball pinball)
+	public void recalculateJoints(PinballGameState pinball)
 	{
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
@@ -171,7 +171,7 @@ public class Plunger extends Node
 		this.joint = joint;
 	}
 
-	public void setPinball(Pinball pinball)
+	public void setPinball(PinballGameState pinball)
 	{
 		this.pinball = pinball;
 	}

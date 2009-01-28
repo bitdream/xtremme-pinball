@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jmex.physics.StaticPhysicsNode;
@@ -13,7 +13,7 @@ public class Obstacle extends Node
 {
 	private static final long serialVersionUID = 1L;
 	
-	public static StaticPhysicsNode create(Pinball pinball, String name, Geometry visualModel)
+	public static StaticPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel)
 	{
 		StaticPhysicsNode obstacleNode = pinball.getPhysicsSpace().createStaticNode();
 		

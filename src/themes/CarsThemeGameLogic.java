@@ -2,7 +2,7 @@ package themes;
 
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -18,7 +18,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private int bumperCollisionCnt = 0;
 	
-	public CarsThemeGameLogic(Pinball pinball)
+	public CarsThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		

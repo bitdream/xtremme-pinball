@@ -1,7 +1,7 @@
 package input;
 
 import main.Main;
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
@@ -21,7 +21,7 @@ import components.Plunger;
  */
 public class PinballInputHandler extends FirstPersonHandler
 {
-	private Pinball game;
+	private PinballGameState game;
 	
 	// Para la accion de tilt
 	// Cantidad maxima de tilts permitidos dentro del intervalo de tiempo especificado
@@ -31,7 +31,7 @@ public class PinballInputHandler extends FirstPersonHandler
 	//Intervalo de tiempo luego del cual se blanquearan los tilts anteriores y se podra seguir usandolo sin penalizacion
 	private static long tiltFreeTimeInterval = 5000; // Son 5 segundos
 	
-	public PinballInputHandler(Pinball game)
+	public PinballInputHandler(PinballGameState game)
 	{
 		/* Llamo al constructor de FirstPersonHandler pasandole las velocidades de camara del juego */
 		super(game.getCamera(), game.getPinballSettings().getCamMoveSpeed(), game.getPinballSettings().getCamTurnSpeed());

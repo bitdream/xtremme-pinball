@@ -1,8 +1,8 @@
 package main;
 
 import gamestates.MenuGameState;
-import mainloop.Pinball;
-import mainloop.PinballSettings;
+import mainloop.PinballGameState;
+import mainloop.PinballGameStateSettings;
 
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.game.StandardGame;
@@ -42,10 +42,10 @@ public class Main
 		return menuGS;
 	}
 	
-	public static Pinball newPinballGame()
+	public static PinballGameState newPinballGame()
 	{
 		/* Creo las configuraciones */
-		PinballSettings pinballSettings = new PinballSettings();
+		PinballGameStateSettings pinballSettings = new PinballGameStateSettings();
 		
 		// TODO ver que hacer con los settings, probablemente vuelen de aca
 		
@@ -58,7 +58,7 @@ public class Main
 		pinballSettings.setRenderer(stdGame.getSettings().getRenderer());
 		
 		/* Creo un nuevo Pinball */
-		Pinball pinballGS = new Pinball("Game", pinballSettings);
+		PinballGameState pinballGS = new PinballGameState("Game", pinballSettings);
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(pinballGS);

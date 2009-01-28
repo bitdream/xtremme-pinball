@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.input.action.InputAction;
@@ -35,7 +35,7 @@ public class Door extends Node
 	private Joint joint;
 	
 	/* Pinball en el que esta */
-	private static Pinball pinballInstance;
+	private static PinballGameState pinballInstance;
 	
 
     /**
@@ -48,7 +48,7 @@ public class Door extends Node
 	 * @param maxRotationalAngle Angulo maximo de rotacion para la puerta.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, DoorType doorType, float minRotationalAngle, float maxRotationalAngle)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, DoorType doorType, float minRotationalAngle, float maxRotationalAngle)
 	{
 		DynamicPhysicsNode doorNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -148,7 +148,7 @@ public class Door extends Node
 		this.doorType = doorType;
 	}
 	
-	public void recalculateJoints(Pinball pinball)
+	public void recalculateJoints(PinballGameState pinball)
 	{
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
