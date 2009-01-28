@@ -113,8 +113,8 @@ public class X3DLoader
             converter.setProperty( "textures", X3DLoader.getStandardTextureDir() );
         }
         
-        converter.setProperty( "pinball", physicsSpace );
-        //converter.setProperty( "pinball", pinball );
+        //converter.setProperty( "pinball", physicsSpace );
+        converter.setProperty( "pinball", pinball );
 
         //logger.info( "Starting to convert .x3d to .jme" );
         try
