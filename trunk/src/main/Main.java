@@ -69,6 +69,11 @@ public class Main
 		return pinballGS;
 	}
 	
+	public static boolean hasInCourseGame()
+	{
+		return GameStateManager.getInstance().getChild("Game") != null;
+	}
+	
 	public static void pauseCurrentPinballGame()
 	{
 		if (GameStateManager.getInstance().getChild("Game") != null)
@@ -81,14 +86,20 @@ public class Main
 			GameStateManager.getInstance().detachChild("Game");
 	}
 	
+	public static void continueCurrentPinballGame()
+	{
+		if (GameStateManager.getInstance().getChild("Game") != null)
+			GameStateManager.getInstance().activateChildNamed("Game");
+	}
+	
 	public static void deactivateMenu()
 	{
-		GameStateManager.getInstance().getChild("Menu").setActive(false);
+		GameStateManager.getInstance().deactivateChildNamed("Menu");
 	}
 	
 	public static void activateMenu()
 	{
-		GameStateManager.getInstance().getChild("Menu").setActive(true);
+		GameStateManager.getInstance().activateChildNamed("Menu");
 	}
 	
 	public static void shutdownGame()
