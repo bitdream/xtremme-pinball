@@ -209,9 +209,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
             {
             }
         });
-		
-		/* Precision fisica */
-		getPhysicsSpace().setAccuracy(0.001f);
 	}
 
 	/**
