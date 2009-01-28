@@ -29,6 +29,8 @@ public class MenuGameState extends BasicGameState
 	 * y las envie al display de JME para ser capturadas por los otros handlers */
 	private FengJMEInputHandler fengGUIInputHandler;
 	
+	private Button continueButton, newGameButton, exitButton;
+	
 
 	public MenuGameState(String name)
 	{
@@ -55,10 +57,24 @@ public class MenuGameState extends BasicGameState
 		menu.getContentContainer().setLayoutManager(new RowLayout(false));
 		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
 
-		// TODO falta el boton de continuar juego... poner todo esto en setActive?
+		/* Boton de continuar */
+		continueButton = FengGUI.createButton(menu.getContentContainer(), "Continue");
 		
+		continueButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+
+				/* Continuo el juego actual */
+				Main.continueCurrentPinballGame();
+				
+				/* Desactivo el gamestate de menu */
+				Main.deactivateMenu();
+
+			}
+		});
+
 		/* Boton de juego nuevo */
-		final Button newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
+		newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
 		
 		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
 			
@@ -77,7 +93,7 @@ public class MenuGameState extends BasicGameState
 		});
 		
 		/* Boton de salir */
-		final Button exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
+		exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
 		
 		exitButton.addButtonPressedListener(new IButtonPressedListener() {
 			
@@ -89,7 +105,7 @@ public class MenuGameState extends BasicGameState
 		});
  
 		/* Comprime lo posible los botones */
-		//menu.pack(); TODO darle algo de estilo al menu
+		//menu.pack(); TODO darle algo de estilo al menu y agregarle un fondo
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
@@ -99,11 +115,14 @@ public class MenuGameState extends BasicGameState
 	public void setActive(boolean active)
 	{
 		super.setActive(active);
-		
+
 		if (active)
 		{
 			/* Hago visible al cursor */
 			MouseInput.get().setCursorVisible(true);
+			
+			/* Si hay juegos en transcurso, muestro el boton de continue */
+			continueButton.setVisible(Main.hasInCourseGame());
 		}
 		else
 		{
