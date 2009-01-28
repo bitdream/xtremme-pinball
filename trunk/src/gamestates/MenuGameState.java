@@ -54,7 +54,6 @@ public class MenuGameState extends BasicGameState
 		menu.setPosition(new Point(50, 200));
 		menu.getContentContainer().setLayoutManager(new RowLayout(false));
 		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
-//TODO		menu.setVisible(false);
 
 		// TODO falta el boton de continuar juego... poner todo esto en setActive?
 		
@@ -105,17 +104,11 @@ public class MenuGameState extends BasicGameState
 		{
 			/* Hago visible al cursor */
 			MouseInput.get().setCursorVisible(true);
-			
-			/* Muestro el menu */
-			//TODO hace falta? menu.setVisible(true);
 		}
 		else
 		{
 			/* Oculto el cursor */
 			MouseInput.get().setCursorVisible(false);
-			
-			/* Oculto el menu */
-			//TODO hace falta? menu.setVisible(false);
 		}
 	}
 	
