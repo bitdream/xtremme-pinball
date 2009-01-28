@@ -1,7 +1,7 @@
 package input;
 
+import gamestates.PinballGameState;
 import main.Main;
-import mainloop.PinballGameState;
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;

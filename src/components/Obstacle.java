@@ -1,6 +1,7 @@
 package components;
 
-import mainloop.PinballGameState;
+import gamestates.PinballGameState;
+
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jmex.physics.StaticPhysicsNode;

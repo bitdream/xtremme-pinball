@@ -1,4 +1,4 @@
-package mainloop;
+package gamestates;
 
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;

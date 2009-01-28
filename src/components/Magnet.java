@@ -1,6 +1,7 @@
 package components;
 
-import mainloop.PinballGameState;
+import gamestates.PinballGameState;
+
 import com.jme.math.Vector3f;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;

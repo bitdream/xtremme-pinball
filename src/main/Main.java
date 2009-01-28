@@ -1,8 +1,8 @@
 package main;
 
 import gamestates.MenuGameState;
-import mainloop.PinballGameState;
-import mainloop.PinballGameStateSettings;
+import gamestates.PinballGameState;
+import gamestates.PinballGameStateSettings;
 
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.game.StandardGame;
