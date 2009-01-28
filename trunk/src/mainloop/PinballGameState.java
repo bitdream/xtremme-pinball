@@ -47,7 +47,7 @@ import components.Spinner.SpinnerType;
  * Clase principal del juego.
  *
  */
-public class Pinball extends PhysicsEnhancedGameState
+public class PinballGameState extends PhysicsEnhancedGameState
 {
 	
 	public static final Material pinballTableMaterial = Material.PLASTIC;
@@ -59,7 +59,7 @@ public class Pinball extends PhysicsEnhancedGameState
 	private static final String GAME_VERSION = "0.4";
 	
 	/* Logger de la clase Pinball */
-    private static final Logger logger = Logger.getLogger(Pinball.class.getName());
+    private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
     
 	/* InputHandler para el pinball */
 	private PinballInputHandler pinballInputHandler;
@@ -86,7 +86,7 @@ public class Pinball extends PhysicsEnhancedGameState
 	private DynamicPhysicsNode plunger;
 	
 	/* Configuracion del juego */
-	private PinballSettings pinballSettings;
+	private PinballGameStateSettings pinballSettings;
 	
 	/* Score del juego */
 	private int score = 0;
@@ -112,7 +112,7 @@ public class Pinball extends PhysicsEnhancedGameState
 	 * @param name Nombre del estado de juego.
 	 * @param pinballSettings Settings del pinball a iniciar.
 	 */
-	public Pinball(String name, PinballSettings pinballSettings)
+	public PinballGameState(String name, PinballGameStateSettings pinballSettings)
 	{
 		super(name);
 		
@@ -670,7 +670,7 @@ public class Pinball extends PhysicsEnhancedGameState
 		return magnets;
 	}
 	
-	public PinballSettings getPinballSettings()
+	public PinballGameStateSettings getPinballSettings()
 	{
 		return pinballSettings;
 	}

@@ -15,13 +15,13 @@ import components.Flipper;
 import components.Plunger;
 import components.Spinner;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 public abstract class GameLogic
 {
 	protected int score;
 	
-	protected Pinball pinball;
+	protected PinballGameState pinball;
 	
 	protected AudioSystem audio;
 	
@@ -35,7 +35,7 @@ public abstract class GameLogic
 	
 	protected Random rand;
 	
-	public GameLogic(Pinball pinball)
+	public GameLogic(PinballGameState pinball)
 	{
 		this.pinball = pinball;
 		

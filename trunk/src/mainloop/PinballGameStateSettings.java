@@ -3,7 +3,7 @@ package mainloop;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 
-public class PinballSettings
+public class PinballGameStateSettings
 {
 	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.1f, inclinationAngleDefault = 15.0f;
 	
@@ -19,7 +19,7 @@ public class PinballSettings
 	
 	private Quaternion inclinationQuaternion;
 
-	public PinballSettings()
+	public PinballGameStateSettings()
 	{
 		camMoveSpeed = camMoveSpeedDefault;
 		camTurnSpeed = camTurnSpeedDefault;

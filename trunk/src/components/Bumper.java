@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.input.util.SyntheticButton;
@@ -31,7 +31,7 @@ public class Bumper extends Node implements ActivableComponent
 	private BumperType bumperType;	
 		
 	// Pinball en el que esta el bumper
-	private static Pinball pinballInstance;
+	private static PinballGameState pinballInstance;
 	
 	// Intensidad de la fuerza repulsora a aplicar sobre la bola  
 	private static float forceToBallIntensity = 900f; //TODO hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
@@ -53,7 +53,7 @@ public class Bumper extends Node implements ActivableComponent
 	// Esta activo este bumper?
 	public boolean active = true;
 	
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, BumperType bumperType)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, BumperType bumperType)
 	{
 		final DynamicPhysicsNode bumperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -113,13 +113,13 @@ public class Bumper extends Node implements ActivableComponent
                 DynamicPhysicsNode ball, bump;
 
                 // El contacto pudo haber sido bola -> bumper o bumper -> bola
-                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && /*contactInfo.getNode2().getChild(0) instanceof Sphere*/ contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(Pinball.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && /*contactInfo.getNode2().getChild(0) instanceof Sphere*/ contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     bump = (DynamicPhysicsNode) contactInfo.getNode1();
                     sense = 1; //TODO para mi deberia ser -1, pero sino no anda         
                 }
-                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && /*contactInfo.getNode1().getChild(0) instanceof Sphere*/ contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(Pinball.PHYSIC_NODE_NAME_FOR_BALLS) ) 
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && /*contactInfo.getNode1().getChild(0) instanceof Sphere*/ contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
                 {
                 	// fue bola -> bumper
                     ball = (DynamicPhysicsNode) contactInfo.getNode1();
@@ -180,7 +180,7 @@ public class Bumper extends Node implements ActivableComponent
         MutableContactInfo contactDetails = new MutableContactInfo();
         contactDetails.setBounce( bounce );
         contactDetails.setMu( mu);
-        material.putContactHandlingDetails( Pinball.pinballTableMaterial, contactDetails );
+        material.putContactHandlingDetails( PinballGameState.pinballTableMaterial, contactDetails );
         return material;
 	}
 
@@ -223,7 +223,7 @@ public class Bumper extends Node implements ActivableComponent
 	}
 	
 	// Rota el joint del bumper. Para ser invocado luego de inclinar la mesa con todos sus componentes.
-	public void recalculateJoints(Pinball pinball)
+	public void recalculateJoints(PinballGameState pinball)
 	{
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 

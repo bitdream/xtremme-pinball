@@ -65,7 +65,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -895,7 +895,7 @@ System.out.println(pinballTheme);
 
         // parse the metadata
         if (metadataNode != null) {
-           Pinball pinball = (Pinball) getProperty("pinball");
+           PinballGameState pinball = (PinballGameState) getProperty("pinball");
            Hashtable<String, Object> metadata = parseMetadata(metadataNode); 
            if (metadata.containsKey( "type" ))
            {

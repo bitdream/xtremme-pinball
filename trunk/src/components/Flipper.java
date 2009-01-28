@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.input.action.InputAction;
@@ -41,13 +41,13 @@ public class Flipper extends Node implements ActivableComponent
 	private Joint joint;
 	
 	/* Juego que lo contiene */
-	private Pinball pinball;
+	private PinballGameState pinball;
 	
 	/* Esta activo? */
 	public boolean active;
 	
 	/* Pinball en el que esta */
-	private static Pinball pinballInstance;
+	private static PinballGameState pinballInstance;
 	
 	
     /**
@@ -58,7 +58,7 @@ public class Flipper extends Node implements ActivableComponent
 	 * @param flipperType El tipo de flipper deseado, izquierdo o derecho.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, FlipperType flipperType)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, FlipperType flipperType)
 	{
 		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -165,7 +165,7 @@ public class Flipper extends Node implements ActivableComponent
 		this.flipperType = flipperType;
 	}
 	
-	public void recalculateJoints(Pinball pinball)
+	public void recalculateJoints(PinballGameState pinball)
 	{
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
@@ -205,7 +205,7 @@ public class Flipper extends Node implements ActivableComponent
 		this.joint = joint;
 	}
 
-	public void setPinball(Pinball pinball)
+	public void setPinball(PinballGameState pinball)
 	{
 		this.pinball = pinball;
 	}

@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.Pinball;
+import mainloop.PinballGameState;
 
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
@@ -33,7 +33,7 @@ public class Spinner extends Node
 	private SpinnerType spinnerType;
 	
 	/* Pinball en el que esta */
-	private static Pinball pinballInstance;
+	private static PinballGameState pinballInstance;
 	
 
     /**
@@ -43,7 +43,7 @@ public class Spinner extends Node
 	 * @param visualModel Modelo visual del molinete.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(Pinball pinball, String name, Geometry visualModel, SpinnerType spinnerType)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, SpinnerType spinnerType)
 	{
 		DynamicPhysicsNode spinnerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -119,7 +119,7 @@ public class Spinner extends Node
 		attachChild(visualModel);
 	}
 	
-	public void recalculateJoints(Pinball pinball)
+	public void recalculateJoints(PinballGameState pinball)
 	{
 		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
