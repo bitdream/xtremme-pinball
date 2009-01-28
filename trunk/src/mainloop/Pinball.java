@@ -1,44 +1,30 @@
 package mainloop;
 
 import gamelogic.GameLogic;
-import input.FengJMEInputHandler;
+import gamestates.PhysicsEnhancedGameState;
 import input.PinballInputHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.*;
-import org.fenggui.*;
-import org.fenggui.binding.render.lwjgl.LWJGLBinding;
-import org.fenggui.composite.Window;
-import org.fenggui.Display;
-import org.fenggui.event.ButtonPressedEvent;
-import org.fenggui.event.IButtonPressedListener;
-import org.fenggui.layout.RowLayout;
-import org.fenggui.util.Point;
-import org.fenggui.util.Spacing;
-import org.lwjgl.opengl.GL13;
 
 import themes.CarsThemeGameLogic;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
-import com.jme.bounding.BoundingVolume;
-import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
-import com.jme.math.FastMath;
-import com.jme.math.Quaternion;
+import com.jme.light.PointLight;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
-import com.jme.scene.Geometry;
-import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
-import com.jme.system.JmeException;
+import com.jme.scene.state.LightState;
+import com.jme.util.Timer;
 import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
@@ -46,7 +32,7 @@ import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.MutableContactInfo;
 import com.jmex.physics.material.Material;
-import com.jmex.physics.util.SimplePhysicsGame;
+
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -61,7 +47,7 @@ import components.Spinner.SpinnerType;
  * Clase principal del juego.
  *
  */
-public class Pinball extends SimplePhysicsGame
+public class Pinball extends PhysicsEnhancedGameState
 {
 	
 	public static final Material pinballTableMaterial = Material.PLASTIC;
@@ -70,17 +56,13 @@ public class Pinball extends SimplePhysicsGame
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
 	private static final String GAME_NAME = "xtremme pinball";
-	private static final String GAME_VERSION = "0.3";
+	private static final String GAME_VERSION = "0.4";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(Pinball.class.getName());
     
 	/* InputHandler para el pinball */
 	private PinballInputHandler pinballInputHandler;
-	
-	/* Input Handler de FengGUI, sirve para que FengGUI capture las teclas
-	 * y las envie al display de JME para ser capturadas por los otros handlers */
-	private FengJMEInputHandler fengGUIInputHandler;
 	
 	/* Lista de los flippers del juego actual */
 	private List<DynamicPhysicsNode> flippers;
@@ -106,12 +88,6 @@ public class Pinball extends SimplePhysicsGame
 	/* Configuracion del juego */
 	private PinballSettings pinballSettings;
 	
-	/* Pantalla para FengGUI */
-	private Display fengGUIdisplay;
-	
-	/* Menu de opciones */
-	private Window menu;
-	
 	/* Score del juego */
 	private int score = 0;
 	
@@ -127,49 +103,48 @@ public class Pinball extends SimplePhysicsGame
 	/* Logica de juego */
 	private GameLogic gameLogic;
 	
+	/* Timer para los FPS */
+	protected Timer timer;
+
+	
 	/**
-	 * Punto de entrada al juego
+	 * Crea un estado de juego nuevo.
+	 * @param name Nombre del estado de juego.
+	 * @param pinballSettings Settings del pinball a iniciar.
 	 */
-	public static void main(String[] args)
+	public Pinball(String name, PinballSettings pinballSettings)
 	{
-		/* Creo un nuevo Pinball */
-		Pinball app = new Pinball();
+		super(name);
 		
-		//TODO We will load our own "fantastic" Flag Rush logo. Yes, I'm an artist.
-		// TODO cablear que siempre use LWJGL
-		app.setConfigShowMode(ConfigShowMode.AlwaysShow, Pinball.class.getClassLoader().getResource("jmetest/data/images/FlagRush.png"));
-		
-		/* Doy comienzo al juego */
-		app.start();
-	}
+		this.pinballSettings = pinballSettings;
 	
-	public void buildSettings()
-	{
-		/* Creo las configuraciones */
-		pinballSettings = new PinballSettings();
+		/* Adquiero el timer para calcular los FPS */
+		timer = Timer.getTimer();
 		
-		/* Les guardo los valores recogidos de la ventana de configuraciones */
-		pinballSettings.setWidth(settings.getWidth());
-		pinballSettings.setHeight(settings.getHeight());
-		pinballSettings.setDepth(settings.getDepth());
-		pinballSettings.setFreq(settings.getFrequency());
-		pinballSettings.setFullscreen(settings.isFullscreen());
-		pinballSettings.setRenderer(settings.getRenderer());
+		/* Inicializo la camara, el display y los handlers de input */
+		initSystem();
+		
+		/* Inicializo el juego en si */
+		initGame();
 	}
-	
+		
 	/**
 	 * Se debe actualizar la fisica, el puntaje, el tiempo, todo lo relacionado al juego en si.
 	 */
-	protected void simpleUpdate()
+	@Override
+	public void update(float tpf)
 	{
+		// TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
+		//super.update(tpf);
+		super.update(tpf * 3f);
+
 		/* Actualizo el timer */
 		timer.update();
 		
 		/* Pido al timer el tiempo transcurrido desde la ultima llamada */
 		float interpolation = timer.getTimePerFrame();
 		
-		/* Actualizo los controladores de input */
-        fengGUIInputHandler.update(interpolation);
+		/* Actualizo el controlador de input */
         pinballInputHandler.update(interpolation);
         
         /* Actualizo los componentes que asi lo requieren */
@@ -177,74 +152,28 @@ public class Pinball extends SimplePhysicsGame
 
 		/* Se modifico la escena, entonces actualizo el grafo */
         rootNode.updateGeometricState(interpolation, true);        
-        
-        // Se actualiza la info que se presenta en pantalla (score y mensajes)
+
+        /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
         scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
-        
-        
 	}
-
-	private void updateComponents(float interpolation)
-	{
-		/* Flippers */
-		for (DynamicPhysicsNode flipper : getFlippers())
-		{
-			((Flipper)flipper.getChild(0)).update(interpolation);
-		}
-		
-		/* Plunger */
-		if (plunger != null)
-			((Plunger)plunger.getChild(0)).update(interpolation);
-		
-		/* Spinners */
-		for (DynamicPhysicsNode spinner : getSpinners())
-		{
-			((Spinner)spinner.getChild(0)).update(interpolation);
-		}
-	}
-
+	
 	/**
 	 * Se debe redibujar la escena
 	 */
-	protected void simpleRender()
+	@Override
+	public void render(float tpf)
 	{
-		/* Para que la GUI se muestre bien */
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		
-		/* Muestro la pantalla de FengGUI */
-		fengGUIdisplay.display();
+		super.render(tpf);
 	}
-
+	
 	/**
 	 * Inicializar el display, los input handlers y la camara
 	 */
-	@Override
 	protected void initSystem()
 	{
-		// Invoco al metodo que esta implementado en SimplePhysicsGame, que a su vez invoca a BaseSimpleGame
-		super.initSystem();
-
-		/* Tomo las configuraciones */
-		buildSettings();
-		
-		/* Se pisa la camara, (no el display, porque arroja exception si se crean dos windows a traves de el)
-		 * y settings que inicializo la superclase */
-		try
-		{
-			/* Creo la camara */
-		    cam = display.getRenderer().createCamera(pinballSettings.getWidth(), pinballSettings.getHeight());
-		} catch (JmeException e)
-		{
-			logger.log(Level.SEVERE, "No se pudo crear la pantalla de juego", e);
-			System.exit(1);
-		}
-
 		/* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
-		
-		/* Fijo el fondo en negro */
-		display.getRenderer().setBackgroundColor(ColorRGBA.black.clone());
 		
 		/* Inicializo la camara */
 		
@@ -258,7 +187,7 @@ public class Pinball extends SimplePhysicsGame
 		Vector3f dir = new Vector3f(0.0f, 0f, -0.5f);
 
 		cam.setFrame(loc, left, up, dir);
-		
+
 		/* Aplicar los cambios a la camara */
 		cam.update();
 
@@ -268,7 +197,6 @@ public class Pinball extends SimplePhysicsGame
 		/* Creo el input handler del pinball */
 		pinballInputHandler = new PinballInputHandler(this);
 	
-		
 		/* Quiero que ese input handler sea leido en cada paso que haga el motor de fisica,
 		 * de modo tal que las fuerzas que acciones continuas apliquen (ej: plunger) se realicen */
 		getPhysicsSpace().addToUpdateCallbacks(new PhysicsUpdateCallback() {
@@ -283,17 +211,14 @@ public class Pinball extends SimplePhysicsGame
             }
         });
 		
-		/* Se elimina la accion asociada al boton ESC del teclado para evitar que salga del juego y hacer que en vez de ello muestre el menu */
-		KeyBindingManager.getKeyBindingManager().remove("exit");
-		
-		// Para que la velocidad del juego sea mayor
-		this.setPhysicsSpeed(3.0f);
+		/* Precision fisica */
+		getPhysicsSpace().setAccuracy(0.001f);
 	}
 
 	/**
-	 * Inicializar la escena. Invocado por BaseSimpleGame.initGame()
+	 * Inicializar la escena
 	 */
-	protected void simpleInitGame()
+	protected void initGame()
 	{
 	    /* Optimizacion - aplico culling a todos los nodos */
         CullState cs = display.getRenderer().createCullState();
@@ -327,6 +252,8 @@ public class Pinball extends SimplePhysicsGame
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         buildAndAttachComponents();
+        
+        buildLighting();
 
         /* Inclino todos los componentes a la vez desde el nodo raiz */
         inclinePinball();
@@ -334,13 +261,6 @@ public class Pinball extends SimplePhysicsGame
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
-		
-		/* Inicializo la GUI */
-		initGUI();
-		
-		/* Muestro el menu */
-    	showMenu();
-		
 		
 		// Cateles con el puntaje y los mensajes al usuario
         scoreText = Text.createDefaultTextLabel("scoreText", "Score: " + String.valueOf(score));
@@ -356,65 +276,41 @@ public class Pinball extends SimplePhysicsGame
         rootNode.attachChild(messageText);
 	}
 	
-
-
-	/**
-	 * Inicializa la GUI.
-	 */
-	protected void initGUI()
+	private void buildLighting()
 	{
-		/* Obtengo un display en Feng con LWJGL */
-		fengGUIdisplay = new Display(new LWJGLBinding());
- 
-		/* Inicializo el input handler de FengGUI */
-		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
- 
-		/* Creo el menu */
-		final Window menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
-		menu.setTitle("Main menu");
-		menu.setPosition(new Point(50, 200));
-		menu.getContentContainer().setLayoutManager(new RowLayout(false));
-		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
-		menu.setVisible(false);
-		this.menu = menu;
- 
-		/* Boton de juego nuevo */
-		final Button newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
-		
-		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0) {
-
-				/* Habilito el controlador del juego */
-				pinballInputHandler.setEnabled(true);
-				
-				/* Oculto el menu */
-				hideMenu();
-
-				// TODO Iniciar o reiniciar el juego. Esto de la pausa es temporal, sacarlo despues.
-				Pinball.this.pause = false; 
-			}
-		});
-		
-		/* Boton de salir */
-		final Button exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
-		
-		exitButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0)
-			{
- 				Pinball.this.finish();
-			}
-		});
- 
-		/* Comprime lo posible los botones */
-		//menu.pack(); TODO darle algo de estilo al menu
- 
-		/* Actualizo la pantalla con los nuevos componentes */
-		fengGUIdisplay.layout();
-
+		PointLight light = new PointLight();
+		light.setDiffuse( new ColorRGBA( 0.75f, 0.75f, 0.75f, 0.75f ) );
+	    light.setAmbient( new ColorRGBA( 0.5f, 0.5f, 0.5f, 1.0f ) );
+	    light.setLocation( new Vector3f( 100, 100, 100 ) );
+	    light.setEnabled( true );
+	    
+	    /** Attach the light to a lightState and the lightState to rootNode. */
+	    LightState lightState = display.getRenderer().createLightState();
+	    lightState.setEnabled( true );
+	    lightState.attach( light );
+	    
+	    rootNode.setRenderState( lightState );
 	}
 	
+	private void updateComponents(float interpolation)
+	{
+		/* Flippers */
+		for (DynamicPhysicsNode flipper : getFlippers())
+		{
+			((Flipper)flipper.getChild(0)).update(interpolation);
+		}
+		
+		/* Plunger */
+		if (plunger != null)
+			((Plunger)plunger.getChild(0)).update(interpolation);
+		
+		/* Spinners */
+		for (DynamicPhysicsNode spinner : getSpinners())
+		{
+			((Spinner)spinner.getChild(0)).update(interpolation);
+		}
+	}
+
 	private void inclinePinball()
 	{
 		/* Se rota toda la mesa y sus componentes en el eje X */
@@ -454,62 +350,15 @@ public class Pinball extends SimplePhysicsGame
 			((Plunger)plunger.getChild(0)).recalculateJoints(this);
 			
 	}
-	
-	public void showMenu()
-	{
-		/* Desactivo el controlador del pinball */
-		pinballInputHandler.setEnabled(false);
-		
-		/* Muestro el menu */
-		menu.setVisible(true);
-		
-		/* Hago visible al cursor */
-		MouseInput.get().setCursorVisible(true);
-		
-		/* Pauseo el juego */
-		pause = true;
-	}
-	
-	public void hideMenu()
-	{
-		/* Oculto el menu */
-		menu.setVisible(false);
-		
-		/* Oculto el cursor */
-		MouseInput.get().setCursorVisible(false);
-	}
-
-	/**
-	 * Si cambia la resolucion se llama este metodo
-	 */
-	@Override
-	protected void reinit()
-	{
-		super.reinit();
-		/* Creo nuevamente el display con las propiedades requeridas */
-		display.recreateWindow(pinballSettings.getWidth(), 
-				pinballSettings.getHeight(), 
-				pinballSettings.getDepth(), 
-				pinballSettings.getFreq(), 
-				pinballSettings.isFullscreen());
-	}
-    
-	/**
-	 * Salida exitosa del juego
-	 */
-    protected void quit()
-    {
-    	super.quit();
-    	System.exit(0);
-    }
 
 	/**
 	 * Se la llama para limpiar el juego una vez finalizado
 	 */
     @Override
-	protected void cleanup()
+	public void cleanup()
 	{
 		super.cleanup();
+		
 		/* Limpieza de texturas */
 		//TODO ts.deleteAll();
 		
@@ -524,8 +373,9 @@ public class Pinball extends SimplePhysicsGame
 	private void buildAndAttachComponents()
 	{// TODO super temporal, esto vendria del X3d. Ahora hay que meterle nodos fisicos!!!
 
-
-        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
+		logger.info("Construyendo componentes");
+		
+		// Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
         final Material customMaterial = new Material( "material de bola" );
         // Es pesado
         customMaterial.setDensity( 100.0f );
@@ -546,7 +396,7 @@ public class Pinball extends SimplePhysicsGame
         rootNode.attachChild(mainBall);
                
         final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
-		visualMainBall.setLocalTranslation(new Vector3f(0, 20, -60));
+		visualMainBall.setLocalTranslation(new Vector3f(-5, 20, -60));
 		
 		// Agregado de bounding volume 
 		visualMainBall.setModelBound(new BoundingSphere());
@@ -568,7 +418,7 @@ public class Pinball extends SimplePhysicsGame
         rootNode.attachChild(mainBall2);
                
         final Sphere visualMainBall2 = new Sphere("Bola 2", 25, 25, 1);
-        visualMainBall2.setLocalTranslation(new Vector3f(25, 5, -2));
+        visualMainBall2.setLocalTranslation(new Vector3f(25, 15, -2));
 		
 		// Agregado de bounding volume 
 		visualMainBall2.setModelBound(new BoundingSphere());
@@ -609,17 +459,17 @@ public class Pinball extends SimplePhysicsGame
 		
 		//TODO quitar esto, es para debug de bumper
 		// Mover la bola dos hacia el bumper1
-		 getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
-	            public void beforeStep( PhysicsSpace space, float time ) {
-	            	/* Checkea todas las acciones para ver si alguna debe ser invocada, en tal caso invoca a performAction
-	            	 * pasandole el tiempo 'time' 
-	            	 */
-	            	mainBall2.addForce(new Vector3f(-7000f, 0f, 0f));
-	            }
-	            public void afterStep( PhysicsSpace space, float time ) {
-
-	            }
-	        } );
+		// getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
+	     //       public void beforeStep( PhysicsSpace space, float time ) {
+	     //       	/* Checkea todas las acciones para ver si alguna debe ser invocada, en tal caso invoca a performAction
+	     //       	 * pasandole el tiempo 'time' 
+	     //       	 */
+	     //       	mainBall2.addForce(new Vector3f(-7000f, 0f, 0f));
+	     //       }
+	     //       public void afterStep( PhysicsSpace space, float time ) {
+		//
+	      //      }
+	      //  } );
 		 
 		//-----------------------------------------
 
@@ -740,10 +590,10 @@ public class Pinball extends SimplePhysicsGame
 		rootNode.attachChild(magnet1);
 		
 		// Agrego otro iman
-//		final Box visualMagnet2 = new Box("Visual magnet 2", new Vector3f(), 2f, 4f, 2f);
-//		visualMagnet2.setLocalTranslation(new Vector3f(15, 5, -10));
-//		StaticPhysicsNode magnet2 = Magnet.create(this, "Physic magnet 2", visualMagnet2);
-//		rootNode.attachChild(magnet2);
+		//final Box visualMagnet2 = new Box("Visual magnet 2", new Vector3f(), 2f, 4f, 2f);
+		//visualMagnet2.setLocalTranslation(new Vector3f(15, 5, -10));
+		//StaticPhysicsNode magnet2 = Magnet.create(this, "Physic magnet 2", visualMagnet2);
+		//rootNode.attachChild(magnet2);
 		
 		//-----------------------------------------
 
