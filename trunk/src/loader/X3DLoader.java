@@ -1,5 +1,7 @@
 package loader;
 
+import gamestates.PinballGameState;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import mainloop.PinballGameState;
 
 import com.jme.scene.Node;
 import com.jme.scene.shape.Pyramid;

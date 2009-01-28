@@ -2,7 +2,6 @@ package themes;
 
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
-import mainloop.PinballGameState;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -11,6 +10,7 @@ import components.Plunger;
 import components.Spinner;
 
 import gamelogic.GameLogic;
+import gamestates.PinballGameState;
 
 public class CarsThemeGameLogic extends GameLogic
 {

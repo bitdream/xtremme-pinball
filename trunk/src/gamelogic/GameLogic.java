@@ -1,5 +1,7 @@
 package gamelogic;
 
+import gamestates.PinballGameState;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +17,6 @@ import components.Flipper;
 import components.Plunger;
 import components.Spinner;
 
-import mainloop.PinballGameState;
 
 public abstract class GameLogic
 {

@@ -1,6 +1,6 @@
 package components;
 
-import mainloop.PinballGameState;
+import gamestates.PinballGameState;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.input.action.InputAction;
