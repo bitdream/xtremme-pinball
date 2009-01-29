@@ -11,7 +11,7 @@
 <Background groundColor="0.057 0.221 0.4" skyColor="0.057 0.221 0.4" />
 
 <Collision enabled="false">
-	<Transform DEF="BotonEste" translation="22.039814 43.014633 -31.718315" scale="1.479944 1.479944 1.479943" rotation="0.000580 -0.707107 0.707107 3.140433">
+	<Transform DEF="BotonEste" translation="22.039814 7.764676 -4.001628" scale="1.479944 1.479944 1.479943" rotation="0.000580 -0.707107 0.707107 3.140433">
 	<Shape>
 		<Appearance>
 			<Material DEF="MA_MaterialBoton" diffuseColor="0.837 0.0 0.0" specularColor="0.848 0.848 0.848" emissiveColor="0.0 0.0 0.0" 
@@ -26,7 +26,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Chapa" translation="-4.938449 39.910324 -22.933556" scale="9.192517 0.155006 6.117129" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="Chapa" translation="-4.938449 4.660367 4.783132" scale="9.192517 0.155006 6.117129" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 	<Appearance>
 		<Material DEF="MA_MaterialMetal" diffuseColor="0.8 0.8 0.8" specularColor="0.331 0.331 0.331" emissiveColor="0.0 0.0 0.0" 
@@ -41,7 +41,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CajaSuperior" translation="-0.465852 82.722679 -111.596786" scale="22.384069 6.320613 24.995750" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="CajaSuperior" translation="-0.465852 47.472725 -83.880096" scale="22.384069 6.320613 24.995750" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <Appearance>
 	<Material DEF="MA_MaterialCaja" diffuseColor="0.32 0.32 0.32" specularColor="0.213 0.213 0.213" emissiveColor="0.0 0.0 0.0" 
@@ -56,7 +56,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Logo" translation="-0.352006 85.829811 -105.212006" scale="21.132042 15.706701 7.459774" rotation="-1.000000 0.000000 0.000000 0.000000">
+<Transform DEF="Logo" translation="-0.352006 50.579857 -77.495316" scale="21.132042 15.706701 7.459774" rotation="-1.000000 0.000000 0.000000 0.000000">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialLogo" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
@@ -71,7 +71,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="display" translation="-0.352006 63.326008 -105.194351" scale="21.132042 4.336504 7.459774" rotation="-1.000000 0.000000 0.000000 0.000000">
+<Transform DEF="display" translation="-0.352006 28.076052 -77.477661" scale="21.132042 4.336504 7.459774" rotation="-1.000000 0.000000 0.000000 0.000000">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialPantalla" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
@@ -86,7 +86,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Puertita" translation="-5.004103 39.751560 -22.845066" scale="8.263774 5.379501 30.534819" rotation="1.000000 0.000000 0.000000 3.141593">
+<Transform DEF="Puertita" translation="-5.004103 4.501603 4.871622" scale="8.263774 5.379501 30.534819" rotation="1.000000 0.000000 0.000000 3.141593">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialMetal" />
@@ -100,7 +100,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CromoSuperior" translation="-0.517880 53.886871 -65.193771" scale="22.421671 42.210995 30.536848" rotation="-1.000000 0.000000 -0.000000 1.482630">
+<Transform DEF="CromoSuperior" translation="-0.517880 18.636917 -37.477081" scale="22.421671 42.210995 30.536848" rotation="-1.000000 0.000000 -0.000000 1.482630">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialMetal" />
@@ -114,7 +114,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="PataNO" translation="-21.275591 15.409632 -105.376671" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="PataNO" translation="-21.275591 -19.840322 -77.659981" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 <Coordinate DEF="coord_PataNO" 
@@ -125,7 +125,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="PataNE" translation="20.262667 15.408417 -105.369904" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="PataNE" translation="20.262667 -19.841539 -77.653214" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 <Coordinate DEF="coord_PataNE" 
@@ -136,7 +136,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="PataSE" translation="20.267254 15.409636 -24.787870" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="PataSE" translation="20.267254 -19.840319 2.928816" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 <Coordinate DEF="coord_PataSE" 
@@ -147,7 +147,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="PataSO" translation="-21.286354 15.409636 -24.787865" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="PataSO" translation="-21.286354 -19.840319 2.928822" scale="1.526740 1.526740 15.267406" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 <Coordinate DEF="coord_PataSO" 
@@ -158,7 +158,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Vidrio" translation="-0.349369 53.194691 -65.396362" scale="30.534819 30.534819 30.534819" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="Vidrio" translation="-0.349369 17.944736 -37.679672" scale="30.534819 30.534819 30.534819" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialVidrio" diffuseColor="1.0 1.0 1.0" specularColor="0.567 0.567 0.567" emissiveColor="0.0 0.0 0.0" 
@@ -173,7 +173,7 @@ ambientIntensity="0.167" shininess="0.998" transparency="0.689" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Mesa" translation="-0.507605 30.655746 -65.080208" scale="22.290419 41.832703 30.534819" rotation="0.000000 0.707107 0.707107 3.141593">
+<Transform DEF="Mesa" translation="-0.507605 -4.594210 -37.363518" scale="22.290419 41.832703 30.534819" rotation="0.000000 0.707107 0.707107 3.141593">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialCaja" />
@@ -187,7 +187,7 @@ ambientIntensity="0.167" shininess="0.998" transparency="0.689" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CubreBotonOeste" translation="-22.675884 43.033840 -31.659409" scale="0.936739 0.936739 0.936739" rotation="-0.000580 0.707107 0.707107 3.140433">
+<Transform DEF="CubreBotonOeste" translation="-22.675884 7.783883 -3.942721" scale="0.936739 0.936739 0.936739" rotation="-0.000580 0.707107 0.707107 3.140433">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialCubreBoton" diffuseColor="0.635 0.616 0.616" specularColor="0.357 0.357 0.357" emissiveColor="0.0 0.0 0.0" 
@@ -202,7 +202,7 @@ ambientIntensity="0.224" shininess="0.268" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CubreBotonEste" translation="21.674950 43.033840 -31.659409" scale="0.936739 0.936739 0.936739" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="CubreBotonEste" translation="21.674950 7.783883 -3.942721" scale="0.936739 0.936739 0.936739" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialCubreBoto" diffuseColor="0.635 0.616 0.616" specularColor="0.357 0.357 0.357" emissiveColor="0.0 0.0 0.0" 
@@ -217,7 +217,7 @@ ambientIntensity="0.224" shininess="0.268" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="BotonOeste" translation="-23.042301 43.014633 -31.718315" scale="1.479944 1.479944 1.479943" rotation="-0.999999 -0.000836 -0.000836 1.570797">
+<Transform DEF="BotonOeste" translation="-23.042301 7.764676 -4.001628" scale="1.479944 1.479944 1.479943" rotation="-0.999999 -0.000836 -0.000836 1.570797">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialBoton" />

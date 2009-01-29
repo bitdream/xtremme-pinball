@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-
+import com.jme.math.Vector3f;
 import com.jme.scene.Node;
-import com.jme.scene.shape.Pyramid;
 import com.jme.scene.state.LightState;
 import com.jmex.model.converters.DTDResolver;
 import com.jmex.physics.PhysicsSpace;
