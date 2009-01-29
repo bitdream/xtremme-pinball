@@ -1,7 +1,6 @@
 package components;
 
 import gamestates.PinballGameState;
-
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.input.util.SyntheticButton;
@@ -35,7 +34,8 @@ public class Bumper extends Node implements ActivableComponent
 	private static PinballGameState pinballInstance;
 	
 	// Intensidad de la fuerza repulsora a aplicar sobre la bola  
-	private static float forceToBallIntensity = 900f; //TODO hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
+	private static float forceToBallIntensity = 900f; // Grande para que sea un golpe seco y no haya colisiones espureas
+	//TODO antes 900f. hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
 	//Magic number probado con angulo de 15º y repele con fuerza. HACERLO EN FUNCION DEL ANGULO DE INCLINACION DE LA MESA.
 	// POSIBLE FORMULA: cte*(max_angle - pinball_angle) -> MAL
 	// OTRA OPCION: dejarlo cte al valor, despues de todo es asi en la realidad (fuerza mecanica cte)
@@ -53,6 +53,13 @@ public class Bumper extends Node implements ActivableComponent
 	
 	// Esta activo este bumper?
 	public boolean active = true;
+	
+	// Tiempo de la ultima colision considerada (donde se llamo a la logica del juego) entre una bola y este bumper
+	private long lastConsideredCollisionTime = 0;
+	
+	//TODO ver si el tiempo elegido funciona al tener la version final de la mesa
+	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
+	private static final long windowTimeForCollisions = 100; 
 	
 	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, BumperType bumperType)
 	{
@@ -73,7 +80,8 @@ public class Bumper extends Node implements ActivableComponent
         bumperNode.attachChild(bumper);
 	
         // Genero su fisica
-        bumperNode.generatePhysicsGeometry();
+        bumperNode.generatePhysicsGeometry(true); // Para que use triangulos cuando lo necesitemos
+        //PhysicsNode.generatePhysicsGeometry(bumper, bumperNode, true);
         
         // Setear el material del bumper
 		bumperNode.setMaterial(customMaterial);
@@ -81,6 +89,7 @@ public class Bumper extends Node implements ActivableComponent
         // Calculo la masa del bumper (solo si lo hago dinamico)
         bumperNode.computeMass();
         
+       
         // Voy a fijar el bumper con un eje translacional 
         final Joint jointForBumper = pinball.getPhysicsSpace().createJoint();
         final TranslationalJointAxis translationalAxis = jointForBumper.createTranslationalAxis();
@@ -90,7 +99,7 @@ public class Bumper extends Node implements ActivableComponent
         translationalAxis.setPositionMaximum(0.1f);
 
         // Vector que indica la direccion sobre la que se puede mover el bumper. Se calcula en funcion del valor de inclinacion de la mesa
-        //Mesa aun horizontal, en la rotacion se actualizara el eje de movimiento vertical del joint
+        // Mesa aun horizontal, en la rotacion se actualizara el eje de movimiento vertical del joint
         translationalAxis.setDirection(new Vector3f(0,1,0)); 
         
         // Lo fijo al centro de masa del bumper 
@@ -108,7 +117,7 @@ public class Bumper extends Node implements ActivableComponent
         		
         		// Sentido de la fuerza a aplicar sobre la bola
         		int sense = 1;
-        		
+
         		// Algo colisiono con el bumper
                 final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
                 DynamicPhysicsNode ball, bump;
@@ -118,7 +127,7 @@ public class Bumper extends Node implements ActivableComponent
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     bump = (DynamicPhysicsNode) contactInfo.getNode1();
-                    sense = 1; //TODO para mi deberia ser -1, pero sino no anda         
+                    sense = 1; //TODO para mi deberia ser -1, pero sino no anda    
                 }
                 else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && /*contactInfo.getNode1().getChild(0) instanceof Sphere*/ contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
                 {
@@ -133,9 +142,6 @@ public class Bumper extends Node implements ActivableComponent
                     return;
                 }
                 
-                // Llamo a la logica del juego. Lo hago por mas que el bumper no este activo, ya que ella determinara que hacer.
-                pinballInstance.getGameLogic().bumperCollision(bumper);
-                
                 // Solo si el bumper esta activo debe ejercer la fuerza sobre la bola y saltar (si es saltarin)
                 if (((Bumper)bump.getChild(0)).isActive())
                 {
@@ -144,9 +150,6 @@ public class Bumper extends Node implements ActivableComponent
                      */
                     Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
                     Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
-                    
-                    //System.out.println(" -------------------- velocidad" + direction);
-                    //System.out.println(" - -------------- fuerza: " + direction.mult(forceToBallIntensity * sense));
 
                     // Aplicar la fuerza repulsora sobre la bola
                     ball.clearDynamics();
@@ -159,7 +162,24 @@ public class Bumper extends Node implements ActivableComponent
                     	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
                     								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
                     }
-                }                
+                }
+                
+                // Tiempo en el que se dio esta colision
+                long now = System.currentTimeMillis();
+                
+                // Tiempo de la ultima colision considerada
+                long lastColl = bumper.getLastConsideredCollisionTime();
+                
+                // Si la diferencia con la ultima colision considerada no es menor a 100 ms, la tomo como otra colision
+                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
+                {   
+                	// Llamo a la logica del juego. Lo hago por mas que el bumper no este activo, ya que ella determinara que hacer.
+                    pinballInstance.getGameLogic().bumperCollision(bumper);
+                    
+                    // Actualizo el tiempo de la ultima colision considerada
+                    bumper.setLastConsideredCollisionTime(now);
+                }
+                // Sino no hago nada pq es una colision repetida               
             }        	
 
         }, collisionEventHandler, false );
@@ -253,6 +273,16 @@ public class Bumper extends Node implements ActivableComponent
 	public boolean isActive()
 	{
 		return this.active;
+	}
+	
+	public long getLastConsideredCollisionTime() 
+	{
+		return lastConsideredCollisionTime;
+	}
+
+	public void setLastConsideredCollisionTime(long lastCollisionTime) 
+	{
+		this.lastConsideredCollisionTime = lastCollisionTime;
 	}
 	
 }
