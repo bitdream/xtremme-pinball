@@ -123,8 +123,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Timer para los FPS */
 	protected Timer timer;
 
-	/* Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.5f, -9.0f );
+	/* XXX Ubicacion inicial de la bola: cable */
+	private Vector3f ballStartUp = /*new Vector3f( 17.5f, 3.5f, -9.0f )*/ /*new Vector3f( 15,15,-51 )*/ new Vector3f( 1, 16, -58);
 	
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = new Vector3f( 0.0f, 63.0f, 16.0f ); 
@@ -294,24 +294,23 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		balls = new ArrayList<DynamicPhysicsNode>(4);
 
         /* Armo la mesa de juego */
-        //buildTable();
-        
-        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
-        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
-        //gameLogic = new CarsThemeGameLogic(this);
-        
-		// TODO Aca deberia ir la traduccion de X3D para formar la escena
-        //buildAndAttachComponents();
-        
-        //buildLighting();
-        //buildTable();
+//        buildTable();
+//        
+//        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
+//        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
+//        gameLogic = new CarsThemeGameLogic(this);
+//        
+//		// TODO Aca deberia ir la traduccion de X3D para formar la escena
+//        buildAndAttachComponents();
+//        
+        buildLighting();
 
-        loadEnvironment();
+        //loadEnvironment();
         loadTable();
         setUpBall();
         
         /* Inclino todos los componentes a la vez desde el nodo raiz */
-        //inclinePinball(); lo hago en el loadTable
+        //inclinePinball(); //lo hago en el loadTable
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -805,9 +804,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
         customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
 
         /* Nodo dinamico de la bola */
-        //final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-        //mainBall.setName( "ball" );
-        //rootNode.attachChild( mainBall );
+        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+        mainBall.setName( "ball" );
+        rootNode.attachChild( mainBall );
 
         final Sphere visualMainBall = new Sphere( "Bola", 25, 25, 1 );
         visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
@@ -816,14 +815,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
         visualMainBall.setModelBound( new BoundingSphere() );
         visualMainBall.updateModelBound();
 
-//        mainBall.attachChild( visualMainBall );
-//        mainBall.generatePhysicsGeometry();
-//        mainBall.setMaterial( customMaterial );
-//        // Se computa la masa luego de generar la geometria fisica
-//        mainBall.computeMass();
-//
-//        // La agrego a la lista de bolas
-//        balls.add( mainBall );
+        mainBall.attachChild( visualMainBall );
+        mainBall.generatePhysicsGeometry();
+        mainBall.setMaterial( customMaterial );
+        // Se computa la masa luego de generar la geometria fisica
+        mainBall.computeMass();
+
+        // La agrego a la lista de bolas
+        balls.add( mainBall );
 	}
 	
 	private void loadEnvironment()
@@ -886,7 +885,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* cargamos y attacheamos la mesa */
         try
         {
-            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
+            //XXX nombre tabla
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/TableSpinners.x3d" ) );
 
             /* agregamos la fisica */
             loader.setPinball( this );
@@ -900,15 +900,18 @@ public class PinballGameState extends PhysicsEnhancedGameState
             
             /* cargamos y attacheamos la tabla */
             rootNode.attachChild( tabla );
+            
+            this.gameLogic = loader.getTheme(this);
+            
+            //TODO remover
+//            if (this.gameLogic == null)
+//                this.gameLogic = new CarsThemeGameLogic(this);
         }
         catch ( FileNotFoundException e )
         {
             e.printStackTrace();
         }
         
-        //FIXME
-        // this.gameLogic = loader.getTheme();
-        this.gameLogic = new CarsThemeGameLogic(this);
     }
     
     private Node inclinePinball( Node table )

@@ -1,21 +1,24 @@
 package loader;
 
+import gamelogic.GameLogic;
 import gamestates.PinballGameState;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.jme.math.Vector3f;
+import themes.CarsThemeGameLogic;
+
 import com.jme.scene.Node;
 import com.jme.scene.state.LightState;
 import com.jmex.model.converters.DTDResolver;
-import com.jmex.physics.PhysicsSpace;
 
 /**
  * Una clase que wrappea el loader de jme para trabajar todos los x3d igual
@@ -25,7 +28,7 @@ import com.jmex.physics.PhysicsSpace;
 public class X3DLoader
 {
     // TODO poner loggers posta
-    private static final Logger      logger        = Logger.getAnonymousLogger();
+    private static final Logger      logger        = Logger.getLogger( X3DLoader.class.getName() );
 
     private InputStream              x3d;
 
@@ -33,21 +36,16 @@ public class X3DLoader
 
     private Map<String, InputStream> dtds          = null;
 
-    private PhysicsSpace             physicsSpace = null;
-    
-    private PinballGameState                  pinball  = null;
+    private PinballGameState         pinball       = null;
 
     private LightState               lightState    = null;
 
     private String                   x3dFileName   = null;
 
+    private String                   theme         = null;
+
     public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
-        //        System.out.println(x3dFilename.getFile());
-        //        System.out.println(x3dFilename.getPath());
-        //        try{System.out.println(x3dFilename.toURI());}catch(URISyntaxException e){e.printStackTrace();}
-        //        try{System.out.println(x3dFilename.getContent());}catch(Exception e) {e.printStackTrace();}
-
         try
         {
             this.x3d = new FileInputStream( x3dFilename.getFile() );
@@ -111,14 +109,14 @@ public class X3DLoader
         {
             converter.setProperty( "textures", X3DLoader.getStandardTextureDir() );
         }
-        
-        //converter.setProperty( "pinball", physicsSpace );
+
         converter.setProperty( "pinball", pinball );
 
         //logger.info( "Starting to convert .x3d to .jme" );
         try
         {
             node = (Node) converter.loadScene( this.x3d, null, this.lightState );
+            theme = converter.getPinballTheme();
         }
         catch ( Exception e )
         {
@@ -139,11 +137,6 @@ public class X3DLoader
     public void setPinball( PinballGameState pinball )
     {
         this.pinball = pinball;
-    }
-    
-    public void setPinball( PhysicsSpace physicsSpace )
-    {
-        this.physicsSpace = physicsSpace;
     }
 
     public LightState getLightState()
@@ -194,11 +187,11 @@ public class X3DLoader
         }
         try
         {
-            this.dtds.put( key, (InputStream)path.getContent() );
+            this.dtds.put( key, (InputStream) path.getContent() );
         }
-        catch (IOException e)
+        catch ( IOException e )
         {
-            throw new FileNotFoundException(e.getMessage());
+            throw new FileNotFoundException( e.getMessage() );
         }
     }
 
@@ -232,30 +225,29 @@ public class X3DLoader
                     "resources/models/dtd/x3d-3.0.dtd" ).getContent() );
                 dtds.put( "x3d-3.0-InputOutputFields.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
                     "resources/models/dtd/x3d-3.0-InputOutputFields.dtd" ).getContent() );
-                dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                    "resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ).getContent() );
-                dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", (InputStream) X3DLoader.class.getClassLoader().getResource(
-                    "resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ).getContent() );
+                dtds.put( "x3d-3.0-Web3dExtensionsPrivate.dtd", (InputStream) X3DLoader.class.getClassLoader()
+                    .getResource( "resources/models/dtd/x3d-3.0-Web3dExtensionsPrivate.dtd" ).getContent() );
+                dtds.put( "x3d-3.0-Web3dExtensionsPublic.dtd", (InputStream) X3DLoader.class.getClassLoader()
+                    .getResource( "resources/models/dtd/x3d-3.0-Web3dExtensionsPublic.dtd" ).getContent() );
                 dtds.put( "x3d-3.0.xsd", (InputStream) X3DLoader.class.getClassLoader().getResource(
                     "resources/models/dtd/x3d-3.0.xsd" ).getContent() );
             }
             catch ( IOException e )
             {
-                throw new FileNotFoundException(e.getMessage());
+                throw new FileNotFoundException( e.getMessage() );
             }
 
             standardDTDResolver = new DTDResolver( dtds );
-            
+
         }
 
         ret = standardDTDResolver;
-
 
         return ret;
     }
 
     private static DTDResolver standardDTDResolver = null;
-    
+
     /**
      * Retorna los el directorio default para las texturas
      * 
@@ -265,6 +257,53 @@ public class X3DLoader
     {
         //System.out.println( X3DLoader.class.getClassLoader().getResource( "resources/textures/" ) );
         return X3DLoader.class.getClassLoader().getResource( "resources/textures/" );
+    }
+
+    public GameLogic getTheme( PinballGameState p )
+    {
+        // acabo de aprender algo de java :P
+        return X3DLoader.<GameLogic> createInstance( this.theme, p );
+    }
+
+    /* codigo inspectoresco :D */
+    @SuppressWarnings( "unchecked" )
+    private static <T> T createInstance( String className, PinballGameState p )
+    {
+
+        if ( className == null ) return null;
+
+        try
+        {
+            Class<?> clazz = Class.forName( className );
+            Constructor<T> c = (Constructor<T>)clazz.getConstructor( PinballGameState.class );
+            T result = c.newInstance( p );
+            return result;
+        }
+        catch ( ClassNotFoundException e )
+        {
+            System.out.println( "Can't find class " + className );
+        }
+        catch ( InstantiationException e )
+        {
+            System.out.println( "Class " + className + " is not concrete" );
+        }
+        catch ( IllegalAccessException e )
+        {
+            System.out.println( "Class " + className + " needs a public constructor" );
+        }
+        catch ( ClassCastException e )
+        {
+            System.out.println( "Class " + className + " doesn't implement expected interface" );
+        }
+        catch (NoSuchMethodException e)
+        {
+            System.out.println( "Class " + className + " needs a public constructor with paramater pinball" );
+        }
+        catch (InvocationTargetException e)
+        {
+            System.out.println( "Class " + className + " no idea" );
+        }
+        return null;
     }
 
 }
