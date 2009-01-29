@@ -1,5 +1,7 @@
 package themes;
 
+import main.Main;
+
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
@@ -19,16 +21,20 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private int bumperCollisionCnt = 0;
 	
-	private AudioTrack lostBallSound, lostLastBallSound, rampUpSound;
+	private AudioTrack lostBallSound, lostLastBallSound, rampUpSound, music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
 		/* Preparo las pistas de audio que voy a usar */
-		lostBallSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
-		lostLastBallSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
-		rampUpSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
+		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
+		
+		/* Inicializo la musica */
+		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
+		music.setLooping(true);
 	}
 
 	@Override
@@ -66,19 +72,19 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void doorCollision(Door door)
 	{
-		
+		super.doorCollision(door);
 	}
 
 	@Override
 	public void flipperCollision(Flipper flipper)
 	{
-
+		super.flipperCollision(flipper);
 	}
 
 	@Override
 	public void plungerCollision(Plunger plunger)
 	{
-
+		super.plungerCollision(plunger);
 	}
 
 	@Override
@@ -147,5 +153,29 @@ public class CarsThemeGameLogic extends GameLogic
 			lostLastBallSound.play();
 		else // Todavia le quedan bolas en la mesa
 			lostBallSound.play();
+	}
+
+	@Override
+	public void gameStart()
+	{
+		showMessage("Gana la carrera!!!");		
+	}
+
+	@Override
+	public void enterGame()
+	{
+		/* Inicio su musica */
+		audio.getMusicQueue().clearTracks();
+		audio.getMusicQueue().addTrack(music);
+		audio.getMusicQueue().play();
+	}
+
+	@Override
+	public void leaveGame()
+	{
+		/* Detengo su musica */
+		audio.getMusicQueue().clearTracks();
+		
+		// TODO hacer fadeout!
 	}
 }

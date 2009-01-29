@@ -16,7 +16,10 @@ import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
 
+import themes.CarsThemeGameLogic;
+
 import com.jme.input.MouseInput;
+import com.jmex.audio.AudioTrack;
 import com.jmex.game.state.BasicGameState;
 
 
@@ -28,14 +31,23 @@ public class MenuGameState extends BasicGameState
 	/* Input Handler de FengGUI, sirve para que FengGUI capture las teclas
 	 * y las envie al display de JME para ser capturadas por los otros handlers */
 	private FengJMEInputHandler fengGUIInputHandler;
-	
+
+	/* Botones del menu */
 	private Button continueButton, newGameButton, exitButton;
+	
+	/* Musica del menu */
+	private AudioTrack music;
 	
 
 	public MenuGameState(String name)
 	{
 		super(name);
 		
+		/* Inicializo la musica */
+		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu-loading/music.wav"), false);
+		music.setLooping(true);
+		
+		/* Inicializo el menu */
 		initMenu();
 	}
 
@@ -80,15 +92,14 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 
+				/* Desactivo el gamestate de menu */
+				Main.deactivateMenu();
+
 				/* Mato el juego actual si hay alguno */
 				Main.endCurrentPinballGame();
 				
 				/* Creo un juego nuevo y lo inicio */
 				Main.newPinballGame().setActive(true);
-				
-				/* Desactivo el gamestate de menu */
-				Main.deactivateMenu();
-
 			}
 		});
 		
@@ -123,11 +134,21 @@ public class MenuGameState extends BasicGameState
 			
 			/* Si hay juegos en transcurso, muestro el boton de continue */
 			continueButton.setVisible(Main.hasInCourseGame());
+		
+			/* Inicio su musica */
+			Main.getAudioSystem().getMusicQueue().clearTracks();
+			Main.getAudioSystem().getMusicQueue().addTrack(music);
+			Main.getAudioSystem().getMusicQueue().play();
 		}
 		else
 		{
 			/* Oculto el cursor */
 			MouseInput.get().setCursorVisible(false);
+			
+			/* Detengo su musica */
+			Main.getAudioSystem().getMusicQueue().clearTracks();
+			
+			// TODO hacer fadeout!
 		}
 	}
 	
