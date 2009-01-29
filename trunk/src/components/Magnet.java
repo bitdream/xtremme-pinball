@@ -45,7 +45,7 @@ public class Magnet extends Node implements ActivableComponent
 		magnetNode.attachChild(magnet);
         
         // Genero su fisica 
-		magnetNode.generatePhysicsGeometry();
+		magnetNode.generatePhysicsGeometry(true);
 		
 		// Efecto de iman en cada paso fisico
 		pinball.getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
