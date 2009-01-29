@@ -100,7 +100,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
             loader = new X3DLoader( X3DLoader.class.getClassLoader().getResource("resources/models/Room.x3d") );
 
             /* agregamos la fisica */
-            loader.setPinball( getPhysicsSpace() );
+//            loader.setPinball( getPhysicsSpace() );
 
             /* agregamos el lightState */
             loader.setLightState( lightState );
@@ -120,7 +120,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
             loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource("resources/models/Machine.x3d" ) );
 
             /* agregamos la fisica */
-            loader.setPinball( getPhysicsSpace() );
+//            loader.setPinball( getPhysicsSpace() );
 
             /* agregamos el lightState */
             loader.setLightState( lightState );
@@ -142,7 +142,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
             loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
 
             /* agregamos la fisica */
-            loader.setPinball( getPhysicsSpace() );
+//            loader.setPinball( getPhysicsSpace() );
 
             /* agregamos el lightState */
             loader.setLightState( lightState );

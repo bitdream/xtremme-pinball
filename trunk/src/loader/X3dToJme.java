@@ -60,8 +60,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -118,8 +116,6 @@ import com.jme.util.geom.BufferUtils;
 import com.jme.util.geom.NonIndexedNormalGenerator;
 import com.jme.util.geom.NormalGenerator;
 import com.jmex.model.converters.FormatConverter;
-import com.jmex.physics.PhysicsNode;
-import com.jmex.physics.PhysicsSpace;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -292,12 +288,17 @@ public class X3dToJme extends FormatConverter {
      */
     private boolean addToTransparentQueue = false;
 
+    
     /**
-     *  Indicates whether the node being processed shall use static or dynamic 
-     *  physics
+     * Indicates the theme that this table must use
      */
-    //XXX es un cable asqueroso!!!
-    private boolean dynamic = false;
+    // es un cable asquerooooso!!!
+    private String pinballTheme; 
+    
+    public String getPinballTheme()
+    {
+        return this.pinballTheme;
+    }
     
     /**
      * Creates the X3DLoader.
@@ -427,17 +428,11 @@ public class X3dToJme extends FormatConverter {
         
         // Parse header
         Node header = getChildNode(nodes.item(0), "head");
-        String pinballTheme = null;
+        pinballTheme = null;
         if (header != null) {
             pinballTheme = getThemeFromHeader(header);
-            if (pinballTheme == null) {
-                // ojo aca puede venir la habitacion o la maquina.
-                pinballTheme = "noTheme";
-            }
         }
-        //FIXME
-//System.out.println(pinballTheme);
-        
+
         Node scene = getChildNode(nodes.item(0), "Scene");
         com.jme.scene.Node sceneRoot = new com.jme.scene.Node();
 
@@ -623,10 +618,10 @@ public class X3dToJme extends FormatConverter {
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private com.jme.scene.Node parseGroup(Node node) throws Exception {
+    private com.jme.scene.Spatial parseGroup(Node node) throws Exception {
         // Init node
         boolean isSwitch;
-        com.jme.scene.Node group;
+        com.jme.scene.Spatial group;
         if (node.getNodeName().equals("Switch")) {
             group = new SwitchNode();
             isSwitch = true;
@@ -640,14 +635,21 @@ public class X3dToJme extends FormatConverter {
         if (bbox != null) {
             group.setModelBound(bbox);
         }
-
+        
+        // BEGIN HOPELESS CABLE
+        if (node.getNodeName().equals("Transform")) {
+            shouldTransform = true;
+            transformNode = node;
+        }
+        // END HOPELESS CALBE
+        
         // Parse children
         Node child = node.getFirstChild();
         while (child != null) {
             if (isSceneNodeType(child.getNodeName())) {
                 Spatial subnode = parseNode(child);
                 if (subnode != null) {
-                    group.attachChild(subnode);
+                    group = subnode;
                 }
             }
             child = child.getNextSibling();
@@ -664,30 +666,31 @@ public class X3dToJme extends FormatConverter {
                 ((SwitchNode) group).setActiveChild(-1);
             }
         } else if (node.getNodeName().equals("Transform")) {
-            setTransformation(group, node);
-        } else if (node.getNodeName().equals( "Collision" )) {
-          PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
-          if ( physicsSpace != null ) {
-              PhysicsNode physicsResult = null;
-              
-              if (dynamic) {
-                  physicsResult = physicsSpace.createDynamicNode();
-                  dynamic = false;
-                  System.out.println("dinamico");
-              } else {
-                  physicsResult = physicsSpace.createStaticNode();
-                  
-              }
-              physicsResult.attachChild(group);     
-              physicsResult.generatePhysicsGeometry(true);
-
-              group = physicsResult;
-          }
+            //setTransformation(group, node);
+//        } else if (node.getNodeName().equals( "Collision" )) {
+//          PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
+//          if ( physicsSpace != null ) {
+//              PhysicsNode physicsResult = null;
+//              
+//              if (dynamic) {
+//                  physicsResult = physicsSpace.createDynamicNode();
+//                  dynamic = false;
+//                  System.out.println("dinamico");
+//              } else {
+//                  physicsResult = physicsSpace.createStaticNode();
+//                  
+//              }
+//              physicsResult.attachChild(group);     
+//              physicsResult.generatePhysicsGeometry(true);
+//
+//              group = physicsResult;
+//          }
         }
 
         return group;
     }
-
+private boolean shouldTransform = false;
+private Node transformNode;
     /**
      * Creates a BoundingBox according to the attributes bboxCenter and bboxSize
      * of the given node.
@@ -764,7 +767,7 @@ public class X3dToJme extends FormatConverter {
      * @param node
      *            The DOM node
      */
-    private void setTransformation(com.jme.scene.Node sceneNode, Node node) {
+    private void setTransformation(com.jme.scene.Spatial sceneNode, Node node) {
         NamedNodeMap attrs = node.getAttributes();
 
         // Set translation
@@ -891,15 +894,19 @@ public class X3dToJme extends FormatConverter {
         Geometry geom = null;
         if (geometryNode != null) {
             geom = parseGeometry(geometryNode);
-            geom.updateModelBound();
             if (geom != null) {
-                shape.attachChild(geom);
+                if (shouldTransform)
+                {
+                    shouldTransform = false;
+                    setTransformation(geom, transformNode);
+                }//shape.attachChild(geom);
             }
+            geom.updateModelBound();
             if (geom != null && bbox != null) {
                 geom.setModelBound(bbox);
             }
         }
-        shape.detachAllChildren();
+        //shape.detachAllChildren();
         
         
         // yo creo que esto apesta lo suficiente como para anotarlo, pero no 
@@ -927,7 +934,6 @@ System.out.println("createBumper");
                    }
                    shape = Bumper.create( pinball, "bumper"+bumperCounter++, geom, bumperType );
                    
-                   dynamic = true;
                    
                } else if (type.equals( "Door" )) {
 System.out.println("createDoor");
@@ -943,7 +949,6 @@ System.out.println("createDoor");
                    }
                    shape = Door.create( pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
                    
-                   dynamic = true;
                    
                } else if (type.equals( "Flipper" )) {
 System.out.println("createFlipper");
@@ -957,14 +962,12 @@ System.out.println("createFlipper");
                    }
                    shape = Flipper.create( pinball, "flipper"+flipperCounter++, geom, flipperType );
                    
-                   dynamic = true;
                    
                } else if (type.equals( "Magnet" )) {
 System.out.println("createMagnet");
                    
                    shape = Magnet.create( pinball, "magnet"+magnetCounter++, geom );
     
-                   dynamic = false;
                    
                } else if (type.equals( "Plunger" )) {
 System.out.println("createPluneger");
@@ -972,7 +975,6 @@ System.out.println("createPluneger");
                    float maxBackstep = (Float)metadata.get( "maxBackStep" );
                    shape = Plunger.create( pinball, "thePlunger", geom, maxBackstep );
                    
-                   dynamic = true;
                    
                } else if (type.equals( "Spinner" )) {
 System.out.println("createSpinner");
@@ -990,27 +992,15 @@ System.out.println("createSpinner");
                    
                    shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom, spinnerType );
                    
-                   dynamic = true;
                }
            }
            
         }
         else
         {
-            
             shape = Obstacle.create( pinball, "obstacle"+obstacleCounter++, geom );
-            dynamic = false;
-            // TODO volar
-//            PhysicsSpace physicsSpace = ((PinballGameState)getProperty("pinball")).getPhysicsSpace();
-//            if ( physicsSpace != null  ) {
-//                PhysicsNode physicsResult = physicsSpace.createStaticNode();
-//
-//                physicsResult.attachChild(shape);     
-//                physicsResult.generatePhysicsGeometry();
-//                
-//                shape = physicsResult;
-//            }
         }
+        shape.updateModelBound();
         
         // Parse and set the appearance properties, if available
         createBumpController = false; // Reset the create controller flag
@@ -1121,7 +1111,7 @@ System.out.println("createSpinner");
             Node child = node.getFirstChild();
             while (child != null) {
                 if (isMetadataType(child.getNodeName())) {
-                    // XXX esto es cualquiera, pero va a funcar
+                    // esto es cualquiera, pero va a funcar
                     result.putAll( parseMetadata( child ) );
                 }
                 child = child.getNextSibling();
