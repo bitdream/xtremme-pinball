@@ -44,6 +44,7 @@ import com.jme.util.stat.graph.LineGrapher;
 import com.jme.util.stat.graph.TabledLabelGrapher;
 import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
@@ -122,7 +123,17 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Timer para los FPS */
 	protected Timer timer;
 
-	private Vector3f ballStartUp =new Vector3f( 1, 100, -65 );
+	/* Ubicacion inicial de la bola: cable */
+	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.5f, -9.0f );
+	
+	/* Ubicacion inicial de la camara */
+	private Vector3f cameraStartUp = new Vector3f( 0.0f, 63.0f, 16.0f ); 
+	
+	/* Lugar al que mira la camara incialmente */
+	private Vector3f cameraLookAt = new Vector3f( 0.0f, 43.5f, 0.0f );
+	    
+	/* Nodo que guarda la tabla */
+	private Node tabla;
 	
 	/**
 	 * Crea un estado de juego nuevo.
@@ -224,10 +235,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		// y lo ubico en el espacio
         /* seteo ubicacion del jugador */
-        cam.setLocation( new Vector3f( 0.0f, 102.5f, 0.0f ) ); // 100 son 2mts, y seria lineal
+        cam.setLocation( new Vector3f(cameraStartUp) ); // 100 son 2mts, y seria lineal
 
         // seteo la mirada del jugador 
-        cam.lookAt( new Vector3f( 0.0f, 0.0f, -100.0f ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
+        cam.lookAt( new Vector3f(cameraLookAt), new Vector3f( 0.0f, 1.0f, -1.0f ) );
 
         /* Aplicar los cambios al jugador */
         cam.update();
@@ -841,8 +852,15 @@ public class PinballGameState extends PhysicsEnhancedGameState
             /* agregamos el lightState */
             loader.setLightState( lightState );
 
-            Spatial room = loader.loadScene();
+            Node room = loader.loadScene();
             
+            for (Spatial child : room.getChildren())
+            {
+                if ( child instanceof PhysicsNode )
+                {
+                    ((PhysicsNode) child).generatePhysicsGeometry(true);
+                }
+            }
             /* cargamos y attacheamos la habitacion */
             rootNode.attachChild( room );
         }
@@ -888,12 +906,12 @@ public class PinballGameState extends PhysicsEnhancedGameState
             /* agregamos el lightState */
             loader.setLightState( lightState );
 
-            Spatial table = loader.loadScene();
+            tabla = loader.loadScene();
 
-            inclinePinball( table );
+            tabla = inclinePinball( tabla );
             
             /* cargamos y attacheamos la tabla */
-            rootNode.attachChild( table );
+            rootNode.attachChild( tabla );
         }
         catch ( FileNotFoundException e )
         {
@@ -905,10 +923,41 @@ public class PinballGameState extends PhysicsEnhancedGameState
         this.gameLogic = new CarsThemeGameLogic(this);
     }
     
-    private void inclinePinball( Spatial table )
+    private Node inclinePinball( Node table )
     {
+        table.updateModelBound();
+
+//        Node pivot = new Node("PivotNode");
+//        pivot.setLocalTranslation( new Vector3f(0,37,-25) );
+//        pivot.attachChild(table);
+
         /* Se rota toda la mesa y sus componentes en el eje X */
         table.setLocalRotation(getPinballSettings().getInclinationQuaternion());
+        
+//        TransformQuaternion test1 = new TransformQuaternion();
+//
+//        test1.setRotationQuaternion( getPinballSettings().getInclinationQuaternion() );
+//        test1.setTranslation( new Vector3f(0.0f,-3.97f,-3.16f) );
+//        for ( Spatial child : table.getChildren() )
+//        {
+//             if (child instanceof PhysicsNode) {
+//                 PhysicsNode phyChild = (PhysicsNode)child;
+//                 phyChild.setLocalTranslation( eje );
+//                 phyChild.setLocalRotation(getPinballSettings().getInclinationQuaternion());    
+//                 phyChild.generatePhysicsGeometry(true);
+//             }
+//        }
+//        for ( Node node : X3dToJme.transforms)
+//        {
+//            Quaternion q = node.getLocalRotation();
+//            Vector3f aux = new Vector3f();
+//            q.toAngleAxis( aux ) - getPinballSettings().getInclinationQuaternion().toAngleAxis( new Vector3f() );
+//            q.addLocal( getPinballSettings().getInclinationQuaternion() );
+//            node.setLocalRotation( q );
+//        }
+        //test1.applyToSpatial( table );
+
+//        table = pivot;
         
         /* Inclino joints fisicos y demas, recalculandolos */
         /* Flippers */
@@ -934,7 +983,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Plunger */
         if (plunger != null)
             ((Plunger)plunger.getChild(0)).recalculateJoints(this);
-            
+        
+        return table;
     }
     
     private boolean debug = true;
@@ -965,9 +1015,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 {
                     if ( evt.getTriggerPressed() )
                     {
-                        cam.setLocation( new Vector3f( 0.0f, 90.0f, 0.0f ) );
+                        cam.setLocation( new Vector3f( cameraStartUp ) );
 
-                        cam.lookAt( new Vector3f( 0.0f, 0.0f, -100.0f ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
+                        cam.lookAt( new Vector3f( cameraLookAt ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_HOME, InputHandler.AXIS_NONE, false );
@@ -986,7 +1036,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         balls.get( 0 ).setLocalTranslation( new Vector3f(ballStartUp) );
                         balls.get( 0 ).setLocalRotation( new Quaternion() );
                         balls.get( 0 ).updateGeometricState( 0, false );
-                        System.out.println(balls.get( 0 ).getLocalTranslation());
+                        //System.out.println(balls.get( 0 ).getLocalTranslation());
                     }
                 }
                 
@@ -1139,6 +1189,30 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F9, InputHandler.AXIS_NONE, false );
 
+            KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
+            pinballInputHandler.addAction( new InputAction()
+            {
+                public void performAction( InputActionEvent evt )
+                {
+                    if ( evt.getTriggerPressed() )
+                    {
+                        float angle = getPinballSettings().getInclinationAngle();
+                        
+                        if (angle > 9)
+                        {
+                            angle = 1;
+                        }
+                        else
+                        {
+                            angle += 1;
+                        }
+                        
+                        getPinballSettings().setInclinationAngle( angle );
+                        inclinePinball( tabla );
+                    }
+                }
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_T, InputHandler.AXIS_NONE, false );
+            
             /* Assign key ADD to action "step". */
             //            KeyBindingManager.getKeyBindingManager().set( "step",
             //                    KeyInput.KEY_ADD );

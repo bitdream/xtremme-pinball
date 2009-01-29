@@ -60,13 +60,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -124,9 +125,11 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
+import components.Spinner;
 import components.Bumper.BumperType;
 import components.Door.DoorType;
 import components.Flipper.FlipperType;
+import components.Spinner.SpinnerType;
 
 /**
  * A Loader class to load models from XML-encoded X3D files (see <a
@@ -427,7 +430,6 @@ public class X3dToJme extends FormatConverter {
         //FIXME
 //System.out.println(pinballTheme);
         
-        
         Node scene = getChildNode(nodes.item(0), "Scene");
         com.jme.scene.Node sceneRoot = new com.jme.scene.Node();
 
@@ -578,23 +580,23 @@ public class X3dToJme extends FormatConverter {
                     logger.info( "skipping DEF on physics node" );
                 }
             }
-            boolean dynamic = false;
-            PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
-            if ( physicsSpace != null ) {
-                PhysicsNode physicsResult = null;
-                
-                // TODO diferenciar nodos dinamicos y estaticos
-                if (dynamic) {
-                    physicsResult = (PhysicsNode)result;//physicsSpace.createDynamicNode();
-                    dynamic = false;
-                } else {
-                    physicsResult = physicsSpace.createStaticNode();
-                }
-                physicsResult.attachChild(result);     
-                physicsResult.generatePhysicsGeometry(true);
-                
-                result = physicsResult;
-            }
+//            boolean dynamic = false;
+//            PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
+//            if ( physicsSpace != null ) {
+//                PhysicsNode physicsResult = null;
+//                
+//                // TODO diferenciar nodos dinamicos y estaticos
+//                if (dynamic) {
+//                    physicsResult = (PhysicsNode)result;//physicsSpace.createDynamicNode();
+//                    dynamic = false;
+//                } else {
+//                    physicsResult = physicsSpace.createStaticNode();
+//                }
+//                physicsResult.attachChild(result);     
+//                //physicsResult.generatePhysicsGeometry(true);
+//                
+//                result = physicsResult;
+//            }
         }
         
         return result;
@@ -671,6 +673,26 @@ public class X3dToJme extends FormatConverter {
             }
         } else if (node.getNodeName().equals("Transform")) {
             setTransformation(group, node);
+        } else if (node.getNodeName().equals( "Collision" )) {
+          PhysicsSpace physicsSpace = ((PinballGameState) getProperty("pinball")).getPhysicsSpace();
+          if ( physicsSpace != null ) {
+              PhysicsNode physicsResult = null;
+              
+              // TODO diferenciar nodos dinamicos y estaticos
+//              if (dynamic) {
+//                  physicsResult = (PhysicsNode)result;//physicsSpace.createDynamicNode();
+//                  dynamic = false;
+//              } else {
+                  physicsResult = physicsSpace.createStaticNode();
+//              }
+              physicsResult.attachChild(group);     
+              physicsResult.generatePhysicsGeometry(true);
+              
+//              Node def = node.getAttributes().getNamedItem("DEF");
+//              if (def != null && def.getNodeValue().equals("fondodofon"))
+//                  this.fondo = group;
+              group = physicsResult;
+          }
         }
 
         return group;
@@ -902,9 +924,9 @@ public class X3dToJme extends FormatConverter {
            {
                shape.detachAllChildren();
                String type = (String)metadata.get( "type" );
-               System.out.println(type);
+System.out.println(type);
                if (type.equals( "Bumper" )) {
-                   System.out.println("createBumper");
+System.out.println("createBumper");
                    
                    String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
                    
@@ -918,7 +940,7 @@ public class X3dToJme extends FormatConverter {
                    dynamic = true;
                    
                } else if (type.equals( "Door" )) {
-                   System.out.println("createDoor");
+System.out.println("createDoor");
                    
                    String typeOfDoor = (String)metadata.get( "doorType" ); // es obligatorio
                    float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
@@ -934,7 +956,7 @@ public class X3dToJme extends FormatConverter {
                    dynamic = true;
                    
                } else if (type.equals( "Flipper" )) {
-                   System.out.println("createFlipper");
+System.out.println("createFlipper");
                    
                    String typeOfFlipper = (String)metadata.get( "flipperType" );
                    
@@ -948,7 +970,7 @@ public class X3dToJme extends FormatConverter {
                    dynamic = true;
                    
                } else if (type.equals( "Magnet" )) {
-                   System.out.println("createMagnet");
+System.out.println("createMagnet");
                    
 /* TARAAAA!!!!!!!!! my magic */
                    geom.updateModelBound();
@@ -958,30 +980,46 @@ public class X3dToJme extends FormatConverter {
                    dynamic = true;
                    
                } else if (type.equals( "Plunger" )) {
-                   System.out.println("createPluneger");
+System.out.println("createPluneger");
                    
                    float maxBackstep = (Float)metadata.get( "maxBackStep" );
                    shape = Plunger.create( pinball, "thePlunger", geom, maxBackstep );
                    
                    dynamic = true;
                    
-               }
-               
+               } else if (type.equals( "Spinner" )) {
+System.out.println("createSpinner");
                    
-            }
+                   String typeOfSpinner = (String)metadata.get( "spinnerType" );
+                   
+                   SpinnerType spinnerType = SpinnerType.NORMAL_SPINNER;
+                   if (typeOfSpinner.equals( "ramp_entrance_spinner" )) 
+                   {
+                       spinnerType = SpinnerType.RAMP_ENTRANCE_SPINNER;
+                   } else if (typeOfSpinner.equals( "ramp_exit_spinner" ))
+                   {
+                       spinnerType = SpinnerType.RAMP_EXIT_SPINNER;
+                   }
+                   
+                   shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom, spinnerType );
+               }
+           
+                   
+           }
+           
         }
         else
         {
             //shape = new obstacle bla bla bla y a otra cosa 
             // TODO volar
             PhysicsSpace physicsSpace = ((PinballGameState)getProperty("pinball")).getPhysicsSpace();
-            if ( physicsSpace != null && !dynamic ) {
+            if ( physicsSpace != null  ) {
                 PhysicsNode physicsResult = null;
 
                 physicsResult = physicsSpace.createStaticNode();
 
                 physicsResult.attachChild(shape);     
-                physicsResult.generatePhysicsGeometry(true);
+                //physicsResult.generatePhysicsGeometry(true);
                 
                 shape = physicsResult;
             }
@@ -1033,6 +1071,7 @@ public class X3dToJme extends FormatConverter {
     private static int doorCounter = 0;
     private static int flipperCounter = 0;
     private static int magnetCounter = 0;
+    private static int spinnerCounter = 0;
     
     /**
      * Checks if the given String represents one of the types of geometry nodes
