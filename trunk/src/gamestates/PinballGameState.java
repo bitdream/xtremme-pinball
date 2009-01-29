@@ -904,8 +904,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
             this.gameLogic = loader.getTheme(this);
             
             //TODO remover
-//            if (this.gameLogic == null)
-//                this.gameLogic = new CarsThemeGameLogic(this);
+            if (this.gameLogic == null)
+                this.gameLogic = new CarsThemeGameLogic(this);
         }
         catch ( FileNotFoundException e )
         {
