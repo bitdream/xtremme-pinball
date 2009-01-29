@@ -1149,6 +1149,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F9, InputHandler.AXIS_NONE, false );
 
             KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
+
             pinballInputHandler.addAction( new InputAction()
             {
                 public void performAction( InputActionEvent evt )
@@ -1170,7 +1171,30 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         inclinePinball( tabla );
                     }
                 }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_T, InputHandler.AXIS_NONE, false );
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_PGUP, InputHandler.AXIS_NONE, false );
+            
+            pinballInputHandler.addAction( new InputAction()
+            {
+                public void performAction( InputActionEvent evt )
+                {
+                    if ( evt.getTriggerPressed() )
+                    {
+                        float angle = getPinballSettings().getInclinationAngle();
+                        
+                        if (angle < 2)
+                        {
+                            angle = 10;
+                        }
+                        else
+                        {
+                            angle -= 1;
+                        }
+                        
+                        getPinballSettings().setInclinationAngle( angle );
+                        inclinePinball( tabla );
+                    }
+                }
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_PGDN, InputHandler.AXIS_NONE, false );
             
             /* Assign key ADD to action "step". */
             //            KeyBindingManager.getKeyBindingManager().set( "step",
