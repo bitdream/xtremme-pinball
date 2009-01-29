@@ -87,7 +87,8 @@ public class CarsThemeGameLogic extends GameLogic
 		super.spinnerNormalCollision(spinner);
 		
 		score += spinnerScore;
-		
+		// Se actualiza los datos de pantalla de usuario
+		showScore();
 		showMessage("Colision con molinete!");
 	}
 
@@ -97,7 +98,8 @@ public class CarsThemeGameLogic extends GameLogic
 		super.spinnerRampEntranceCollision(spinner);
 		
 		score += spinnerScore;
-		
+		// Se actualiza los datos de pantalla de usuario
+		showScore();
 		showMessage("Colision con molinete entrando a rampa!");
 		
 		rampUpSound.play();
@@ -109,7 +111,8 @@ public class CarsThemeGameLogic extends GameLogic
 		super.spinnerRampExitCollision(spinner);
 		
 		score += spinnerScore;
-		
+		// Se actualiza los datos de pantalla de usuario
+		showScore();
 		showMessage("Colision con molinete saliendo de rampa!");
 	}
 

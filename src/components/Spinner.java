@@ -123,9 +123,7 @@ public class Spinner extends Node
                 }
                 // Sino no hago nada pq es una colision repetida        
         		
-        		
-                
-            }
+           }
 
         }, collisionEventHandler, false);
         
