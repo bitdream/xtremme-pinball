@@ -181,6 +181,9 @@ public class PinballInputHandler extends FirstPersonHandler
 
 		public void performAction(InputActionEvent event)
 		{
+			if (game.getPlunger() == null)
+				return;
+			
 			Plunger plunger = (Plunger)(game.getPlunger().getChild(0));
 			
 			if(event.getTriggerPressed())
