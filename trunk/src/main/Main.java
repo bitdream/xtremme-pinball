@@ -104,6 +104,10 @@ public class Main
 	
 	public static void shutdownGame()
 	{
+		/* TODO Termino con el sistema de sonido */
+		
+		
+		/* Termino con el juego */
 		stdGame.shutdown();
 	}
 }
