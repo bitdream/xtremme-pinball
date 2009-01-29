@@ -1,5 +1,6 @@
 package themes;
 
+import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
 import components.Bumper;
@@ -18,12 +19,16 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private int bumperCollisionCnt = 0;
 	
+	private AudioTrack lostBallSound, lostLastBallSound, rampUpSound;
+	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
-		/* Preparo las pistas de audio que voy a usar */ // TODO falta poner las especificas del tema de autos
-		//bumpSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/bump.wav"), false);
+		/* Preparo las pistas de audio que voy a usar */
+		lostBallSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		lostLastBallSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		rampUpSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
 	}
 
 	@Override
@@ -93,7 +98,9 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		score += spinnerScore;
 		
-		showMessage("Colision con molinete!");
+		showMessage("Colision con molinete entrando a rampa!");
+		
+		rampUpSound.play();
 	}
 
 	@Override
@@ -103,7 +110,7 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		score += spinnerScore;
 		
-		showMessage("Colision con molinete!");
+		showMessage("Colision con molinete saliendo de rampa!");
 	}
 
 	@Override
@@ -119,13 +126,23 @@ public class CarsThemeGameLogic extends GameLogic
 		super.abuseTilt();
 		
 		// Imprimir en pantalla un cartel que avise el abuso de tilts 
-		showMessage("Abuso de tilt! Bola perdida");
+		showMessage("Abuso de tilt! Flippers deshabilitados!");
 		
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
 		{
 			((Flipper)flipper.getChild(0)).setActive(false);
 		}
+	}
+
+	@Override
+	public void lostBall()
+	{
+		showMessage("Bola perdida");
 		
+		if (getInTableBallQty() == 0) // Era la ultima bola
+			lostLastBallSound.play();
+		else // Todavia le quedan bolas en la mesa
+			lostBallSound.play();
 	}
 }

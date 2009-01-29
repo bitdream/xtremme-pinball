@@ -27,7 +27,7 @@ public abstract class GameLogic
 	protected AudioSystem audio;
 	
 	/* Sonidos default */
-	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound;
+	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound;
 	
 	/* Sonidos default de flipperMove */
 	private List<AudioTrack> flipperMoveSounds;
@@ -42,7 +42,7 @@ public abstract class GameLogic
 		
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
-		
+
 		audio.getEar().trackOrientation(pinball.getCamera());
 		audio.getEar().trackPosition(pinball.getCamera());
 		
@@ -52,6 +52,7 @@ public abstract class GameLogic
 		plungerReleaseSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/plungerRelease.wav"), false);
 		ballTouchSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/ballTouch.wav"), false);
 		tiltSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/tilt.wav"), false);
+		tiltAbuseSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
 
 		/* Agrego los sonidos posibles de golpear con flipper */
 		flipperMoveSounds = new ArrayList<AudioTrack>();
@@ -73,6 +74,11 @@ public abstract class GameLogic
 	public void showMessage(String message)
 	{
 		pinball.setMessage(message);
+	}
+	
+	public int getInTableBallQty()
+	{
+		return pinball.getBalls().size();
 	}
 	
 	/* La idea es que los siguientes metodos sean overrideados en caso de necesitarse y
@@ -148,6 +154,12 @@ public abstract class GameLogic
 	// Invocado cuando el usuario hizo abuso del uso de tilt
 	public void abuseTilt()
 	{
-		tiltSound.play();
+		tiltAbuseSound.play();
+		
+		/* TODO Corto la musica (fade out) y recordar recomenzarla */
+		
 	}
+	
+	// Invocado cuando se pierde una bola
+	public abstract void lostBall();
 }
