@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import loader.X3DLoader;
+import main.Main;
 import themes.CarsThemeGameLogic;
 
 import com.jme.bounding.BoundingBox;
@@ -225,7 +226,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* seteo ubicacion del jugador */
         cam.setLocation( new Vector3f( 0.0f, 102.5f, 0.0f ) ); // 100 son 2mts, y seria lineal
 
-        // seteo la miradad del jugador 
+        // seteo la mirada del jugador 
         cam.lookAt( new Vector3f( 0.0f, 0.0f, -100.0f ), new Vector3f( 0.0f, 1.0f, -1.0f ) );
 
         /* Aplicar los cambios al jugador */
@@ -254,6 +255,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	 */
 	protected void initGame()
 	{
+		/* Preparo la orientacion del sistema de audio */
+		Main.getAudioSystem().getEar().trackOrientation(getCamera());
+		Main.getAudioSystem().getEar().trackPosition(getCamera());
+		
 	    /* Optimizacion - aplico culling a todos los nodos */
         CullState cs = display.getRenderer().createCullState();
         cs.setCullFace(CullState.Face.Back);
@@ -318,6 +323,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
         rootNode.attachChild(messageText);
+        
+        /* Aviso a la logica de juego que empieza uno */
+        gameLogic.gameStart();
 	}
 	
 	private void buildLighting()
@@ -1302,5 +1310,18 @@ public class PinballGameState extends PhysicsEnhancedGameState
         labGraph.getDefaultColor().a = 0;
         graphNode.attachChild(labGraph);
         
+    }
+    
+    @Override
+    public void setActive(boolean active)
+    {
+    	super.setActive(active);
+    	
+    	/* Notifico a la logica de juego cada vez que
+    	 * ingreso, reingreso o salgo del juego (para ir al menu) */
+    	if (active)
+    		gameLogic.enterGame();
+    	else
+    		gameLogic.leaveGame();
     }
 }

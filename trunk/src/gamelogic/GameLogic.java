@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import themes.CarsThemeGameLogic;
+import main.Main;
 
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
@@ -24,6 +24,7 @@ public abstract class GameLogic
 	
 	protected PinballGameState pinball;
 	
+	/* Sistema de sonido */
 	protected AudioSystem audio;
 	
 	/* Sonidos default */
@@ -40,26 +41,22 @@ public abstract class GameLogic
 	{
 		this.pinball = pinball;
 		
-		/* Preparo el sistema de sonido */
-		audio = AudioSystem.getSystem();
-
-		audio.getEar().trackOrientation(pinball.getCamera());
-		audio.getEar().trackPosition(pinball.getCamera());
+		audio = Main.getAudioSystem();
 		
 		/* Preparo los sonidos default */
-		bumpSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/bump.wav"), false);
-		plungerChargeSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/plungerCharge.wav"), false);
-		plungerReleaseSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/plungerRelease.wav"), false);
-		ballTouchSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/ballTouch.wav"), false);
-		tiltSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/tilt.wav"), false);
-		tiltAbuseSound = audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
+		bumpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/bump.wav"), false);
+		plungerChargeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/plungerCharge.wav"), false);
+		plungerReleaseSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/plungerRelease.wav"), false);
+		ballTouchSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/ballTouch.wav"), false);
+		tiltSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt.wav"), false);
+		tiltAbuseSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
 
 		/* Agrego los sonidos posibles de golpear con flipper */
 		flipperMoveSounds = new ArrayList<AudioTrack>();
 		
 		for (int i = 1; i <= flipperMoveSoundQty; i++)
 		{
-			flipperMoveSounds.add(audio.createAudioTrack(CarsThemeGameLogic.class.getClassLoader().getResource("resources/sounds/flipperMove" + i + ".wav"), false));
+			flipperMoveSounds.add(audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/flipperMove" + i + ".wav"), false));
 		}
 		
 		/* Inicializo el random */
@@ -162,4 +159,13 @@ public abstract class GameLogic
 	
 	// Invocado cuando se pierde una bola
 	public abstract void lostBall();
+	
+	// Invocado cuando comienza el juego
+	public abstract void gameStart();
+	
+	// Invocado cuando retorna al juego (o entra por vez primera)
+	public abstract void enterGame();
+	
+	// Invocado cuando se va del juego momentaneamente
+	public abstract void leaveGame();
 }

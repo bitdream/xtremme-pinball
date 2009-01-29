@@ -5,6 +5,7 @@ import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
 
 import com.jme.app.AbstractGame.ConfigShowMode;
+import com.jmex.audio.AudioSystem;
 import com.jmex.game.StandardGame;
 import com.jmex.game.state.GameStateManager;
 
@@ -12,12 +13,16 @@ public class Main
 {
 	
 	private static StandardGame stdGame;
+	
+	private static AudioSystem audio;
 
 	/**
 	 * Punto de entrada al juego
 	 */
 	public static void main(String[] args)
 	{
+		/* Preparo el sistema de sonido */
+		audio = AudioSystem.getSystem();
 		
 		stdGame = new StandardGame("xtremme-pinball");
 		
@@ -104,10 +109,15 @@ public class Main
 	
 	public static void shutdownGame()
 	{
-		/* TODO Termino con el sistema de sonido */
-		
-		
 		/* Termino con el juego */
 		stdGame.shutdown();
+		
+		/* Termino con el sistema de sonido TODO no anda? */
+		getAudioSystem().fadeOutAndClear(2f);
+	}
+
+	public static AudioSystem getAudioSystem()
+	{
+		return audio;
 	}
 }
