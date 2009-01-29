@@ -26,7 +26,7 @@ public class Obstacle extends Node
 		obstacleNode.attachChild(m);
         
         /* Genero su fisica */ 
-		obstacleNode.generatePhysicsGeometry();
+		obstacleNode.generatePhysicsGeometry(true);
 		
 		return obstacleNode;
 	}

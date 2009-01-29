@@ -298,18 +298,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
         // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
         // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
-        gameLogic = new CarsThemeGameLogic(this);
+        //gameLogic = new CarsThemeGameLogic(this);
         
 		// TODO Aca deberia ir la traduccion de X3D para formar la escena
         //buildAndAttachComponents();
         
         //buildLighting();
         //buildTable();
-
-        
-        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
-        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
-        gameLogic = new CarsThemeGameLogic(this);
 
         loadEnvironment();
         loadTable();
@@ -810,9 +805,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
         customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
 
         /* Nodo dinamico de la bola */
-        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-        mainBall.setName( "ball" );
-        rootNode.attachChild( mainBall );
+        //final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+        //mainBall.setName( "ball" );
+        //rootNode.attachChild( mainBall );
 
         final Sphere visualMainBall = new Sphere( "Bola", 25, 25, 1 );
         visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
@@ -821,14 +816,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
         visualMainBall.setModelBound( new BoundingSphere() );
         visualMainBall.updateModelBound();
 
-        mainBall.attachChild( visualMainBall );
-        mainBall.generatePhysicsGeometry();
-        mainBall.setMaterial( customMaterial );
-        // Se computa la masa luego de generar la geometria fisica
-        mainBall.computeMass();
-
-        // La agrego a la lista de bolas
-        balls.add( mainBall );
+//        mainBall.attachChild( visualMainBall );
+//        mainBall.generatePhysicsGeometry();
+//        mainBall.setMaterial( customMaterial );
+//        // Se computa la masa luego de generar la geometria fisica
+//        mainBall.computeMass();
+//
+//        // La agrego a la lista de bolas
+//        balls.add( mainBall );
 	}
 	
 	private void loadEnvironment()
@@ -854,13 +849,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
             Node room = loader.loadScene();
             
-            for (Spatial child : room.getChildren())
-            {
-                if ( child instanceof PhysicsNode )
-                {
-                    ((PhysicsNode) child).generatePhysicsGeometry(true);
-                }
-            }
             /* cargamos y attacheamos la habitacion */
             rootNode.attachChild( room );
         }
@@ -927,37 +915,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
     {
         table.updateModelBound();
 
-//        Node pivot = new Node("PivotNode");
-//        pivot.setLocalTranslation( new Vector3f(0,37,-25) );
-//        pivot.attachChild(table);
-
         /* Se rota toda la mesa y sus componentes en el eje X */
         table.setLocalRotation(getPinballSettings().getInclinationQuaternion());
-        
-//        TransformQuaternion test1 = new TransformQuaternion();
-//
-//        test1.setRotationQuaternion( getPinballSettings().getInclinationQuaternion() );
-//        test1.setTranslation( new Vector3f(0.0f,-3.97f,-3.16f) );
-//        for ( Spatial child : table.getChildren() )
-//        {
-//             if (child instanceof PhysicsNode) {
-//                 PhysicsNode phyChild = (PhysicsNode)child;
-//                 phyChild.setLocalTranslation( eje );
-//                 phyChild.setLocalRotation(getPinballSettings().getInclinationQuaternion());    
-//                 phyChild.generatePhysicsGeometry(true);
-//             }
-//        }
-//        for ( Node node : X3dToJme.transforms)
-//        {
-//            Quaternion q = node.getLocalRotation();
-//            Vector3f aux = new Vector3f();
-//            q.toAngleAxis( aux ) - getPinballSettings().getInclinationQuaternion().toAngleAxis( new Vector3f() );
-//            q.addLocal( getPinballSettings().getInclinationQuaternion() );
-//            node.setLocalRotation( q );
-//        }
-        //test1.applyToSpatial( table );
-
-//        table = pivot;
         
         /* Inclino joints fisicos y demas, recalculandolos */
         /* Flippers */

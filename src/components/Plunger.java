@@ -106,6 +106,7 @@ public class Plunger extends Node
 
         }, collisionEventHandler, false);
         
+        //plungerNode.setAffectedByGravity( false );
         
 		return plungerNode;
 	}
