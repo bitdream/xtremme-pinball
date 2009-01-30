@@ -95,15 +95,9 @@ public abstract class GameLogic
 		ballTouchSound.play();
 	}
 	
-	public void flipperCollision(Flipper flipper)
-	{
-		ballTouchSound.play();
-	}
+	public abstract void flipperCollision(Flipper flipper);
 	
-	public void plungerCollision(Plunger plunger)
-	{
-		ballTouchSound.play();
-	}
+	public abstract void plungerCollision(Plunger plunger);
 	
 	public void spinnerRampEntranceCollision(Spinner spinner)
 	{
