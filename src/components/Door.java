@@ -12,6 +12,7 @@ import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.RotationalJointAxis;
+import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.material.Material;
 
 
@@ -103,7 +104,16 @@ public class Door extends Node
         pinball.getPinballInputHandler().addAction(new InputAction() {
         	
         	public void performAction(InputActionEvent evt) 
-        	{        		
+        	{
+        		// Algo colisiono con la door
+                final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
+
+                // El contacto pudo haber sido bola -> door o door -> bola, si no se dio, no hago nada mas
+                if ( !((contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS)) || (contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS))) )
+                {
+                	return;
+                }
+                
         		// Tiempo en el que se dio esta colision
                 long now = System.currentTimeMillis();
                 

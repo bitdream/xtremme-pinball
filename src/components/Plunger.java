@@ -11,6 +11,7 @@ import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.TranslationalJointAxis;
+import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.material.Material;
 
 
@@ -99,6 +100,15 @@ public class Plunger extends Node
         pinball.getPinballInputHandler().addAction(new InputAction() {
         	
         	public void performAction(InputActionEvent evt) {
+        		
+        		// Algo colisiono con el plunger
+                final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
+
+                // El contacto pudo haber sido bola -> plunger o plunger -> bola, si no se dio, no hago nada mas
+                if ( !((contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS)) || (contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS))) )
+                {
+                	return;
+                }
         		
                 /* Llamo a la logica del juego */
         		pinballInstance.getGameLogic().plungerCollision(plunger);
