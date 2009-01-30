@@ -61,6 +61,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -307,6 +308,7 @@ public class X3dToJme extends FormatConverter {
      *             In case the XML DocumentBuilder cannot be instantiated
      */
     public X3dToJme() throws InstantiationException {
+    	logger.setLevel(Level.SEVERE);
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory
                     .newInstance();

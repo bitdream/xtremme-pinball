@@ -12,9 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import themes.CarsThemeGameLogic;
 
 import com.jme.scene.Node;
 import com.jme.scene.state.LightState;
@@ -46,6 +45,7 @@ public class X3DLoader
 
     public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
+    	logger.setLevel(Level.SEVERE);
         try
         {
             this.x3d = new FileInputStream( x3dFilename.getFile() );
