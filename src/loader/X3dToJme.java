@@ -941,12 +941,17 @@ private Node transformNode;
                    float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
                    float maxRotationalAngle = (Float)metadata.get( "maxRotationalAngle" );
                    
+                   Float jointX = (Float)metadata.get( "jointX" );
+                   Float jointY = (Float)metadata.get( "jointY" );
+                   Float jointZ = (Float)metadata.get( "jointZ" );
+                   Vector3f jointCoords = new Vector3f( jointX, jointY, jointZ );
+                   
                    DoorType doorType = DoorType.RIGHT_DOOR;
                    if (typeOfDoor.equals( "left_door" ))
                    {
                        doorType = DoorType.LEFT_DOOR;
                    }
-                   shape = Door.create( pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
+                   shape = Door.create( pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle , jointCoords);
                    
                } else if (type.equals( "Flipper" )) {
                    

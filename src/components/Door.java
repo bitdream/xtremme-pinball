@@ -56,7 +56,7 @@ public class Door extends Node
 	 * @param maxRotationalAngle Angulo maximo de rotacion para la puerta.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, DoorType doorType, float minRotationalAngle, float maxRotationalAngle)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, DoorType doorType, float minRotationalAngle, float maxRotationalAngle, Vector3f anchor)
 	{
 		DynamicPhysicsNode doorNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -88,8 +88,11 @@ public class Door extends Node
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
         rotationalAxis.setDirection(new Vector3f(0, 1, 0));
                 
+        if (anchor == null)
+            anchor = locateDoorExtreme(doorType, visualModel);
+        
         /* Le fijo como punto de rotacion la punta de la puerta */
-        jointForDoor.setAnchor(locateDoorExtreme(doorType, visualModel));
+        jointForDoor.setAnchor(anchor);
         
         /* Guardo que esa door tiene este joint */
         door.setJoint(jointForDoor);
