@@ -12,6 +12,7 @@ import com.jme.scene.*;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.RotationalJointAxis;
+import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.material.Material;
 
 
@@ -23,7 +24,7 @@ public class Flipper extends Node implements ActivableComponent
 	private static final long serialVersionUID = 1L;
 	
 	/* Fuerzas en los flippers */
-	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -16000000f), flipperRestoreForce = new Vector3f(0f, 0f, 1000000f);
+	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -1600000f), flipperRestoreForce = new Vector3f(0f, 0f, 100000f);
 	
 	/* Maximos angulos de rotacion de los flippers */
 	private static final float maxRotationalAngle = 0.3f, minRotationalAngle = -0.3f;
@@ -116,9 +117,16 @@ public class Flipper extends Node implements ActivableComponent
         	
         	public void performAction(InputActionEvent evt) {
         		
-                /* Llamo a la logica del juego */
-                pinballInstance.getGameLogic().flipperCollision(flipper);
-            }        	
+        		// Algo colisiono con el flipper
+                final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
+
+                // El contacto pudo haber sido bola -> flipper o flipper -> bola
+                if ( (contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS)) || (contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS)) )
+                {
+                    /* Llamo a la logica del juego */
+                    pinballInstance.getGameLogic().flipperCollision(flipper);
+                }
+            }
 
         }, collisionEventHandler, false);
 
