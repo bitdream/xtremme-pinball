@@ -128,9 +128,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = new Vector3f( 0.0f, 63.0f, 16.0f ); 
-	
+//	new Vector3f(-7.8f,11.6f,-63.6f);
 	/* Lugar al que mira la camara incialmente */
 	private Vector3f cameraLookAt = new Vector3f( 0.0f, 43.5f, 0.0f );
+//	new Vector3f(-6.8f,11.6f,-62.6f);
 	    
 	/* Nodo que guarda la tabla */
 	private Node tabla;
@@ -293,24 +294,20 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Creo la lista de bolas */
 		balls = new ArrayList<DynamicPhysicsNode>(4);
 
-        /* Armo la mesa de juego */
-//        buildTable();
-//        
-//        // TODO armar instancia del loader con el x3d elegido (inicialmente habra 1 solo) y
-//        // preguntar el theme para ahora instanciarlo y asignarlo a la variable gameLogic
-//        gameLogic = new CarsThemeGameLogic(this);
-//        
-//		// TODO Aca deberia ir la traduccion de X3D para formar la escena
-//        buildAndAttachComponents();
-//        
-        buildLighting();
-
-        //loadEnvironment();
+		/* Armo la habitacion, la mesa y la bola */
+//        loadEnvironment();
         loadTable();
         setUpBall();
+		
         
-        /* Inclino todos los componentes a la vez desde el nodo raiz */
-        //inclinePinball(); //lo hago en el loadTable
+		// ----------------------------------------
+		// TODO volar: es para debug
+//        buildTable();
+//        gameLogic = new CarsThemeGameLogic(this);
+//        buildAndAttachComponents();
+//        inclinePinball();
+        buildLighting();
+        //-----------------------------------------
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -470,7 +467,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         rootNode.attachChild(mainBall2);
                
         final Sphere visualMainBall2 = new Sphere("Bola 2", 25, 25, 1);
-        visualMainBall2.setLocalTranslation(new Vector3f(25, 15, -2));
+        visualMainBall2.setLocalTranslation(new Vector3f(0, 15, -20));
 		
 		// Agregado de bounding volume 
 		visualMainBall2.setModelBound(new BoundingSphere());
@@ -650,10 +647,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		//-----------------------------------------
 
 		// Agrego un bumper
-		final Box visualBumper1 = new Box("Visual bumper 1", new Vector3f(), 2f, 4f, 2f);
+		final Box visualBumper1 = new Box("Visual bumper 1", new Vector3f(), 2f, 2f, 2f);
 		// Le doy color al bumper
-		Utils.color( visualBumper1, new ColorRGBA( 0f, 1f, 0f, 1.0f ), 120 );
-		visualBumper1.setLocalTranslation(new Vector3f(0, 5.6f, 0));
+		Utils.color( visualBumper1, new ColorRGBA( 1f, 1f, 0f, 1.0f ), 120 );
+		
+		visualBumper1.setLocalScale( new Vector3f(0.19173f,5.595036f, 0.804614f ) );
+		visualBumper1.setLocalRotation( new Quaternion().fromAngleAxis( 1.593925f, new Vector3f( -0.982868f, -0.150476f, -0.106427f ) ) );
+		visualBumper1.setLocalTranslation(new Vector3f(-4, 2f, 0));
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
@@ -886,7 +886,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         try
         {
             //XXX nombre tabla
-            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/TableSpinners.x3d" ) );
+            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
 
             /* agregamos la fisica */
             loader.setPinball( this );
@@ -1153,6 +1153,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
             KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
 
+            //estas son para debug... es mala idea pasarlas a estable porque se rompe la fisica
             pinballInputHandler.addAction( new InputAction()
             {
                 public void performAction( InputActionEvent evt )
