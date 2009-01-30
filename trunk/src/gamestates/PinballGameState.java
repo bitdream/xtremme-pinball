@@ -2,16 +2,13 @@ package gamestates;
 
 import gamelogic.GameLogic;
 import input.PinballInputHandler;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
 import loader.X3DLoader;
 import main.Main;
 import themes.CarsThemeGameLogic;
-
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.InputHandler;
@@ -44,7 +41,6 @@ import com.jme.util.stat.graph.LineGrapher;
 import com.jme.util.stat.graph.TabledLabelGrapher;
 import com.jmetest.physics.Utils;
 import com.jmex.physics.DynamicPhysicsNode;
-import com.jmex.physics.PhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
 import com.jmex.physics.StaticPhysicsNode;
@@ -56,9 +52,10 @@ import components.Flipper;
 import components.Magnet;
 import components.Plunger;
 import components.Spinner;
+import components.Sensor;
 import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
-import components.Spinner.SpinnerType;
+import components.Sensor.SensorType;;
 
 /**
  * Clase principal del juego.
@@ -98,6 +95,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Bolas del juego */
 	private List<DynamicPhysicsNode> balls;
+	
+	/* Sensores del juego */
+	private List<DynamicPhysicsNode> sensors;
 	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
@@ -596,7 +596,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Le doy color */
 		Utils.color(visualSpinner, new ColorRGBA(1f, 0.3f, 0.5f, 1.0f), 128);
 		
-		DynamicPhysicsNode testSpinner = Spinner.create(this, "Physic spinner", visualSpinner, SpinnerType.NORMAL_SPINNER);
+		DynamicPhysicsNode testSpinner = Spinner.create(this, "Physic spinner", visualSpinner/*, SpinnerType.NORMAL_SPINNER*/);
 		rootNode.attachChild(testSpinner);
 		
 		/*Box box = new Box("The Box", new Vector3f(-1, -1, -1), new Vector3f(1, 1, 1));
@@ -672,6 +672,17 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		//rootNode.attachChild(bumper2);
 		//bumpers.add(bumper2);
 		
+		// Agrego un sensor de prueba
+		final Box visualLostBallSensor = new Box("visualLostBallSensor 1", new Vector3f(), 4f, 2f, 2f);
+		// TODO Ponerlo transparente para que no se vea (lo pongo verde para verlo y poder hacer debug)
+		Utils.color( visualLostBallSensor, new ColorRGBA( 0f, 1f, 0f, 1f ), 120 );
+		visualLostBallSensor.setLocalTranslation(new Vector3f(0, 2f, 0));
+		// Agregado de bounding volume 
+		visualLostBallSensor.setModelBound(new BoundingBox());
+		visualLostBallSensor.updateModelBound();
+		DynamicPhysicsNode lostBallSensor = Sensor.create(this, "Physic los ball sensor 1", visualLostBallSensor, SensorType.RAMP_SENSOR);
+		rootNode.attachChild(lostBallSensor);
+		
 	}
 	
 	private void buildTable()
@@ -715,6 +726,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public List<DynamicPhysicsNode> getSpinners() 
 	{
 		return spinners;
+	}
+	
+	public List<DynamicPhysicsNode> getSensors() 
+	{
+		return sensors;
 	}
 	
 	public List<StaticPhysicsNode> getMagnets()
@@ -765,6 +781,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public void addSpinner(DynamicPhysicsNode spinner)
 	{
 		spinners.add(spinner);
+	}
+	
+	public void addSensor(DynamicPhysicsNode sensor)
+	{
+		sensors.add(sensor);
 	}
 
 	public void setScore(int score)

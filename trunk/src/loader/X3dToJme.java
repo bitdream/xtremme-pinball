@@ -991,7 +991,7 @@ System.out.println("createSpinner");
                        spinnerType = SpinnerType.RAMP_EXIT_SPINNER;
                    }
                    
-                   shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom, spinnerType );
+                   shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom/*, spinnerType*/ );
                    
                }
            }
