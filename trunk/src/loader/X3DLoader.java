@@ -45,7 +45,6 @@ public class X3DLoader
 
     public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
-    	logger.setLevel(Level.SEVERE);
         try
         {
             this.x3d = new FileInputStream( x3dFilename.getFile() );

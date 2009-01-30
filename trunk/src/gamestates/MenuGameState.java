@@ -16,8 +16,6 @@ import org.fenggui.util.Point;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
 
-import themes.CarsThemeGameLogic;
-
 import com.jme.input.MouseInput;
 import com.jmex.audio.AudioTrack;
 import com.jmex.game.state.BasicGameState;

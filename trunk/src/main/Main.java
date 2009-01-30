@@ -1,5 +1,8 @@
 package main;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import gamestates.MenuGameState;
 import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
@@ -21,6 +24,9 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
+		/* Logueos severos desde el root logger */
+		Logger.getLogger("").setLevel(Level.SEVERE);
+		
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
 		
