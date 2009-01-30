@@ -65,7 +65,7 @@ public class Plunger extends Node
         plungerNode.attachChild(plunger);
         
         /* Genero su fisica */
-        plungerNode.generatePhysicsGeometry();
+        plungerNode.generatePhysicsGeometry(true);
         
         /* Computo su masa */
 		plungerNode.computeMass();

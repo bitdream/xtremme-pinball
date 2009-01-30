@@ -4,6 +4,8 @@ import gamelogic.GameLogic;
 import input.PinballInputHandler;
 
 import java.io.FileNotFoundException;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,12 +16,12 @@ import main.Main;
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.InputHandler;
-import com.jme.input.KeyBindingManager;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.light.PointLight;
+import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
@@ -27,7 +29,9 @@ import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
+import com.jme.scene.TexCoords;
 import com.jme.scene.Text;
+import com.jme.scene.TriMesh;
 import com.jme.scene.Spatial.CullHint;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Quad;
@@ -35,6 +39,8 @@ import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.util.Debug;
 import com.jme.util.Timer;
+import com.jme.util.geom.BufferUtils;
+import com.jme.util.geom.NormalGenerator;
 import com.jme.util.stat.StatCollector;
 import com.jme.util.stat.StatType;
 import com.jme.util.stat.graph.DefColorFadeController;
@@ -128,14 +134,18 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	protected Timer timer;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = /*new Vector3f( 17.5f, 3.5f, -9.0f )*/ /*new Vector3f( 15,15,-51 )*/ new Vector3f( 1, 16, -58); //1, 16, -58
+	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.0f, -3.0f ) /*new Vector3f( 15,15,-51 )*/ /*new Vector3f( 1, 16, -58)*/; //1, 16, -58
 	
 	/* Ubicacion inicial de la camara */
-	private Vector3f cameraStartUp = new Vector3f( 0.0f, 63.0f, 16.0f ); 
-//	new Vector3f(-7.8f,11.6f,-63.6f);
+	private Vector3f cameraStartUp = 
+//	    new Vector3f( 0.0f, 63.0f, 16.0f ); 
+//      new Vector3f(-7.8f,11.6f,-63.6f);
+	    new Vector3f(0,50,80);
 	/* Lugar al que mira la camara incialmente */
-	private Vector3f cameraLookAt = new Vector3f( 0.0f, 43.5f, 0.0f );
-//	new Vector3f(-6.8f,11.6f,-62.6f);
+	private Vector3f cameraLookAt = 
+//	    new Vector3f( 0.0f, 43.5f, 0.0f );
+//      new Vector3f(-6.8f,11.6f,-62.6f);
+	    Vector3f.ZERO;
 	    
 	/* Nodo que guarda la tabla */
 	private Node tabla;
@@ -313,7 +323,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// ----------------------------------------
 		// TODO volar: es para debug
 //        buildTable();
-//        gameLogic = new CarsThemeGameLogic(this);
+//        gameLogic = new themes.CarsThemeGameLogic(this);
 //        buildAndAttachComponents();
 //        inclinePinball();
         buildLighting();
@@ -533,15 +543,99 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		//-----------------------------------------
 
 		/* Pongo flippers de prueba */
-		final Box rightVisualFlipper = new Box("Right visual flipper", new Vector3f(), 7, 1, 2);
-		rightVisualFlipper.setLocalTranslation(new Vector3f(11, 3, 70));
+		
+        IntBuffer indexBuffer = BufferUtils.createIntBuffer(RflipIndices);
+        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(RflipVertices);
+        FloatBuffer colorBuffer = BufferUtils
+                .createFloatBuffer((float[])null);
+        FloatBuffer normalBuffer = BufferUtils
+                .createFloatBuffer((float[])null);
+        
+        float[] texCoord;
+        {
+            float[] vertices = RflipVertices;
+            float[] texCoords = new float[vertices.length / 3 * 2];
+
+            float minX = 0;
+            float maxX = 0;
+            float minY = 0;
+            float maxY = 0;
+            float minZ = 0;
+            float maxZ = 0;
+
+            // Get the extents of the object
+            for (int i = 0; i * 3 < vertices.length; i++) {
+                minX = Math.min(minX, vertices[i * 3 + 0]);
+                maxX = Math.max(maxX, vertices[i * 3 + 0]);
+                minY = Math.min(minY, vertices[i * 3 + 1]);
+                maxY = Math.max(maxY, vertices[i * 3 + 1]);
+                minZ = Math.min(minZ, vertices[i * 3 + 2]);
+                maxZ = Math.max(maxZ, vertices[i * 3 + 2]);
+            }
+
+            // The coordinate with the largest extent is s, the second largest t
+            float xExtent = maxX - minX;
+            float yExtent = maxY - minY;
+            float zExtent = maxZ - minZ;
+            int sCoord = 0;
+            int tCoord = 1;
+            // default order: X-Y-Z
+            if (yExtent > xExtent) {
+                if (zExtent > yExtent) { // order: Z-Y-X
+                    sCoord = 2;
+                    tCoord = 1;
+                } else {
+                    sCoord = 1;
+                    if (zExtent > xExtent) { // order: Y-Z-X
+                        tCoord = 2;
+                    } else { // order: Y-X-Z
+                        tCoord = 0;
+                    }
+                }
+            } else {
+                if (zExtent > xExtent) { // order: Z-X-Y
+                    sCoord = 2;
+                    tCoord = 0;
+                } else {
+                    if (zExtent > yExtent) { // order: X-Z-Y
+                        tCoord = 2;
+                    } // else order: X-Y-Z (default)
+                }
+            }
+
+            // Fill the texCoords array
+            float[] minValues = { minX, minY, minZ };
+            float[] extents = { xExtent, yExtent, zExtent };
+            for (int i = 0; i * 3 < vertices.length; i++) {
+                texCoords[i * 2 + 0] = (vertices[i * 3 + sCoord] - minValues[sCoord])
+                        / extents[sCoord];
+                texCoords[i * 2 + 1] = (vertices[i * 3 + tCoord] - minValues[tCoord])
+                        / extents[tCoord];
+            }
+
+            texCoord = texCoords;
+        }
+        
+        FloatBuffer texCoordBuffer = BufferUtils
+                .createFloatBuffer(texCoord);
+        final TriMesh rightVisualFlipper = 
+            new TriMesh("Right visual flipper", vertexBuffer, normalBuffer, colorBuffer,
+                new TexCoords(texCoordBuffer), indexBuffer);
+        new NormalGenerator().generateNormals(rightVisualFlipper, 0);
+		//final Box rightVisualFlipper = new Box("Right visual flipper", new Vector3f(), 7, 1, 2);
+        
+        rightVisualFlipper.getLocalRotation().fromAngleAxis(3.048941f,
+            new Vector3f(0.046361f, 0.706364f, -0.706329f));
+        rightVisualFlipper.setLocalScale( new Vector3f(2.288804f, 2.288804f, 16.101135f).mult( 2 ) );
+        
+		rightVisualFlipper.setLocalTranslation(new Vector3f(11, 3.1f, 70));
 		rightVisualFlipper.setModelBound(new BoundingBox());
 		rightVisualFlipper.updateModelBound();
 		
 		/* Le doy color */
 		Utils.color(rightVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
 		
-		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER, null);
+		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER, new Vector3f(14,4.2f,68.5f));
 		rootNode.attachChild(rightTestFlipper);
 		
 		final Box leftVisualFlipper = new Box("Left visual flipper", new Vector3f(), 7, 1, 2);
@@ -685,7 +779,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// Agrego un sensor de prueba
 		final Box visualLostBallSensor = new Box("visualLostBallSensor 1", new Vector3f(), 4f, 2f, 2f);
 		// TODO Ponerlo transparente para que no se vea (lo pongo verde para verlo y poder hacer debug)
-		Utils.color( visualLostBallSensor, new ColorRGBA( 0f, 1f, 0f, 1f ), 120 );
+		Utils.color( visualLostBallSensor, new ColorRGBA( 0f, 1f, 0f, 0.5f ), 120 );
 		visualLostBallSensor.setLocalTranslation(new Vector3f(0, 2f, 0));
 		// Agregado de bounding volume 
 		visualLostBallSensor.setModelBound(new BoundingBox());
@@ -701,7 +795,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		StaticPhysicsNode table = getPhysicsSpace().createStaticNode();
 		rootNode.attachChild(table);
 		
-		final Box visualTable = new Box( "Table", new Vector3f(), 30, 1, 80);
+		Box visualTable = new Box( "Table", new Vector3f(), 30, 1, 80);
 	
 		table.attachChild(visualTable);		
 		table.generatePhysicsGeometry();
@@ -711,6 +805,90 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		// Seteo el color de la mesa. Brillo al maximo
 	    Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
+
+	    
+	    // pared izq
+	    table = getPhysicsSpace().createStaticNode();
+        rootNode.attachChild(table);
+        
+        visualTable = new Box( "left", new Vector3f(), 1, 4, 80);
+        visualTable.setLocalTranslation( new Vector3f(-30,0,0) );
+    
+        table.attachChild(visualTable);     
+        table.generatePhysicsGeometry();
+        
+        // Seteo el material de la mesa
+        table.setMaterial( pinballTableMaterial );
+        
+        // Seteo el color de la mesa. Brillo al maximo
+        Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
+        
+        // pared der
+        table = getPhysicsSpace().createStaticNode();
+        rootNode.attachChild(table);
+        
+        visualTable = new Box( "left", new Vector3f(), 1, 4, 80);
+        visualTable.setLocalTranslation( new Vector3f(30,0,0) );
+    
+        table.attachChild(visualTable);     
+        table.generatePhysicsGeometry();
+        
+        // Seteo el material de la mesa
+        table.setMaterial( pinballTableMaterial );
+        
+        // Seteo el color de la mesa. Brillo al maximo
+        Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
+        
+        //fondo
+        table = getPhysicsSpace().createStaticNode();
+        rootNode.attachChild(table);
+        
+        visualTable = new Box( "left", new Vector3f(), 30, 4, 1);
+        visualTable.setLocalTranslation( new Vector3f(0,0,-80) );
+    
+        table.attachChild(visualTable);     
+        table.generatePhysicsGeometry();
+        
+        // Seteo el material de la mesa
+        table.setMaterial( pinballTableMaterial );
+        
+        // Seteo el color de la mesa. Brillo al maximo
+        Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
+        
+        
+        // slider izq
+        table = getPhysicsSpace().createStaticNode();
+        rootNode.attachChild(table);
+        
+        visualTable = new Box( "left", new Vector3f(), 8, 4, 1);
+        visualTable.setLocalTranslation( new Vector3f(25,0,60) );
+        visualTable.setLocalRotation( new Quaternion( ).fromAngles(0,FastMath.DEG_TO_RAD * 45f,0));
+    
+        table.attachChild(visualTable);     
+        table.generatePhysicsGeometry();
+        
+        // Seteo el material de la mesa
+        table.setMaterial( pinballTableMaterial );
+        
+        // Seteo el color de la mesa. Brillo al maximo
+        Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );  
+        
+        // slider der
+        table = getPhysicsSpace().createStaticNode();
+        rootNode.attachChild(table);
+        
+        visualTable = new Box( "left", new Vector3f(), 8, 4, 1);
+        visualTable.setLocalTranslation( new Vector3f(-25,0,60) );
+        visualTable.setLocalRotation( new Quaternion( ).fromAngles(0,FastMath.DEG_TO_RAD * -45f,0));    
+        table.attachChild(visualTable);     
+        table.generatePhysicsGeometry();
+        
+        // Seteo el material de la mesa
+        table.setMaterial( pinballTableMaterial );
+        
+        // Seteo el color de la mesa. Brillo al maximo
+        Utils.color( table, new ColorRGBA( 0.5f, 0.5f, 0.9f, 1.0f ), 128 );
+        
 	}
 	
 	public DynamicPhysicsNode getPlunger()
@@ -1173,7 +1351,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F8, InputHandler.AXIS_NONE, false );
 
             /* Assign key F9 to action "camera_out". */
-            KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
+//            KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
             pinballInputHandler.addAction( new InputAction()
             {
                 public void performAction( InputActionEvent evt )
@@ -1184,12 +1362,12 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         Vector3f pos = display.getRenderer().getCamera().getLocation();
                         message = "cam[" + String.format( "%.2f", pos.x ) + ";" + String.format( "%.2f", pos.y ) + ";" + String.format( "%.2f", pos.z ) + "]";
                         messageText.getText().replace(0, messageText.getText().length(), "" + message);
-                        logger.info( "Camera at: " + display.getRenderer().getCamera().getLocation() );
+                        System.out.println( "Camera at: " + display.getRenderer().getCamera().getLocation() );
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F9, InputHandler.AXIS_NONE, false );
 
-            KeyBindingManager.getKeyBindingManager().set( "camera_out", KeyInput.KEY_F9 );
+           
 
             //estas son para debug... es mala idea pasarlas a estable porque se rompe la fisica
             pinballInputHandler.addAction( new InputAction()
@@ -1423,4 +1601,83 @@ public class PinballGameState extends PhysicsEnhancedGameState
     	else
     		gameLogic.leaveGame();
     }
+    
+    private static int[] RflipIndices = {
+
+        33,34,35,32,33,35,32,35,36,31,32,36,30,31,36,30,36,37,29,30,37,28,29,37,27,28,37,27,
+        37,38,26,27,38,25,26,38,24,25,38,24,38,39,23,24,39,23,39,40,22,23,40,21,22,40,21,40,
+        41,20,21,41,20,41,42,19,20,42,18,19,42,18,42,43,17,18,43,17,43,44,16,17,44,15,16,44,
+        15,44,45,14,15,45,13,14,45,13,45,46,12,13,46,11,12,46,11,46,47,10,11,47,9,10,47,9,
+        47,48,8,9,48,7,8,48,6,7,48,6,48,49,5,6,49,5,49,50,4,5,50,4,50,51,3,4,51,3,51,52,2,3,
+        52,2,52,53,2,53,54,1,2,54,1,54,55,0,1,55,0,55,56,0,56,57,59,0,57,59,57,58,58,61,59,
+        61,60,59,57,62,58,62,61,58,56,63,57,63,62,57,55,64,56,64,63,56,54,65,55,65,64,55,53,
+        66,54,66,65,54,52,67,53,67,66,53,51,68,52,68,67,52,50,69,51,69,68,51,49,70,50,70,69,
+        50,48,71,49,71,70,49,47,72,48,72,71,48,46,73,47,73,72,47,45,74,46,74,73,46,44,75,45,
+        75,74,45,43,76,44,76,75,44,42,77,43,77,76,43,41,78,42,78,77,42,40,79,41,79,78,41,39,
+        80,40,80,79,40,38,81,39,81,80,39,37,82,38,82,81,38,36,83,37,83,82,37,35,84,36,84,83,
+        36,34,85,35,85,84,35,33,86,34,86,85,34,32,87,33,87,86,33,31,88,32,88,87,32,30,89,31,
+        89,88,31,29,90,30,90,89,30,28,91,29,91,90,29,27,92,28,92,91,28,26,93,27,93,92,27,25,
+        94,26,94,93,26,24,95,25,95,94,25,23,96,24,96,95,24,22,97,23,97,96,23,21,98,22,98,97,
+        22,20,99,21,99,98,21,19,100,20,100,99,20,18,101,19,101,100,19,17,102,18,102,101,18,
+        16,103,17,103,102,17,15,104,16,104,103,16,14,105,15,105,104,15,13,106,14,106,105,14,
+        12,107,13,107,106,13,11,108,12,108,107,12,10,109,11,109,108,11,9,110,10,110,109,10,
+        8,111,9,111,110,9,7,112,8,112,111,8,6,113,7,113,112,7,5,114,6,114,113,6,4,115,5,115,
+        114,5,3,116,4,116,115,4,2,117,3,117,116,3,1,118,2,118,117,2,119,0,60,0,59,60,0,119,
+        1,119,118,1,85,86,84,86,87,84,84,87,83,87,88,83,88,89,83,83,89,82,89,90,82,90,91,82,
+        91,92,82,82,92,81,92,93,81,93,94,81,94,95,81,81,95,80,95,96,80,80,96,79,96,97,79,97,
+        98,79,79,98,78,98,99,78,78,99,77,99,100,77,100,101,77,77,101,76,101,102,76,76,102,
+        75,102,103,75,103,104,75,75,104,74,104,105,74,105,106,74,74,106,73,106,107,73,107,
+        108,73,73,108,72,108,109,72,109,110,72,72,110,71,110,111,71,111,112,71,112,113,71,
+        71,113,70,113,114,70,70,114,69,114,115,69,69,115,68,115,116,68,68,116,67,116,117,67,
+        67,117,66,66,117,65,117,118,65,65,118,64,118,119,64,64,119,63,63,119,62,60,62,119,
+        62,60,61
+        };
+
+    private static float[] RflipVertices = {
+        0.959677f,-0.583074f,-0.049665f,0.909426f,-0.569651f,-0.049665f,0.851084f,-0.553364f,
+        -0.049665f,0.785562f,-0.534387f,-0.049665f,0.713772f,-0.512891f,-0.049665f,0.636627f,
+        -0.48905f,-0.049665f,0.555038f,-0.463037f,-0.049665f,0.469919f,-0.435023f,-0.049665f,
+        0.382182f,-0.405182f,-0.049665f,0.292738f,-0.373687f,-0.049665f,0.202501f,-0.34071f,
+        -0.049665f,0.112383f,-0.306424f,-0.049665f,0.023295f,-0.271001f,-0.049665f,-0.10392f,
+        -0.220853f,-0.049665f,-0.232654f,-0.17207f,-0.049665f,-0.360967f,-0.123491f,-0.049665f,
+        -0.48692f,-0.073959f,-0.049665f,-0.608574f,-0.022314f,-0.049665f,-0.723988f,0.032602f,
+        -0.049665f,-0.831224f,0.091948f,-0.049665f,-0.928341f,0.156884f,-0.049665f,-1.0134f,
+        0.228567f,-0.049665f,-1.084462f,0.308158f,-0.049665f,-1.139587f,0.396814f,-0.049665f,
+        -1.176836f,0.495694f,-0.049665f,-1.184946f,0.54646f,-0.049665f,-1.183377f,0.597793f,
+        -0.049665f,-1.17301f,0.648179f,-0.049665f,-1.154727f,0.696106f,-0.049665f,-1.129413f,
+        0.740058f,-0.049665f,-1.09795f,0.778522f,-0.049665f,-1.061221f,0.809985f,-0.049665f,
+        -1.020109f,0.832931f,-0.049665f,-0.975496f,0.845849f,-0.049665f,-0.928267f,0.847223f,
+        -0.049665f,-0.879302f,0.83554f,-0.049665f,-0.829486f,0.809286f,-0.049665f,-0.620274f,
+        0.666687f,-0.049665f,-0.424393f,0.533188f,-0.049665f,-0.240821f,0.408114f,-0.049665f,
+        -0.06854f,0.290792f,-0.049665f,0.093473f,0.180548f,-0.049665f,0.246236f,0.076709f,
+        -0.049665f,0.39077f,-0.021397f,-0.049665f,0.528096f,-0.114446f,-0.049665f,0.659232f,
+        -0.203109f,-0.049665f,0.7852f,-0.288061f,-0.049665f,0.90702f,-0.369975f,-0.049665f,
+        1.025711f,-0.449524f,-0.049665f,1.059373f,-0.475102f,-0.049665f,1.080739f,-0.497906f,
+        -0.049665f,1.091361f,-0.517979f,-0.049665f,1.092793f,-0.535366f,-0.049665f,1.086586f,
+        -0.550111f,-0.049665f,1.074294f,-0.562258f,-0.049665f,1.057469f,-0.571853f,-0.049665f,
+        1.037662f,-0.578938f,-0.049665f,1.016427f,-0.583558f,-0.049665f,0.995316f,-0.585758f,
+        -0.049665f,0.975882f,-0.585582f,-0.049665f,0.975882f,-0.585582f,0.050335f,0.995316f,
+        -0.585758f,0.050335f,1.016427f,-0.583558f,0.050335f,1.037662f,-0.578938f,0.050335f,
+        1.057469f,-0.571853f,0.050335f,1.074294f,-0.562258f,0.050335f,1.086586f,-0.550111f,
+        0.050335f,1.092793f,-0.535366f,0.050335f,1.091361f,-0.517979f,0.050335f,1.080739f,
+        -0.497906f,0.050335f,1.059373f,-0.475102f,0.050335f,1.025711f,-0.449524f,0.050335f,
+        0.90702f,-0.369975f,0.050335f,0.7852f,-0.288061f,0.050335f,0.659232f,-0.203109f,
+        0.050335f,0.528096f,-0.114446f,0.050335f,0.39077f,-0.021397f,0.050335f,0.246236f,
+        0.076709f,0.050335f,0.093473f,0.180548f,0.050335f,-0.06854f,0.290792f,0.050335f,
+        -0.240821f,0.408114f,0.050335f,-0.424393f,0.533188f,0.050335f,-0.620274f,0.666687f,
+        0.050335f,-0.829486f,0.809286f,0.050335f,-0.879302f,0.83554f,0.050335f,-0.928267f,
+        0.847223f,0.050335f,-0.975496f,0.845849f,0.050335f,-1.020109f,0.832931f,0.050335f,
+        -1.061221f,0.809985f,0.050335f,-1.09795f,0.778522f,0.050335f,-1.129413f,0.740058f,
+        0.050335f,-1.154727f,0.696106f,0.050335f,-1.17301f,0.648179f,0.050335f,-1.183377f,
+        0.597793f,0.050335f,-1.184946f,0.54646f,0.050335f,-1.176836f,0.495694f,0.050335f,
+        -1.139587f,0.396814f,0.050335f,-1.084462f,0.308158f,0.050335f,-1.0134f,0.228567f,
+        0.050335f,-0.928341f,0.156884f,0.050335f,-0.831224f,0.091948f,0.050335f,-0.723988f,
+        0.032602f,0.050335f,-0.608574f,-0.022314f,0.050335f,-0.48692f,-0.073959f,0.050335f,
+        -0.360967f,-0.123491f,0.050335f,-0.232654f,-0.17207f,0.050335f,-0.10392f,-0.220853f,
+        0.050335f,0.023295f,-0.271001f,0.050335f,0.112383f,-0.306424f,0.050335f,0.202501f,
+        -0.34071f,0.050335f,0.292738f,-0.373687f,0.050335f,0.382182f,-0.405182f,0.050335f,
+        0.469919f,-0.435023f,0.050335f,0.555038f,-0.463037f,0.050335f,0.636627f,-0.48905f,
+        0.050335f,0.713772f,-0.512891f,0.050335f,0.785562f,-0.534387f,0.050335f,0.851084f,
+        -0.553364f,0.050335f,0.909426f,-0.569651f,0.050335f,0.959677f,-0.583074f,0.050335f
+        };
 }
