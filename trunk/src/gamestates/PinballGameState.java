@@ -55,7 +55,6 @@ import components.Magnet;
 import components.Plunger;
 import components.Sensor;
 import components.Spinner;
-import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
 import components.Sensor.SensorType;
 
@@ -83,8 +82,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Lista de los flippers del juego actual */
 	private List<DynamicPhysicsNode> flippers;
 	
-	/* Lista de los bumpers del juego actual */
-	private List<DynamicPhysicsNode> bumpers;
+	/* Lista de los bumpers saltarines del juego actual */
+	private List<DynamicPhysicsNode> jumperBumpers;
+	
+	/* Lista de los bumpers no saltarines del juego actual */
+	private List<StaticPhysicsNode> noJumperBumpers;
 	
 	/* Lista de las puertas del juego actual */
 	private List<DynamicPhysicsNode> doors;
@@ -126,7 +128,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	protected Timer timer;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = /*new Vector3f( 17.5f, 3.5f, -9.0f )*/ /*new Vector3f( 15,15,-51 )*/ new Vector3f( 1, 16, -58);
+	private Vector3f ballStartUp = /*new Vector3f( 17.5f, 3.5f, -9.0f )*/ /*new Vector3f( 15,15,-51 )*/ new Vector3f( 1, 16, -58); //1, 16, -58
 	
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = new Vector3f( 0.0f, 63.0f, 16.0f ); 
@@ -281,8 +283,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Creo la lista de flippers */
 		flippers = new ArrayList<DynamicPhysicsNode>(4);
 		
-		/* Creo la lista de bumpers */
-		bumpers = new ArrayList<DynamicPhysicsNode>(4);
+		/* Creo la lista de bumpers saltarines*/
+		jumperBumpers = new ArrayList<DynamicPhysicsNode>(4);
+		
+		/* Creo la lista de bumpers estaticos */
+		noJumperBumpers = new ArrayList<StaticPhysicsNode>(4);
 		
 		/* Creo la lista de puertas */
 		doors = new ArrayList<DynamicPhysicsNode>(2);
@@ -377,7 +382,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 			((Flipper)flipper.getChild(0)).recalculateJoints(this);
 		}
 		/* Bumpers */
-		for (DynamicPhysicsNode bumper : getBumpers())
+		for (DynamicPhysicsNode bumper : getJumperBumpers())
 		{
 			((Bumper)bumper.getChild(0)).recalculateJoints(this);
 //			BoundingVolume b;
@@ -662,7 +667,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// Agregado de bounding volume 
 		visualBumper1.setModelBound(new BoundingBox());
 		visualBumper1.updateModelBound();
-		DynamicPhysicsNode bumper1 = Bumper.create(this, "Physic bumper 1", visualBumper1, BumperType.JUMPER);
+		DynamicPhysicsNode bumper1 = Bumper.createJumperBumper(this, "Physic bumper 1", visualBumper1);
 		rootNode.attachChild(bumper1);
 		
 		// Agrego otro bumper
@@ -718,9 +723,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		return flippers;
 	}
 	
-	public List<DynamicPhysicsNode> getBumpers() 
+	public List<DynamicPhysicsNode> getJumperBumpers() 
 	{
-		return bumpers;
+		return jumperBumpers;
+	}
+	
+	public List<StaticPhysicsNode> getNoJumperBumpers() 
+	{
+		return noJumperBumpers;
 	}
 	
 	public List<DynamicPhysicsNode> getDoors() 
@@ -758,9 +768,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		return pinballInputHandler;
 	}
 	
-	public void addBumper(DynamicPhysicsNode bumper)
+	public void addJumperBumper(DynamicPhysicsNode bumper)
 	{
-		bumpers.add(bumper);
+		jumperBumpers.add(bumper);
+	}
+	
+	public void addNoJumperBumper(StaticPhysicsNode bumper)
+	{
+		noJumperBumpers.add(bumper);
 	}
 	
 	public void addMagnet(StaticPhysicsNode magnet)
@@ -820,7 +835,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
         final Material customMaterial = new Material( "material de bola" );
         // Es pesado
-        customMaterial.setDensity( 100.0f );
+        customMaterial.setDensity( 10.0f ); //TODO antes 100
         // Detalles de contacto con el otro material
         MutableContactInfo contactDetails = new MutableContactInfo();
         // Poco rebote
@@ -951,7 +966,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
             ((Flipper)flipper.getChild(0)).recalculateJoints(this);
         }
         /* Bumpers */
-        for (DynamicPhysicsNode bumper : getBumpers())
+        for (DynamicPhysicsNode bumper : getJumperBumpers())
         {
             ((Bumper)bumper.getChild(0)).recalculateJoints(this);
         }

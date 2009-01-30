@@ -11,6 +11,7 @@ import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
+import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.TranslationalJointAxis;
 import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.contact.MutableContactInfo;
@@ -48,7 +49,7 @@ public class Bumper extends Node implements ActivableComponent
     // Mucho rozamiento
 	private static float bumperMaterialMu = 99999999.0f;
 	
-	// Joint que lo fija a la mesa
+	// Joint que lo fija a la mesa. Solo usado para bumpers saltarines
 	private Joint joint;
 	
 	// Esta activo este bumper?
@@ -61,7 +62,108 @@ public class Bumper extends Node implements ActivableComponent
 	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
 	private static final long windowTimeForCollisions = 100; 
 	
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, BumperType bumperType)
+	public static StaticPhysicsNode createNoJumperBumper(PinballGameState pinball, String name, Geometry visualModel)
+	{
+		final StaticPhysicsNode bumperNode = pinball.getPhysicsSpace().createStaticNode();
+		
+		// Nombre del nodo fisico de todos los bumpers
+		bumperNode.setName("Bumper");
+		
+		pinballInstance = pinball;	
+		
+		/* Crear un material que no tenga rebote con el material de la mesa y que su rozamiento sea muy grande. Ademas que sea
+		 * muy denso para que la bola no lo tire.
+		 */
+        final Material customMaterial = buildBumperMaterial("Material de bumper", bumperMaterialDensity, bumperMaterialBounce, bumperMaterialMu);
+        
+        /* Creo un nodo de Bumper, con todas sus caracteristicas y lo fijo al nodo fisico */
+        final Bumper bumper = new Bumper(name, visualModel, BumperType.NO_JUMPER);
+        bumperNode.attachChild(bumper);
+	
+        // Genero su fisica
+        bumperNode.generatePhysicsGeometry(true); // Para que use triangulos cuando lo necesitemos
+        //PhysicsNode.generatePhysicsGeometry(bumper, bumperNode, true);
+        
+        // Setear el material del bumper
+		bumperNode.setMaterial(customMaterial);
+        
+        // Para detectar colisiones de objetos contra los bumpers
+        final SyntheticButton collisionEventHandler = bumperNode.getCollisionEventHandler();
+        pinball.getPinballInputHandler().addAction( new InputAction(){
+        	
+        	public void performAction( InputActionEvent evt ) {
+        		
+        		// Sentido de la fuerza a aplicar sobre la bola
+        		int sense = 1;
+
+        		// Algo colisiono con el bumper
+                final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
+                DynamicPhysicsNode ball;
+                StaticPhysicsNode bump;
+
+                // El contacto pudo haber sido bola -> bumper o bumper -> bola
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
+                    // fue bumper -> bola
+                    ball = (DynamicPhysicsNode) contactInfo.getNode2();
+                    bump = (StaticPhysicsNode) contactInfo.getNode1();
+                    sense = 1; //TODO para mi deberia ser -1, pero sino no anda    
+                }
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
+                {
+                	// fue bola -> bumper
+                    ball = (DynamicPhysicsNode) contactInfo.getNode1();
+                    bump = (StaticPhysicsNode) contactInfo.getNode2();
+                    sense = -1;
+                }
+                else 
+                {
+                    // Colisiono el bumper contra otra cosa, por ejemplo contra la mesa, lo ignoro
+                    return;
+                }
+                
+                // Solo si el bumper esta activo debe ejercer la fuerza sobre la bola
+                if (((Bumper)bump.getChild(0)).isActive())
+                {
+                    /* La fuerza aplicada sobre la bola tiene una intensidad proporcional a la velocidad que la bola tenia al momento de la colision
+                     * y es en sentido opuesto.
+                     */
+                    Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
+                    Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
+
+                    // Aplicar la fuerza repulsora sobre la bola
+                    ball.clearDynamics();
+                    ball.addForce( appliedForce );
+                    
+                }
+                
+                // Tiempo en el que se dio esta colision
+                long now = System.currentTimeMillis();
+                
+                // Tiempo de la ultima colision considerada
+                long lastColl = bumper.getLastConsideredCollisionTime();
+                
+                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
+                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
+                {   
+                	// Llamo a la logica del juego. Lo hago por mas que el bumper no este activo, ya que ella determinara que hacer.
+                    pinballInstance.getGameLogic().bumperCollision(bumper);
+                    
+                    // Actualizo el tiempo de la ultima colision considerada
+                    bumper.setLastConsideredCollisionTime(now);
+                }
+                // Sino no hago nada pq es una colision repetida               
+            }        	
+
+        }, collisionEventHandler, false );
+        
+        /* Agrego el componente a la lista del pinball */
+        pinball.addNoJumperBumper(bumperNode);
+        
+    	return bumperNode;
+	}
+	
+	
+	public static DynamicPhysicsNode createJumperBumper(PinballGameState pinball, String name, Geometry visualModel)
 	{
 		final DynamicPhysicsNode bumperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -76,7 +178,7 @@ public class Bumper extends Node implements ActivableComponent
         final Material customMaterial = buildBumperMaterial("Material de bumper", bumperMaterialDensity, bumperMaterialBounce, bumperMaterialMu);
         
         /* Creo un nodo de Bumper, con todas sus caracteristicas y lo fijo al nodo fisico */
-        final Bumper bumper = new Bumper(name, visualModel, bumperType);
+        final Bumper bumper = new Bumper(name, visualModel, BumperType.JUMPER);
         bumperNode.attachChild(bumper);
 	
         // Genero su fisica
@@ -89,7 +191,7 @@ public class Bumper extends Node implements ActivableComponent
         // Calculo la masa del bumper (solo si lo hago dinamico)
         bumperNode.computeMass();
         
-       
+
         // Voy a fijar el bumper con un eje translacional 
         final Joint jointForBumper = pinball.getPhysicsSpace().createJoint();
         final TranslationalJointAxis translationalAxis = jointForBumper.createTranslationalAxis();
@@ -107,8 +209,7 @@ public class Bumper extends Node implements ActivableComponent
         
         // Guardo que ese bumper tiene este joint
         bumper.setJoint(jointForBumper);
-        
-        
+       
         // Para detectar colisiones de objetos contra los bumpers
         final SyntheticButton collisionEventHandler = bumperNode.getCollisionEventHandler();
         pinball.getPinballInputHandler().addAction( new InputAction(){
@@ -120,7 +221,7 @@ public class Bumper extends Node implements ActivableComponent
 
         		// Algo colisiono con el bumper
                 final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
-                DynamicPhysicsNode ball, bump;
+                DynamicPhysicsNode ball, bump;;
 
                 // El contacto pudo haber sido bola -> bumper o bumper -> bola
                 if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
@@ -156,12 +257,10 @@ public class Bumper extends Node implements ActivableComponent
                     ball.addForce( appliedForce );
                     
                     // Aplicarle fuerza para hacer saltar a aquellos bumpers que sean saltarines (honguitos). La misma debe ser paralela a la mesa, no exclusiva en Y
-                    if (bumper.getBumperType().equals(BumperType.JUMPER))
-                    {
-                    	bump.clearDynamics();
-                    	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
-                    								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-                    }
+                	bump.clearDynamics();
+                	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
+                								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
+                    
                 }
                 
                 // Tiempo en el que se dio esta colision
@@ -185,7 +284,7 @@ public class Bumper extends Node implements ActivableComponent
         }, collisionEventHandler, false );
         
         /* Agrego el componente a la lista del pinball */
-        pinball.addBumper(bumperNode);
+        pinball.addJumperBumper(bumperNode);
         
     	return bumperNode;
 	}
@@ -246,6 +345,12 @@ public class Bumper extends Node implements ActivableComponent
 	// Rota el joint del bumper. Para ser invocado luego de inclinar la mesa con todos sus componentes.
 	public void recalculateJoints(PinballGameState pinball)
 	{
+		// Solo tienen joints los saltarines
+		if ( getBumperType().equals(BumperType.NO_JUMPER) )
+		{
+			return;
+		}
+		
 		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
 
 		/* Tomo el angulo de juego e inclino el eje anterior del joint */

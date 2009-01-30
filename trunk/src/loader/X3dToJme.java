@@ -926,12 +926,16 @@ private Node transformNode;
                    
                    String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
                    
-                   BumperType bumperType = BumperType.NO_JUMPER;
+//                   BumperType bumperType = BumperType.NO_JUMPER;
                    if (typeOfBumper.equals( "jumper" ))
                    {
-                       bumperType = BumperType.JUMPER;
+//                       bumperType = BumperType.JUMPER;
+                       shape = Bumper.createJumperBumper( pinball, "bumper"+bumperCounter++, geom );
                    }
-                   shape = Bumper.create( pinball, "bumper"+bumperCounter++, geom, bumperType );
+                   else
+                   {
+                	   shape = Bumper.createNoJumperBumper( pinball, "bumper"+bumperCounter++, geom );
+                   }                   
                    
                } else if (type.equals( "Door" )) {
                    
