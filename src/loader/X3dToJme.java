@@ -122,9 +122,7 @@ import components.Flipper;
 import components.Magnet;
 import components.Obstacle;
 import components.Plunger;
-import components.Sensor;
 import components.Spinner;
-import components.Bumper.BumperType;
 import components.Door.DoorType;
 import components.Flipper.FlipperType;
 import components.Sensor.SensorType;
@@ -965,6 +963,7 @@ private Node transformNode;
                    {
                        flipperType = FlipperType.LEFT_FLIPPER;
                    }
+                   
                    shape = Flipper.create( pinball, "flipper"+flipperCounter++, geom, flipperType, jointCoords );
                    
                    
@@ -1365,6 +1364,7 @@ private Node transformNode;
             // The mesh contains vertex indices, but no separate indices for
             // normals, colors or texCoords => The values can be used without
             // modification
+            
             IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices);
             FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices);
             FloatBuffer colorBuffer = BufferUtils
@@ -1380,6 +1380,7 @@ private Node transformNode;
             if (normalBuffer == null) {
                 normalGenerator.generateNormals(mesh, creaseAngle);
             }
+
         } else {
             int[] indicesBackup = indices.clone();
 
@@ -2606,21 +2607,5 @@ private static int  ifscount = 0;
                 && FastMath.abs(vec.z) <= FastMath.ZERO_TOLERANCE && FastMath
                 .abs(vec.y) > FastMath.ZERO_TOLERANCE);
     }
-    
-//    private class Metadata extends Hashtable<String, Object>
-//    {
-//        private static final long serialVersionUID = -8931137331269225964L;
-//        
-//        private String type; 
-//        
-//        private void setType( final String type )
-//        {
-//            this.type = type;
-//        }
-//        
-//        private String getType()
-//        {
-//            return this.type;
-//        }
-//    }
+
 }
