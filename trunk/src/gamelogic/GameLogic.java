@@ -10,6 +10,7 @@ import main.Main;
 
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
+import com.jmex.physics.DynamicPhysicsNode;
 
 import components.Bumper;
 import components.Door;
@@ -96,15 +97,12 @@ public abstract class GameLogic
 	}
 	
 	public abstract void flipperCollision(Flipper flipper);
+
 	
 	public abstract void plungerCollision(Plunger plunger);
+
 	
-	public void spinnerRampEntranceCollision(Spinner spinner)
-	{
-		ballTouchSound.play();
-	}
-	
-	public void spinnerRampExitCollision(Spinner spinner)
+	public void sensorRampCollision()
 	{
 		ballTouchSound.play();
 	}
@@ -152,7 +150,7 @@ public abstract class GameLogic
 	}
 	
 	// Invocado cuando se pierde una bola
-	public abstract void lostBall();
+	public abstract void lostBall(DynamicPhysicsNode ball);
 	
 	// Invocado cuando comienza el juego
 	public abstract void gameStart();

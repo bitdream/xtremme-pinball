@@ -123,13 +123,13 @@ public class Bumper extends Node implements ActivableComponent
                 DynamicPhysicsNode ball, bump;
 
                 // El contacto pudo haber sido bola -> bumper o bumper -> bola
-                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && /*contactInfo.getNode2().getChild(0) instanceof Sphere*/ contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) { 
                     // fue bumper -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();
                     bump = (DynamicPhysicsNode) contactInfo.getNode1();
                     sense = 1; //TODO para mi deberia ser -1, pero sino no anda    
                 }
-                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && /*contactInfo.getNode1().getChild(0) instanceof Sphere*/ contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
                 {
                 	// fue bola -> bumper
                     ball = (DynamicPhysicsNode) contactInfo.getNode1();
@@ -170,7 +170,7 @@ public class Bumper extends Node implements ActivableComponent
                 // Tiempo de la ultima colision considerada
                 long lastColl = bumper.getLastConsideredCollisionTime();
                 
-                // Si la diferencia con la ultima colision considerada no es menor a 100 ms, la tomo como otra colision
+                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
                 if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
                 {   
                 	// Llamo a la logica del juego. Lo hago por mas que el bumper no este activo, ya que ella determinara que hacer.

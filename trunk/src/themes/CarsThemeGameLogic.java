@@ -2,6 +2,7 @@ package themes;
 
 import main.Main;
 
+import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
@@ -11,7 +12,6 @@ import components.Flipper;
 import components.Magnet;
 import components.Plunger;
 import components.Spinner;
-
 import gamelogic.GameLogic;
 import gamestates.PinballGameState;
 
@@ -20,6 +20,9 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int bumperScore = 10, spinnerScore = 5;
 	
 	private int bumperCollisionCnt = 0;
+	
+	// Cantidad de veces que paso por la rampa
+	private int rampPassedCnt = 0;	
 	
 	private AudioTrack lostBallSound, lostLastBallSound, rampUpSound, music;
 	
@@ -95,30 +98,39 @@ public class CarsThemeGameLogic extends GameLogic
 		showScore();
 		showMessage("Colision con molinete!");
 	}
-
-	@Override
-	public void spinnerRampEntranceCollision(Spinner spinner)
+	
+	public void sensorRampCollision()
 	{
-		super.spinnerRampEntranceCollision(spinner);
+		super.sensorRampCollision();
 		
-		score += spinnerScore;
-		// Se actualiza los datos de pantalla de usuario
-		showScore();
-		showMessage("Colision con molinete entrando a rampa!");
-		
-		rampUpSound.play();
+		// TODO setear que se paso por la rampa (incrementar un contador o algo)
+		rampPassedCnt++;
+		showMessage("Paso por rampa N: " + String.valueOf(rampPassedCnt));
 	}
 
-	@Override
-	public void spinnerRampExitCollision(Spinner spinner)
-	{
-		super.spinnerRampExitCollision(spinner);
-		
-		score += spinnerScore;
-		// Se actualiza los datos de pantalla de usuario
-		showScore();
-		showMessage("Colision con molinete saliendo de rampa!");
-	}
+//	@Override
+//	public void spinnerRampEntranceCollision(Spinner spinner)
+//	{
+//		super.spinnerRampEntranceCollision(spinner);
+//		
+//		score += spinnerScore;
+//		// Se actualiza los datos de pantalla de usuario
+//		showScore();
+//		showMessage("Colision con molinete entrando a rampa!");
+//		
+//		rampUpSound.play();
+//	}
+//
+//	@Override
+//	public void spinnerRampExitCollision(Spinner spinner)
+//	{
+//		super.spinnerRampExitCollision(spinner);
+//		
+//		score += spinnerScore;
+//		// Se actualiza los datos de pantalla de usuario
+//		showScore();
+//		showMessage("Colision con molinete saliendo de rampa!");
+//	}
 
 	@Override
 	public void tilt()
@@ -143,14 +155,27 @@ public class CarsThemeGameLogic extends GameLogic
 	}
 
 	@Override
-	public void lostBall()
+	public void lostBall(DynamicPhysicsNode ball)
 	{
 		showMessage("Bola perdida");
-		
+
 		if (getInTableBallQty() == 0) // Era la ultima bola
+		{
 			lostLastBallSound.play();
+			
+			// Reubicar la bola en el plunger TODO ver posicion, aveces la reposiciona mal!!!
+    		ball.clearDynamics();
+    		ball.getLocalTranslation().set(new Vector3f(0, 5, -100));
+		}
 		else // Todavia le quedan bolas en la mesa
+		{			
 			lostBallSound.play();
+			
+			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
+			pinball.getBalls().remove(ball);
+			pinball.getRootNode().detachChild(ball);			
+		}
+
 	}
 
 	@Override

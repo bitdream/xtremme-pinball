@@ -30,7 +30,7 @@ public class Spinner extends Node
 	private Joint joint;
 	
 	/* Tipo de spinner */
-	private SpinnerType spinnerType;
+//	private SpinnerType spinnerType;
 	
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
@@ -50,7 +50,7 @@ public class Spinner extends Node
 	 * @param visualModel Modelo visual del molinete.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, SpinnerType spinnerType)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel/*, SpinnerType spinnerType*/)
 	{
 		DynamicPhysicsNode spinnerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -69,7 +69,7 @@ public class Spinner extends Node
         spinnerNode.attachChild(spinner);
         
         /* Le asigno el tipo */
-        spinner.setSpinnerType(spinnerType);
+//        spinner.setSpinnerType(spinnerType);
         
         /* Genero su fisica */
         spinnerNode.generatePhysicsGeometry();
@@ -107,16 +107,16 @@ public class Spinner extends Node
                 // Tiempo de la ultima colision considerada
                 long lastColl = spinner.getLastConsideredCollisionTime();
                 
-                // Si la diferencia con la ultima colision considerada no es menor a 1000 ms, la tomo como otra colision
+                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
                 if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
                 {   
                 	/* Llamo a la logica del juego */
-            		if (spinner.getSpinnerType() == SpinnerType.NORMAL_SPINNER)
+ //           		if (spinner.getSpinnerType() == SpinnerType.NORMAL_SPINNER)
             			pinballInstance.getGameLogic().spinnerNormalCollision(spinner);
-            		else if (spinner.getSpinnerType() == SpinnerType.RAMP_ENTRANCE_SPINNER)
-            			pinballInstance.getGameLogic().spinnerRampEntranceCollision(spinner);
-            		else
-            			pinballInstance.getGameLogic().spinnerRampExitCollision(spinner);
+//            		else if (spinner.getSpinnerType() == SpinnerType.RAMP_ENTRANCE_SPINNER)
+//            			pinballInstance.getGameLogic().spinnerRampEntranceCollision(spinner);
+//            		else
+//            			pinballInstance.getGameLogic().spinnerRampExitCollision(spinner);
                     
                     // Actualizo el tiempo de la ultima colision considerada
                 	spinner.setLastConsideredCollisionTime(now);
@@ -176,15 +176,15 @@ public class Spinner extends Node
 				parentNode.getAngularVelocity(null).z));
 	}
 
-	public SpinnerType getSpinnerType()
-	{
-		return spinnerType;
-	}
-
-	public void setSpinnerType(SpinnerType spinnerType)
-	{
-		this.spinnerType = spinnerType;
-	}
+//	public SpinnerType getSpinnerType()
+//	{
+//		return spinnerType;
+//	}
+//
+//	public void setSpinnerType(SpinnerType spinnerType)
+//	{
+//		this.spinnerType = spinnerType;
+//	}
 	
     public long getLastConsideredCollisionTime() 
     {
