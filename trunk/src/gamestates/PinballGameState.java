@@ -134,7 +134,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	protected Timer timer;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.0f, -3.0f ) /*new Vector3f( 15,15,-51 )*/ /*new Vector3f( 1, 16, -58)*/; //1, 16, -58
+	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.0f, -8.0f ) /*new Vector3f( 15,15,-51 )*/ /*new Vector3f( 1, 16, -58)*/; //1, 16, -58
 	
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = 
@@ -685,7 +685,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Le doy color */
 		Utils.color(visualDoor, new ColorRGBA(0f, 1.0f, 1.0f, 1.0f), 128);
 		
-		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -1.3f, 0.5f);
+		DynamicPhysicsNode testDoor = Door.create(this, "Physic door", visualDoor, Door.DoorType.RIGHT_DOOR, -1.3f, 0.5f, null);
 		rootNode.attachChild(testDoor);
 		
 		//-----------------------------------------
