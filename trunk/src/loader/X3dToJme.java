@@ -61,7 +61,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -123,11 +122,12 @@ import components.Flipper;
 import components.Magnet;
 import components.Obstacle;
 import components.Plunger;
+import components.Sensor;
 import components.Spinner;
 import components.Bumper.BumperType;
 import components.Door.DoorType;
 import components.Flipper.FlipperType;
-import components.Spinner.SpinnerType;
+import components.Sensor.SensorType;
 
 /**
  * A Loader class to load models from XML-encoded X3D files (see <a
@@ -922,9 +922,7 @@ private Node transformNode;
            {
                
                String type = (String)metadata.get( "type" );
-System.out.println(type);
                if (type.equals( "Bumper" )) {
-System.out.println("createBumper");
                    
                    String typeOfBumper = (String)metadata.get( "bumperType" ); // es obligatorio aclararlo
                    
@@ -935,9 +933,7 @@ System.out.println("createBumper");
                    }
                    shape = Bumper.create( pinball, "bumper"+bumperCounter++, geom, bumperType );
                    
-                   
                } else if (type.equals( "Door" )) {
-System.out.println("createDoor");
                    
                    String typeOfDoor = (String)metadata.get( "doorType" ); // es obligatorio
                    float minRotationalAngle = (Float)metadata.get( "minRotationalAngle" );
@@ -950,50 +946,48 @@ System.out.println("createDoor");
                    }
                    shape = Door.create( pinball, "door"+doorCounter++, geom, doorType, minRotationalAngle, maxRotationalAngle );
                    
-                   
                } else if (type.equals( "Flipper" )) {
-System.out.println("createFlipper");
                    
                    String typeOfFlipper = (String)metadata.get( "flipperType" );
+                   
+                   Float jointX = (Float)metadata.get( "jointX" );
+                   Float jointY = (Float)metadata.get( "jointY" );
+                   Float jointZ = (Float)metadata.get( "jointZ" );
+                   
+                   Vector3f jointCoords = new Vector3f( jointX, jointY, jointZ );
                    
                    FlipperType flipperType = FlipperType.RIGHT_FLIPPER;
                    if (typeOfFlipper.equals( "left_flipper" ))
                    {
                        flipperType = FlipperType.LEFT_FLIPPER;
                    }
-                   shape = Flipper.create( pinball, "flipper"+flipperCounter++, geom, flipperType );
+                   shape = Flipper.create( pinball, "flipper"+flipperCounter++, geom, flipperType, jointCoords );
                    
                    
                } else if (type.equals( "Magnet" )) {
-System.out.println("createMagnet");
                    
                    shape = Magnet.create( pinball, "magnet"+magnetCounter++, geom );
-    
                    
                } else if (type.equals( "Plunger" )) {
-System.out.println("createPluneger");
                    
                    float maxBackstep = (Float)metadata.get( "maxBackStep" );
                    shape = Plunger.create( pinball, "thePlunger", geom, maxBackstep );
                    
-                   
                } else if (type.equals( "Spinner" )) {
-System.out.println("createSpinner");
                  
-// Ya no hay varios tipos de spinner, hay uno solo
-//                   String typeOfSpinner = (String)metadata.get( "spinnerType" );
-//                   
-//                   SpinnerType spinnerType = SpinnerType.NORMAL_SPINNER;
-//                   if (typeOfSpinner.equals( "ramp_entrance_spinner" )) 
-//                   {
-//                       spinnerType = SpinnerType.RAMP_ENTRANCE_SPINNER;
-//                   } else if (typeOfSpinner.equals( "ramp_exit_spinner" ))
-//                   {
-//                       spinnerType = SpinnerType.RAMP_EXIT_SPINNER;
-//                   }
+                   shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom );
                    
-                   shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom/*, spinnerType*/ );
+               } else if (type.equals( "Sensor" )) {
                    
+                   String typeOfSensor = (String)metadata.get( "sensorType" );
+                   
+                   SensorType sensorType = SensorType.RAMP_SENSOR;
+                   if (typeOfSensor.equals( "lost_ball_sensor" ))
+                   {
+                       sensorType = SensorType.LOST_BALL_SENSOR;
+                   }
+                   
+                   shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
                }
            }
            
@@ -1052,6 +1046,7 @@ System.out.println("createSpinner");
     private static int magnetCounter = 0;
     private static int spinnerCounter = 0;
     private static int obstacleCounter = 0;
+    private static int sensorCounter = 0;
     
     /**
      * Checks if the given String represents one of the types of geometry nodes
@@ -1113,7 +1108,6 @@ System.out.println("createSpinner");
             Node child = node.getFirstChild();
             while (child != null) {
                 if (isMetadataType(child.getNodeName())) {
-                    // esto es cualquiera, pero va a funcar
                     result.putAll( parseMetadata( child ) );
                 }
                 child = child.getNextSibling();

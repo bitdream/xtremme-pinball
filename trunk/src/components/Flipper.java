@@ -26,7 +26,7 @@ public class Flipper extends Node implements ActivableComponent
 	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -16000000f), flipperRestoreForce = new Vector3f(0f, 0f, 1000000f);
 	
 	/* Maximos angulos de rotacion de los flippers */
-	private static final float maxRotationalAngle = 0.4f, minRotationalAngle = -0.4f;
+	private static final float maxRotationalAngle = 0.3f, minRotationalAngle = -0.3f;
 	
 	/* Para considerar extremos de los flippers */
 	private static final float xExtreme = 0.95f, zExtreme = 0.8f;
@@ -48,9 +48,8 @@ public class Flipper extends Node implements ActivableComponent
 	
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
-	
-	
-    /**
+
+	/**
      * Crea un nodo dinamico de flipper.
 	 * @param pinball El juego.
 	 * @param name Nombre del nodo de flipper.
@@ -58,7 +57,7 @@ public class Flipper extends Node implements ActivableComponent
 	 * @param flipperType El tipo de flipper deseado, izquierdo o derecho.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, FlipperType flipperType)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, FlipperType flipperType, Vector3f anchorPlace)
 	{
 		DynamicPhysicsNode flipperNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -78,7 +77,7 @@ public class Flipper extends Node implements ActivableComponent
         flipperNode.attachChild(flipper);
         
         /* Genero su fisica */
-        flipperNode.generatePhysicsGeometry(); //esto es el tema de los bounding malos
+        flipperNode.generatePhysicsGeometry(true); //esto es el tema de los bounding malos
         
         /* Computo su masa */
 		flipperNode.computeMass();
@@ -95,7 +94,10 @@ public class Flipper extends Node implements ActivableComponent
         rotationalAxis.setDirection(new Vector3f(0, 1, 0));
         
         /* Le fijo como punto de rotacion la punta del flipper */
-        jointForFlipper.setAnchor(locateFlipperExtreme(flipperType, visualModel));
+        //debug
+        if (anchorPlace == null)
+            anchorPlace = locateFlipperExtreme(flipperType, visualModel);
+        jointForFlipper.setAnchor(anchorPlace);
         
         /* Guardo que ese flipper tiene este joint */
         flipper.setJoint(jointForFlipper);
@@ -119,8 +121,7 @@ public class Flipper extends Node implements ActivableComponent
             }        	
 
         }, collisionEventHandler, false);
-        
-        
+
 		return flipperNode;
 	}
 	

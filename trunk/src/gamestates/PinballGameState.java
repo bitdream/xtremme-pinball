@@ -531,7 +531,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Le doy color */
 		Utils.color(rightVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
 		
-		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER);
+		DynamicPhysicsNode rightTestFlipper = Flipper.create(this, "Physic right flipper", rightVisualFlipper, FlipperType.RIGHT_FLIPPER, null);
 		rootNode.attachChild(rightTestFlipper);
 		
 		final Box leftVisualFlipper = new Box("Left visual flipper", new Vector3f(), 7, 1, 2);
@@ -542,7 +542,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Le doy color */
 		Utils.color(leftVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
 		
-		DynamicPhysicsNode leftTestFlipper = Flipper.create(this, "Physic left flipper", leftVisualFlipper, FlipperType.LEFT_FLIPPER);
+		DynamicPhysicsNode leftTestFlipper = Flipper.create(this, "Physic left flipper", leftVisualFlipper, FlipperType.LEFT_FLIPPER, null);
 		rootNode.attachChild(leftTestFlipper);
 		
 		final Box leftSmallVisualFlipper = new Box("Left small visual flipper", new Vector3f(), 3.5f, 0.5f, 1);
@@ -553,7 +553,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Le doy color */
 		Utils.color(leftSmallVisualFlipper, new ColorRGBA(0f, 1.0f, 0f, 1.0f), 128);
 		
-		DynamicPhysicsNode leftSmallTestFlipper = Flipper.create(this, "Physic small left flipper", leftSmallVisualFlipper, FlipperType.LEFT_FLIPPER);
+		DynamicPhysicsNode leftSmallTestFlipper = Flipper.create(this, "Physic small left flipper", leftSmallVisualFlipper, FlipperType.LEFT_FLIPPER, null);
 		rootNode.attachChild(leftSmallTestFlipper);
 
 
@@ -924,9 +924,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
             
             this.gameLogic = loader.getTheme(this);
             
-            //TODO remover
-            if (this.gameLogic == null)
-                this.gameLogic = new CarsThemeGameLogic(this);
         }
         catch ( FileNotFoundException e )
         {
