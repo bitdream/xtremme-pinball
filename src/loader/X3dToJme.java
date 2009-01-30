@@ -987,7 +987,7 @@ private Node transformNode;
                        sensorType = SensorType.LOST_BALL_SENSOR;
                    }
                    
-                   shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
+//                   shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
                }
            }
            
