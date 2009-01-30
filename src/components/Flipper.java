@@ -27,7 +27,7 @@ public class Flipper extends Node implements ActivableComponent
 	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -1600000f), flipperRestoreForce = new Vector3f(0f, 0f, 100000f);
 	
 	/* Maximos angulos de rotacion de los flippers */
-	private static final float maxRotationalAngle = 0.3f, minRotationalAngle = -0.3f;
+	private static final float maxRightRotationalAngle = 0.3f, maxLeftRotationalAngle = 0.6f, minLeftRotationalAngle = -0.3f, minRightRotationalAngle = -0.6f;
 	
 	/* Para considerar extremos de los flippers */
 	private static final float xExtreme = 0.95f, zExtreme = 0.8f;
@@ -86,10 +86,18 @@ public class Flipper extends Node implements ActivableComponent
         /* Voy a fijar el flipper con un eje rotacional */
         final Joint jointForFlipper = pinball.getPhysicsSpace().createJoint();
         final RotationalJointAxis rotationalAxis = jointForFlipper.createRotationalAxis();
-        
+
         /* Maximos angulos de operacion de los flippers */
-        rotationalAxis.setPositionMaximum(maxRotationalAngle);
-        rotationalAxis.setPositionMinimum(minRotationalAngle);
+        if (flipperType == FlipperType.LEFT_FLIPPER)
+        {
+	        rotationalAxis.setPositionMaximum(maxLeftRotationalAngle);
+	        rotationalAxis.setPositionMinimum(minLeftRotationalAngle);
+        }
+        else
+        {
+	        rotationalAxis.setPositionMaximum(maxRightRotationalAngle);
+	        rotationalAxis.setPositionMinimum(minRightRotationalAngle);
+        }
         
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
         rotationalAxis.setDirection(new Vector3f(0, 1, 0));
