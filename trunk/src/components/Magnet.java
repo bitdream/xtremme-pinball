@@ -22,7 +22,7 @@ public class Magnet extends Node implements ActivableComponent
 	private Geometry visualModel;
 	
 	// Intensidad de la fuerza
-	private static int force = 5000;
+	private static int force = 500;
 	
 	//TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa (xed final)
 	// Radio del campo de la fuerza magnetica
