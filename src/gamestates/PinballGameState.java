@@ -451,7 +451,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Nodo dinamico de la bola */
 		DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
 		// El nodo fisico de todas las bolas debera llamarse "ball" -> POR CONVENCION!
-		mainBall.setName("ball");
+		mainBall.setName(PHYSIC_NODE_NAME_FOR_BALLS);
         rootNode.attachChild(mainBall);
                
         final Sphere visualMainBall = new Sphere("Bola principal", 25, 25, 1);
@@ -473,7 +473,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// Una segunda bola para probar el bumper
 		/* Nodo dinamico de la bola */
 		final DynamicPhysicsNode mainBall2 = getPhysicsSpace().createDynamicNode(); 
-		mainBall2.setName("ball");
+		mainBall2.setName(PHYSIC_NODE_NAME_FOR_BALLS);
         rootNode.attachChild(mainBall2);
                
         final Sphere visualMainBall2 = new Sphere("Bola 2", 25, 25, 1);
@@ -495,7 +495,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// Una tercera bola para probar el iman magnet1
 		/* Nodo dinamico de la bola */
 		final DynamicPhysicsNode mainBall3 = getPhysicsSpace().createDynamicNode();
-		mainBall3.setName("ball");
+		mainBall3.setName(PHYSIC_NODE_NAME_FOR_BALLS);
         rootNode.attachChild(mainBall3);
                
         final Sphere visualMainBall3 = new Sphere("Bola 3", 25, 25, 1);
@@ -846,7 +846,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
         /* Nodo dinamico de la bola */
         final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-        mainBall.setName( "ball" );
+        mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
         rootNode.attachChild( mainBall );
 
         final Sphere visualMainBall = new Sphere( "Bola", 25, 25, 1 );
