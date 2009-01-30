@@ -2,13 +2,15 @@ package gamestates;
 
 import gamelogic.GameLogic;
 import input.PinballInputHandler;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import loader.X3DLoader;
 import main.Main;
-import themes.CarsThemeGameLogic;
+
 import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.InputHandler;
@@ -51,11 +53,11 @@ import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
-import components.Spinner;
 import components.Sensor;
+import components.Spinner;
 import components.Bumper.BumperType;
 import components.Flipper.FlipperType;
-import components.Sensor.SensorType;;
+import components.Sensor.SensorType;
 
 /**
  * Clase principal del juego.
@@ -290,6 +292,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Creo la lista de imanes */
 		magnets = new ArrayList<StaticPhysicsNode>(2);
+		
+	    /* Creo la lista de sensores */
+        sensors = new ArrayList<DynamicPhysicsNode>(2);
 		
 		/* Creo la lista de bolas */
 		balls = new ArrayList<DynamicPhysicsNode>(4);
