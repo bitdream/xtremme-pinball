@@ -37,6 +37,13 @@ public class Door extends Node
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
 	
+	// Tiempo de la ultima colision considerada (donde se llamo a la logica del juego) entre una bola y este door
+	private long lastConsideredCollisionTime = 0;
+	
+	// TODO ver si el tiempo elegido funciona al tener la version final de la mesa
+	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
+	// El tiempo debe ser grande pq la cantidad de colisiones detectadas depende de la velocidad de la bola
+	private static final long windowTimeForCollisions = 1000; 
 
     /**
      * Crea un nodo dinamico de puerta.
@@ -95,10 +102,24 @@ public class Door extends Node
         /* Agrego la accion al controlador de pinball */
         pinball.getPinballInputHandler().addAction(new InputAction() {
         	
-        	public void performAction(InputActionEvent evt) {
-        		
-                /* Llamo a la logica del juego */
-                pinballInstance.getGameLogic().doorCollision(door);
+        	public void performAction(InputActionEvent evt) 
+        	{        		
+        		// Tiempo en el que se dio esta colision
+                long now = System.currentTimeMillis();
+                
+                // Tiempo de la ultima colision considerada
+                long lastColl = door.getLastConsideredCollisionTime();
+                
+                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
+                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
+                {   
+                	 /* Llamo a la logica del juego */
+                    pinballInstance.getGameLogic().doorCollision(door);
+                    
+                    door.setLastConsideredCollisionTime(now);
+                }
+                // Sino no hago nada pq es una colision repetida 
+               
             }        	
 
         }, collisionEventHandler, false);
@@ -186,5 +207,15 @@ public class Door extends Node
 	public void setJoint(Joint joint)
 	{
 		this.joint = joint;
+	}
+	
+    public long getLastConsideredCollisionTime() 
+    {
+		return lastConsideredCollisionTime;
+	}
+
+	public void setLastConsideredCollisionTime(long lastConsideredCollisionTime) 
+	{
+		this.lastConsideredCollisionTime = lastConsideredCollisionTime;
 	}
 }
