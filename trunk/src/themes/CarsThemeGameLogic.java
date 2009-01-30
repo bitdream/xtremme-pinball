@@ -78,13 +78,11 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void flipperCollision(Flipper flipper)
 	{
-		super.flipperCollision(flipper);
 	}
 
 	@Override
 	public void plungerCollision(Plunger plunger)
 	{
-		super.plungerCollision(plunger);
 	}
 
 	@Override
