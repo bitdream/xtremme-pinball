@@ -78,7 +78,7 @@ public class Flipper extends Node implements ActivableComponent
         flipperNode.attachChild(flipper);
         
         /* Genero su fisica */
-        flipperNode.generatePhysicsGeometry();
+        flipperNode.generatePhysicsGeometry(); //esto es el tema de los bounding malos
         
         /* Computo su masa */
 		flipperNode.computeMass();
