@@ -308,7 +308,6 @@ public class X3dToJme extends FormatConverter {
      *             In case the XML DocumentBuilder cannot be instantiated
      */
     public X3dToJme() throws InstantiationException {
-    	logger.setLevel(Level.SEVERE);
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory
                     .newInstance();
