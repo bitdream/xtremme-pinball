@@ -979,17 +979,18 @@ System.out.println("createPluneger");
                    
                } else if (type.equals( "Spinner" )) {
 System.out.println("createSpinner");
-                   
-                   String typeOfSpinner = (String)metadata.get( "spinnerType" );
-                   
-                   SpinnerType spinnerType = SpinnerType.NORMAL_SPINNER;
-                   if (typeOfSpinner.equals( "ramp_entrance_spinner" )) 
-                   {
-                       spinnerType = SpinnerType.RAMP_ENTRANCE_SPINNER;
-                   } else if (typeOfSpinner.equals( "ramp_exit_spinner" ))
-                   {
-                       spinnerType = SpinnerType.RAMP_EXIT_SPINNER;
-                   }
+                 
+// Ya no hay varios tipos de spinner, hay uno solo
+//                   String typeOfSpinner = (String)metadata.get( "spinnerType" );
+//                   
+//                   SpinnerType spinnerType = SpinnerType.NORMAL_SPINNER;
+//                   if (typeOfSpinner.equals( "ramp_entrance_spinner" )) 
+//                   {
+//                       spinnerType = SpinnerType.RAMP_ENTRANCE_SPINNER;
+//                   } else if (typeOfSpinner.equals( "ramp_exit_spinner" ))
+//                   {
+//                       spinnerType = SpinnerType.RAMP_EXIT_SPINNER;
+//                   }
                    
                    shape = Spinner.create( pinball, "spinner"+spinnerCounter++, geom/*, spinnerType*/ );
                    
