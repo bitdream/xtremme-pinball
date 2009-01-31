@@ -247,7 +247,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Hongo3" translation="-4.683098 1.90 -57.872005" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
+<Transform DEF="Hongo3" translation="-4.683098 2 -57.872005" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
 <Shape>
 <MetadataSet>
     <MetadataString name="type" value="Bumper"/>
@@ -262,7 +262,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Hongo2" translation="4.204180 1.90 -59.784458" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
+<Transform DEF="Hongo2" translation="4.204180 2 -59.784458" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
 <Shape>
 <MetadataSet>
     <MetadataString name="type" value="Bumper"/>
@@ -278,7 +278,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Hongo4" translation="-5.751822 1.90 -64.115608" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
+<Transform DEF="Hongo4" translation="-5.751822 2 -64.115608" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
 <Shape>
 <MetadataSet>
     <MetadataString name="type" value="Bumper"/>
@@ -410,7 +410,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Hongo1" translation="0.604271 1.90 -66.534294" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
+<Transform DEF="Hongo1" translation="0.604271 2 -66.534294" scale="1.616966 1.616966 1.616966" rotation="-0.000025 -0.000025 -1.000000 1.570796">
 <Shape>
 <MetadataSet>
     <MetadataString name="type" value="Bumper"/>

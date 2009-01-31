@@ -56,6 +56,9 @@ public class Bumper extends Node implements ActivableComponent
 	// Esta activo este bumper?
 	public boolean active = true;
 	
+	// Usado para que los bumpers saltarines dejen de saltar luego de  segundos ante una colision con una bola
+	// private float remainigFramesInMovement = 0.0f;
+
 	// Tiempo de la ultima colision considerada (donde se llamo a la logica del juego) entre una bola y este bumper
 	private long lastConsideredCollisionTime = 0;
 	
@@ -269,7 +272,9 @@ public class Bumper extends Node implements ActivableComponent
                 	bump.clearDynamics();
                 	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
                 								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-//bump.clearDynamics(); //TODO quitar, es para ver si para de moverse otra es edsde el update si se detecta que ya se movio bastante tiempo, hacerle el clear
+
+                	// Le seteo la camtidad de frames que le quedan de movimiento a este bumper antes de hacerle clearDynamics()
+                	//bumper.setRemainigFramesInMovement(Timer.getTimer().getFrameRate());
                 }
                 
                 // Tiempo en el que se dio esta colision
@@ -398,5 +403,15 @@ public class Bumper extends Node implements ActivableComponent
 	{
 		this.lastConsideredCollisionTime = lastCollisionTime;
 	}
+	
+//	public float getRemainigFramesInMovement() 
+//	{
+//		return remainigFramesInMovement;
+//	}
+//
+//	public void setRemainigFramesInMovement(float framesInMovementRemainig) 
+//	{
+//		this.remainigFramesInMovement = framesInMovementRemainig;
+//	}
 	
 }
