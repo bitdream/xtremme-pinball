@@ -231,8 +231,8 @@ public class PinballInputHandler extends FirstPersonHandler
 				// Intensidad de la fuerza a aplicar
 				float forceIntensity = 500; //90000f;
 				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
-				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)) , 
-						FastMath.sign(FastMath.nextRandomInt(-1, 1)),
+				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)),
+						0.0f, /*FastMath.sign(FastMath.nextRandomInt(-1, 1)) , */
 						FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);
 				
 				 // Tomo cada bola de la escena y le aplico la fuerza
@@ -247,11 +247,7 @@ public class PinballInputHandler extends FirstPersonHandler
 				 
 				 // Agregado de la logica necesaria para la deteccion del uso abusivo de tilt
 				 
-				 // TODO debug
-				 //System.out.println("Antes: ");
-				 //printArr(tiltArrayTimes);				 
-				 
-				 // Tiempo actual
+  			     // Tiempo actual
 				 long now = System.currentTimeMillis();
 				 
 				 // Si la diferencia entre el ultimo tilt y el actual es mayor a tiltFreeTimeInterval seg, blanqueo el arreglo. Ademas debe haber habido al menos 1 tilt anterior
@@ -291,10 +287,6 @@ public class PinballInputHandler extends FirstPersonHandler
 					 /* Aviso a la logica de juego */
 					 game.getGameLogic().tilt();
 				 }			
-				 
-				 //TODO debug
-				 //System.out.println("Luego: ");
-				 //printArr(tiltArrayTimes);
 
 			}
 			else if (!event.getTriggerPressed())
@@ -310,16 +302,6 @@ public class PinballInputHandler extends FirstPersonHandler
 			for(int i=0; i<arr.length-1;i++)
 			{
 				arr[i] = arr[i+1];
-			}
-		}
-		
-		
-		// TODO qutar, es para debug
-		private void printArr(long[] arr)
-		{
-			for(int i=0; i<arr.length;i++)
-			{
-				System.out.println(arr[i]);
 			}
 		}
 	}

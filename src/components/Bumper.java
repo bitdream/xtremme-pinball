@@ -7,6 +7,7 @@ import com.jme.input.util.SyntheticButton;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
+import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -129,7 +130,10 @@ public class Bumper extends Node implements ActivableComponent
                      */
                     Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
                     Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
-
+                    
+                    // Para que no hagan saltar la bola, la fuerza en Y es cero
+                    appliedForce.setY(0.0f);
+                    
                     // Aplicar la fuerza repulsora sobre la bola
                     ball.clearDynamics();
                     ball.addForce( appliedForce );
@@ -169,6 +173,8 @@ public class Bumper extends Node implements ActivableComponent
 		
 		// Nombre del nodo fisico de todos los bumpers
 		bumperNode.setName("Bumper");
+		
+		visualModel.setDefaultColor(new ColorRGBA(1.0f, 0f, 0f, 0.6f));
 		
 		pinballInstance = pinball;	
 		
@@ -251,7 +257,10 @@ public class Bumper extends Node implements ActivableComponent
                      */
                     Vector3f direction = contactInfo.getContactVelocity(null); // the velocity with which the two objects hit (in direction 'into' object 1)
                     Vector3f appliedForce = new Vector3f(direction.mult(forceToBallIntensity * sense * ball.getMass()));
-
+                    
+                    // Para que no hagan saltar la bola, la fuerza en Y es cero
+                    appliedForce.setY(0.0f);
+                    
                     // Aplicar la fuerza repulsora sobre la bola
                     ball.clearDynamics();
                     ball.addForce( appliedForce );
@@ -260,7 +269,7 @@ public class Bumper extends Node implements ActivableComponent
                 	bump.clearDynamics();
                 	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
                 								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
-                    
+//bump.clearDynamics(); //TODO quitar, es para ver si para de moverse otra es edsde el update si se detecta que ya se movio bastante tiempo, hacerle el clear
                 }
                 
                 // Tiempo en el que se dio esta colision
