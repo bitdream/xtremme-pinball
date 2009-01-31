@@ -144,8 +144,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Lugar al que mira la camara incialmente */
 	private Vector3f cameraLookAt = 
 //	    new Vector3f( 0.0f, 43.5f, 0.0f );
-//      new Vector3f(-6.8f,11.6f,-62.6f);
-	    Vector3f.ZERO;
+     new Vector3f(-6.8f,11.6f,-62.6f);
+//	    Vector3f.ZERO;
 	    
 	/* Nodo que guarda la tabla */
 	private Node tabla;
@@ -203,6 +203,21 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
         scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
+        
+//    	for (DynamicPhysicsNode bumper : getJumperBumpers()) 
+//    	{
+//    		float remainingFrames = ((Bumper)bumper.getChild(0)).getRemainigFramesInMovement();
+//			if ( remainingFrames > 0.0f )
+//			{
+//				// Restarle 1 y si queda menor o igual a cero, ponerlo en cero y limpiarle la fisica para que deje de moverse
+//				remainingFrames--;
+//				if (remainingFrames <= 0.0f)
+//				{
+//					bumper.clearDynamics();
+//					((Bumper)bumper.getChild(0)).setRemainigFramesInMovement(0.0f);
+//				}
+//			}
+//		}
         
 	}
 	
