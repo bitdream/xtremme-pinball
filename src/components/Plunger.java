@@ -196,7 +196,7 @@ public class Plunger extends Node
 		if (isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
 			parentNode.addForce((new Vector3f(0, 0,
 					-10 * pinball.getPinballSettings().getInclinationAngle()
-					-1000 * (float)Math.pow(getDistance(), 2))
+					-2000 * (float)Math.pow(getDistance(), 2)) // Antes decia 1000
 			).rotate(rot));
 		else /* Aplico la fuerza para alejarlo del origen */
 			parentNode.addForce(plungerChargeForce.rotate(rot));
