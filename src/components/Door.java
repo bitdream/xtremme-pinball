@@ -231,4 +231,18 @@ public class Door extends Node
 	{
 		this.lastConsideredCollisionTime = lastConsideredCollisionTime;
 	}
+	
+	// FIXME mejora un poco la puerta
+//	public void update(float time)
+//    {
+//        Quaternion rot = pinballInstance.getPinballSettings().getInclinationQuaternion();
+//        
+//        /* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
+//         * de recuperacion de los flippers */
+//        final Vector3f forceToApply = new Vector3f();
+//        
+//        forceToApply.set(new Vector3f(0f, 0f, 10f)).multLocal(time);
+//
+//        ((DynamicPhysicsNode)getParent()).addForce(forceToApply.rotate(rot));
+//    }
 }

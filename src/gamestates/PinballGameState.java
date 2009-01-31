@@ -138,13 +138,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = 
-//	    new Vector3f( 0.0f, 63.0f, 16.0f ); 
+	    new Vector3f( 0.0f, 63.0f, 16.0f ); 
 //      new Vector3f(-7.8f,11.6f,-63.6f);
-	    new Vector3f(0,50,80);
+//	    new Vector3f(0,50,80);
 	/* Lugar al que mira la camara incialmente */
 	private Vector3f cameraLookAt = 
-//	    new Vector3f( 0.0f, 43.5f, 0.0f );
-     new Vector3f(-6.8f,11.6f,-62.6f);
+	    new Vector3f( 0.0f, 43.5f, 0.0f );
+//     new Vector3f(-6.8f,11.6f,-62.6f);
 //	    Vector3f.ZERO;
 	    
 	/* Nodo que guarda la tabla */
@@ -235,7 +235,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	 */
 	protected void initSystem()
 	{
-		/* Fijo el nombre a la ventana */
+	    // para tener en cuenta.. hace mas dinamico el asunto, pero la bola vuela mas es una gadorcha	    
+	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, -17.893f, 3.999f) );
+		
+	    
+	    /* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
 		
 		/* Inicializo al jugador */
@@ -330,7 +334,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		balls = new ArrayList<DynamicPhysicsNode>(4);
 
 		/* Armo la habitacion, la mesa y la bola */
-//        loadEnvironment();
+        loadEnvironment();
         loadTable();
         setUpBall();
 		
@@ -341,7 +345,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //        gameLogic = new themes.CarsThemeGameLogic(this);
 //        buildAndAttachComponents();
 //        inclinePinball();
-        buildLighting();
+//        buildLighting();
         //-----------------------------------------
         
 		/* Actualizo el nodo raiz */
@@ -1268,10 +1272,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         long freeMem = Runtime.getRuntime().freeMemory();
                         long maxMem = Runtime.getRuntime().maxMemory();
 
-                        logger.info( "|*|*|  Memory Stats  |*|*|" );
-                        logger.info( "Total memory: " + ( totMem >> 10 ) + " kb" );
-                        logger.info( "Free memory: " + ( freeMem >> 10 ) + " kb" );
-                        logger.info( "Max memory: " + ( maxMem >> 10 ) + " kb" );
+                        System.out.println( "|*|*|  Memory Stats  |*|*|" );
+                        System.out.println( "Total memory: " + ( totMem >> 10 ) + " kb" );
+                        System.out.println( "Free memory: " + ( freeMem >> 10 ) + " kb" );
+                        System.out.println( "Max memory: " + ( maxMem >> 10 ) + " kb" );
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F2, InputHandler.AXIS_NONE, false );
