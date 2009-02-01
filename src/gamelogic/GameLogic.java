@@ -2,10 +2,6 @@ package gamelogic;
 
 import gamestates.PinballGameState;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import main.Main;
 
 import com.jmex.audio.AudioSystem;
@@ -29,14 +25,7 @@ public abstract class GameLogic
 	protected AudioSystem audio;
 	
 	/* Sonidos default */
-	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound;
-	
-	/* Sonidos default de flipperMove */
-	private List<AudioTrack> flipperMoveSounds;
-	
-	private static final int flipperMoveSoundQty = 6;
-	
-	protected Random rand;
+	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound;
 	
 	public GameLogic(PinballGameState pinball)
 	{
@@ -51,17 +40,7 @@ public abstract class GameLogic
 		ballTouchSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/ballTouch.wav"), false);
 		tiltSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt.wav"), false);
 		tiltAbuseSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
-
-		/* Agrego los sonidos posibles de golpear con flipper */
-		flipperMoveSounds = new ArrayList<AudioTrack>();
-		
-		for (int i = 1; i <= flipperMoveSoundQty; i++)
-		{
-			flipperMoveSounds.add(audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/flipperMove" + i + ".wav"), false));
-		}
-		
-		/* Inicializo el random */
-		rand = new Random();
+		flipperMoveSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/flipperMove.wav"), false);
 	}
 	
 	public void showScore()
@@ -125,13 +104,13 @@ public abstract class GameLogic
 	public void leftFlipperMove(Flipper flipper)
 	{
 		/* Ejecuto un sonido al azar para el golpe */
-		flipperMoveSounds.get(rand.nextInt(flipperMoveSoundQty)).play();
+		flipperMoveSound.play();
 	}
 	
 	public void rightFlipperMove(Flipper flipper)
 	{
 		/* Ejecuto un sonido al azar para el golpe */
-		flipperMoveSounds.get(rand.nextInt(flipperMoveSoundQty)).play();
+		flipperMoveSound.play();
 	}
 	
 	// Invocado cuando el usuario hace tilt
