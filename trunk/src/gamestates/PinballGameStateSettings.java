@@ -5,7 +5,7 @@ import com.jme.math.Quaternion;
 
 public class PinballGameStateSettings
 {
-	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 1.0f;
+	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 8.0f;
 	
 	private float camMoveSpeed, camTurnSpeed;
 	

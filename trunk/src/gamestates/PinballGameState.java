@@ -69,7 +69,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
 	private static final String GAME_NAME = "xtremme pinball";
-	private static final String GAME_VERSION = "0.4";
+	private static final String GAME_VERSION = "0.5";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
@@ -114,7 +114,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	private Text scoreText;
 	
 	/* Mensaje al usuario */
-	private String message = "Mensaje inicial";
+	private String message = "";
 	
 	private Text fpsText;
 	
@@ -137,7 +137,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //	    new Vector3f(0,50,80);
 	/* Lugar al que mira la camara incialmente */
 	private Vector3f cameraLookAt = 
-	    new Vector3f( 0.0f, 10.875f, 0.0f );
+	    new Vector3f( 0.0f, 9.875f, 0.0f );
 //     new Vector3f(-6.8f,11.6f,-62.6f);
 //	    Vector3f.ZERO;
 	    
