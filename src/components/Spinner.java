@@ -73,7 +73,7 @@ public class Spinner extends Node
 //        spinner.setSpinnerType(spinnerType);
         
         /* Genero su fisica */
-        spinnerNode.generatePhysicsGeometry();
+        spinnerNode.generatePhysicsGeometry(true);
 
         /* Computo su masa */
 		spinnerNode.computeMass();

@@ -32,7 +32,7 @@ public class Magnet extends Node implements ActivableComponent
 	private static float maxRadius = 3; //Valor de testeo: 3 cuando las bolas son de radio 1
 	
 	// Esta activo este magnet?
-	public boolean active = true;
+	public boolean active = false;
 
 	public static StaticPhysicsNode create(final PinballGameState pinball, String name, Geometry visualModel)
 	{

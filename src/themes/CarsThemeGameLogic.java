@@ -2,6 +2,7 @@ package themes;
 
 import main.Main;
 
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -48,8 +49,6 @@ public class CarsThemeGameLogic extends GameLogic
 		// Si el bumper esta activo, se hace la suma de puntos y de colisiones contra bumpers
 		if (bumper.isActive())
 		{
-			// TODO por cada colision entra 4 veces aca, es acorde al tiempo que dure la colision, asi que no es bug
-			// pero hay que notar que cada colision "visible" al ojo humano sumara 40 ptos
 			score += bumperScore;
 			
 			// Se actualiza los datos de pantalla de usuario
@@ -159,21 +158,24 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		showMessage("Bola perdida");
 
-		if (getInTableBallQty() == 0) // Era la ultima bola
+		if (getInTableBallQty() == 1) // Era la ultima bola
 		{
 			lostLastBallSound.play();
 			
 			// Reubicar la bola en el plunger TODO ver posicion, aveces la reposiciona mal!!!
-    		ball.clearDynamics();
-    		ball.getLocalTranslation().set(new Vector3f(0, 5, -100));
+			ball.clearDynamics();
+            ball.setLocalTranslation( new Vector3f(pinball.getBallStartUp()) );
+//            ball.getChild(0).setLocalTranslation( new Vector3f(pinball.getBallStartUp()) );
+//            ball.setLocalRotation( new Quaternion() );
+//            ball.updateGeometricState( 0, false );
+            
 		}
 		else // Todavia le quedan bolas en la mesa
 		{			
-			lostBallSound.play();
-			
+			lostBallSound.play();			
 			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
 			pinball.getBalls().remove(ball);
-			pinball.getRootNode().detachChild(ball);			
+			pinball.getRootNode().detachChild(ball);
 		}
 
 	}

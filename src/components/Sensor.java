@@ -4,9 +4,13 @@ import gamestates.PinballGameState;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.input.util.SyntheticButton;
+import com.jme.math.Quaternion;
+import com.jme.math.Vector3f;
+import com.jme.renderer.ColorRGBA;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.StaticPhysicsNode;
 import com.jmex.physics.contact.ContactInfo;
 import com.jmex.physics.material.Material;
 
@@ -34,7 +38,7 @@ private static final long serialVersionUID = 1L;
 	// TODO ver si el tiempo elegido funciona al tener la version final de la mesa
 	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
 	// El tiempo debe ser grande pq la cantidad de colisiones detectadas depende de la velocidad de la bola
-	private static final long windowTimeForCollisions = 1000; 
+	private static final long windowTimeForCollisions = 5000; 
 	
 
 	/**
@@ -44,9 +48,9 @@ private static final long serialVersionUID = 1L;
 	 * @param visualModel Modelo visual del sensor (si se desea se lo hace transparente).
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, SensorType sensorType)
+	public static StaticPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel, SensorType sensorType)
 	{
-		DynamicPhysicsNode sensorNode = pinball.getPhysicsSpace().createDynamicNode();
+		StaticPhysicsNode sensorNode = pinball.getPhysicsSpace().createStaticNode();
 		
 		sensorNode.setName("Sensor");
 		
@@ -60,17 +64,12 @@ private static final long serialVersionUID = 1L;
         sensor.setSensorType(sensorType);
         
         /* Genero su fisica */
-		sensorNode.generatePhysicsGeometry();
+		sensorNode.generatePhysicsGeometry(true);
 		
 		/* El material de los sensores es ghost */
 		sensorNode.setMaterial(Material.GHOST);
 
-        /* Computo su masa */
-		sensorNode.computeMass();
-		
-		sensorNode.setAffectedByGravity(false);// -> Con esto se renderea el nodo , pero andan las colisiones bien!!!!
-		
-		 /* Agrego el componente a la lista del pinball */
+		/* Agrego el componente a la lista del pinball */
         pinball.addSensor(sensorNode);
         
 		// Detectar colisiones contra el sensor y actuar en consecuencia
@@ -82,17 +81,22 @@ private static final long serialVersionUID = 1L;
         		
         		final ContactInfo contactInfo = ( (ContactInfo) evt.getTriggerData() );
                 DynamicPhysicsNode ball;
+                //StaticPhysicsNode s;
 
                 // El contacto pudo haber sido bola -> sensor o sensor -> bola
-                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) /*&&
+                		contactInfo.getNode1() instanceof StaticPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals("SensorPerder")*/) 
                 { 
                     // fue sensor -> bola
-                    ball = (DynamicPhysicsNode) contactInfo.getNode2();                       
+                    ball = (DynamicPhysicsNode) contactInfo.getNode2();  
+                    //s = (StaticPhysicsNode) contactInfo.getNode1();  
                 }
-                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) ) 
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) /*&&
+                		     contactInfo.getNode2() instanceof StaticPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals("SensorPerder")*/) 
                 {
                 	// fue bola -> sensor
-                    ball = (DynamicPhysicsNode) contactInfo.getNode1();                   
+                    ball = (DynamicPhysicsNode) contactInfo.getNode1();  
+                    //s = (StaticPhysicsNode) contactInfo.getNode2();  
                 }
                 else 
                 {
@@ -100,7 +104,7 @@ private static final long serialVersionUID = 1L;
                     return;
                 }
                 
-        		// Tiempo en el que se dio esta colision
+                // Tiempo en el que se dio esta colision
                 long now = System.currentTimeMillis();
                 
                 // Tiempo de la ultima colision considerada
@@ -110,13 +114,11 @@ private static final long serialVersionUID = 1L;
                 if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
                 {   
                     // TODO Para debug, quitar
-                    // System.out.println(" Ubicacion del nodo ghost: " + ghost.getLocalTranslation());
-            		//System.out.println("Colision entre ghost y " + ball.getChild(0).getName());
+            		//System.out.println("2- Colision entre " + ball.getChild(0).getName() + " y " + s.getName());
             		
             		// Dependiendo del tipo de sensor, se llama a metodos diferentes de la logica del juego
-            		/* Llamo a la logica del juego */
             		if (sensor.getSensorType() == SensorType.LOST_BALL_SENSOR)
-            		{
+            		{    		
             			pinballInstance.getGameLogic().lostBall(ball);
             		}
             		else 
@@ -128,13 +130,7 @@ private static final long serialVersionUID = 1L;
                 }
                 // Sino no hago nada pq es una colision repetida       		
         	}
-        }, collisionEventHandler, true );
-        
-        /* TODO ver pq imprime tantas veces colision con misma bola, por ahi es pq material liviano y la bola se lo lleva de vieje con el y estan 
-         * permanentemente colisionando.
-         * Probar reposicionando el box ghost y la bola al detectar la colision a ver que pasa.
-         * Mejor: ignorar la colision usando ContactCallbacks para que no reaccionen a la colision
-         */	
+        }, collisionEventHandler, false );
 		
 		return sensorNode;
 	}
