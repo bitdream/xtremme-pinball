@@ -47,11 +47,11 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers derechos */
-		addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
+		// TODO addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
 		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, false); //KeyInput.KEY_RSHIFT
 		
 		/* Golpear con flippers izquierdos */
-		addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
+		// TODO addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
 		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
 		
 		/* Activar plunger */
@@ -76,33 +76,33 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 	}
 	
-	/* Accion para golpear con flippers derechos */
-	private class RightFlippersAction extends InputAction
-	{
-		private final Vector3f forceToApply = new Vector3f();
-		
-		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
-
-		public void performAction(InputActionEvent event)
-		{
-			if(event.getTriggerPressed())
-			{
-				/* Presiona la tecla, fijo la fuerza a aplicar */
-				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
-
-				for (DynamicPhysicsNode flipper : game.getFlippers())
-				{
-					Flipper actualFlipper = (Flipper)flipper.getChild(0);
-					/* Aplico la fuerza sobre los flippers derechos */
-					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
-					{
-						flipper.addForce(forceToApply.rotate(rot));
-					}
-				}
-			}
-		}
-		
-	}
+	/* TODO (quitada para usar velocs y accels) Accion para golpear con flippers derechos */
+//	private class RightFlippersAction extends InputAction
+//	{
+//		private final Vector3f forceToApply = new Vector3f();
+//		
+//		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
+//
+//		public void performAction(InputActionEvent event)
+//		{
+//			if(event.getTriggerPressed())
+//			{
+//				/* Presiona la tecla, fijo la fuerza a aplicar */
+//				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
+//
+//				for (DynamicPhysicsNode flipper : game.getFlippers())
+//				{
+//					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+//					/* Aplico la fuerza sobre los flippers derechos */
+//					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
+//					{
+//						flipper.addForce(forceToApply.rotate(rot));
+//					}
+//				}
+//			}
+//		}
+//		
+//	}
 	
 	/* Accion para golpear con flippers derechos por unica vez */
 	private class RightFlippersActionOnce extends InputAction
@@ -119,39 +119,54 @@ public class PinballInputHandler extends FirstPersonHandler
 					{
 						/* Aviso a la logica de juego */
 						game.getGameLogic().rightFlipperMove(actualFlipper);
+						
+						/* Lo marco como en uso */
+						actualFlipper.setInUse(true);
+					}
+				}
+			}
+			else
+			{
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+				
+					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
+					{
+						/* Dejo de usar este flipper */
+						actualFlipper.setInUse(false);
 					}
 				}
 			}
 		}
 	}
 	
-	/* Accion para golpear con flippers izquierdos */
-	private class LeftFlippersAction extends InputAction
-	{
-		private final Vector3f forceToApply = new Vector3f();
-		
-		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
-
-		public void performAction(InputActionEvent event)
-		{
-			if(event.getTriggerPressed())
-			{
-				/* Presiona la tecla, fijo la fuerza a aplicar */
-				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
-
-				for (DynamicPhysicsNode flipper : game.getFlippers())
-				{
-					Flipper actualFlipper = (Flipper)flipper.getChild(0);
-					/* Aplico la fuerza sobre los flippers izquierdos */
-					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
-					{
-						flipper.addForce(forceToApply.rotate(rot));
-					}
-				}
-			}
-		}
-		
-	}
+	/* TODO (quitada para usar velocs y accels) Accion para golpear con flippers izquierdos */
+//	private class LeftFlippersAction extends InputAction
+//	{
+//		private final Vector3f forceToApply = new Vector3f();
+//		
+//		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
+//
+//		public void performAction(InputActionEvent event)
+//		{
+//			if(event.getTriggerPressed())
+//			{
+//				/* Presiona la tecla, fijo la fuerza a aplicar */
+//				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
+//
+//				for (DynamicPhysicsNode flipper : game.getFlippers())
+//				{
+//					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+//					/* Aplico la fuerza sobre los flippers izquierdos */
+//					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
+//					{
+//						flipper.addForce(forceToApply.rotate(rot));
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	/* Accion para golpear con flippers izquierdos por unica vez */
 	private class LeftFlippersActionOnce extends InputAction
@@ -168,11 +183,26 @@ public class PinballInputHandler extends FirstPersonHandler
 					{
 						/* Aviso a la logica de juego */
 						game.getGameLogic().leftFlipperMove(actualFlipper);
+						
+						/* Lo marco como en uso */
+						actualFlipper.setInUse(true);
+					}
+				}
+			}
+			else
+			{
+				for (DynamicPhysicsNode flipper : game.getFlippers())
+				{
+					Flipper actualFlipper = (Flipper)flipper.getChild(0);
+				
+					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
+					{
+						/* Dejo de usar este flipper */
+						actualFlipper.setInUse(false);
 					}
 				}
 			}
 		}
-		
 	}
 	
 	/* Accion para retraer el plunger */

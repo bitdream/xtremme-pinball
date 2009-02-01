@@ -23,7 +23,7 @@ public class Plunger extends Node
 	private static final long serialVersionUID = 1L;
 	
 	/* Fuerza de charge */
-	public static final Vector3f plungerChargeForce = new Vector3f(0f, 0f, 500f);
+	public static final Vector3f plungerChargeForce = new Vector3f(0f, 0f, 30f);
 	
 	/* Esta suelto o lo esta controlando el usuario */
 	private boolean loose;
@@ -195,8 +195,8 @@ public class Plunger extends Node
 		
 		if (isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
 			parentNode.addForce((new Vector3f(0, 0,
-					-10 * pinball.getPinballSettings().getInclinationAngle()
-					-3000 * (float)Math.pow(getDistance(), 2)) // Antes decia 1000
+					-4 * pinball.getPinballSettings().getInclinationAngle()
+					-250 * (float)Math.pow(getDistance(), 2))
 			).rotate(rot));
 		else /* Aplico la fuerza para alejarlo del origen */
 			parentNode.addForce(plungerChargeForce.rotate(rot));
