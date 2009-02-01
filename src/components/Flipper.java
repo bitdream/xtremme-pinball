@@ -23,8 +23,11 @@ public class Flipper extends Node implements ActivableComponent
 {
 	private static final long serialVersionUID = 1L;
 	
+	/* Aceleracion y velocidad en los flippers */
+	private static final float AVAILABLE_ACCELERATION_BACK = 15, AVAILABLE_ACCELERATION_FORWARD = 55, DESIRED_VELOCITY_BACK = 60, DESIRED_VELOCITY_FORWARD = 110;
+	
 	/* Fuerzas en los flippers */
-	public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -1600000f), flipperRestoreForce = new Vector3f(0f, 0f, 100000f);
+	//public static final Vector3f flipperHitForce = new Vector3f(0f, 0f, -1600000f), flipperRestoreForce = new Vector3f(0f, 0f, 100000f);
 	
 	/* Maximos angulos de rotacion de los flippers */
 	private static final float maxRightRotationalAngle = 0.3f, maxLeftRotationalAngle = 0.6f, minLeftRotationalAngle = -0.3f, minRightRotationalAngle = -0.6f;
@@ -45,10 +48,14 @@ public class Flipper extends Node implements ActivableComponent
 	private PinballGameState pinball;
 	
 	/* Esta activo? */
-	public boolean active;
+	private boolean active;
 	
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
+	
+	/* Lo estan usando? */
+	private boolean inUse;
+	
 
 	/**
      * Crea un nodo dinamico de flipper.
@@ -69,16 +76,19 @@ public class Flipper extends Node implements ActivableComponent
 		/* Actualizo los vectores globales */
 		flipperNode.updateWorldVectors();
 		
-		/* El material de los flippers es goma para simular la banda de goma que los rodea */
-        flipperNode.setMaterial(Material.RUBBER);
+		/* Defino su material  */
+        flipperNode.setMaterial(Material.PLASTIC);
 		
         /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
         final Flipper flipper = new Flipper(name, visualModel, flipperType);
         flipper.setActive(true);
         flipperNode.attachChild(flipper);
         
+        /* No los afecta la gravedad */
+        flipperNode.setAffectedByGravity(false);
+        
         /* Genero su fisica */
-        flipperNode.generatePhysicsGeometry(true); //esto es el tema de los bounding malos
+        flipperNode.generatePhysicsGeometry(true);
         
         /* Computo su masa */
 		flipperNode.computeMass();
@@ -101,7 +111,7 @@ public class Flipper extends Node implements ActivableComponent
         
         /* Vector que indica la direccion sobre la que esta parado el eje, en este caso, Y */
         rotationalAxis.setDirection(new Vector3f(0, 1, 0));
-        
+ 
         /* Le fijo como punto de rotacion la punta del flipper */
         //debug
         if (anchorPlace == null)
@@ -229,15 +239,46 @@ public class Flipper extends Node implements ActivableComponent
 	
 	public void update(float time)
 	{
-		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+		/* Fijo las velocidades deseadas en base a si esta en uso o no (y si es izq o der) */
+		if (isInUse())
+		{
+			/* Fijo la aceleracion con la que cuenta */
+			joint.getAxes().get(0).setAvailableAcceleration(AVAILABLE_ACCELERATION_FORWARD);
+			
+			if (isLeftFlipper())
+			{
+				joint.getAxes().get(0).setDesiredVelocity(DESIRED_VELOCITY_FORWARD);
+			}
+			else
+			{
+				joint.getAxes().get(0).setDesiredVelocity(-DESIRED_VELOCITY_FORWARD);
+			}
+		}
+		else
+		{
+			/* Fijo la aceleracion con la que cuenta */
+			joint.getAxes().get(0).setAvailableAcceleration(AVAILABLE_ACCELERATION_BACK);
+			
+			if (isLeftFlipper())
+			{
+				joint.getAxes().get(0).setDesiredVelocity(-DESIRED_VELOCITY_BACK);
+			}
+			else
+			{
+				joint.getAxes().get(0).setDesiredVelocity(DESIRED_VELOCITY_BACK);
+			}
+		}
 		
-		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
-		 * de recuperacion de los flippers */
-		final Vector3f forceToApply = new Vector3f();
-		
-		forceToApply.set(flipperRestoreForce).multLocal(time);
-
-		((DynamicPhysicsNode)getParent()).addForce(forceToApply.rotate(rot));
+//		TODO Viejo metodo de las fuerzas explicitas
+//		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
+//		
+//		/* Cada vez que el motor de fisica llama a actualizacion, aplico la fuerza
+//		 * de recuperacion de los flippers */
+//		final Vector3f forceToApply = new Vector3f();
+//		
+//		forceToApply.set(flipperRestoreForce).multLocal(time);
+//
+//		((DynamicPhysicsNode)getParent()).addForce(forceToApply.rotate(rot));
 	}
 	
 	public void setActive(boolean active)
@@ -249,5 +290,15 @@ public class Flipper extends Node implements ActivableComponent
 	public boolean isActive()
 	{
 		return this.active;
+	}
+
+	public boolean isInUse()
+	{
+		return inUse;
+	}
+
+	public void setInUse(boolean inUse)
+	{
+		this.inUse = inUse;
 	}
 }

@@ -1039,7 +1039,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	private void setUpBall()
 	{
 	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
-
+/* TODO ojo, aca comento esto porque quiero probar solo con IRON
         // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
         final Material customMaterial = new Material( "material de bola" );
         // Es pesado
@@ -1051,7 +1051,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         // Poco rozamiento
         contactDetails.setMu( 0.5f );
         customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
-
+*/
         /* Nodo dinamico de la bola */
         final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
         mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
@@ -1066,7 +1066,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
         mainBall.attachChild( visualMainBall );
         mainBall.generatePhysicsGeometry();
-        mainBall.setMaterial( customMaterial );
+//		mainBall.setMaterial( customMaterial );
+        mainBall.setMaterial(Material.IRON);
         // Se computa la masa luego de generar la geometria fisica
         mainBall.computeMass();
 
