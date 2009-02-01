@@ -136,6 +136,8 @@ public class CarsThemeGameLogic extends GameLogic
 			lostLastBallSound.play();
 			
 			// Bajar la cantidad de vidas y si aun queda alguna, reposicionar la bola TODO
+			// Informar la cantidad de vidas que quedan
+			// Con algo aumentar las vidas (ptos)
 			
 			
 			// Reubicar la bola en el plunger
