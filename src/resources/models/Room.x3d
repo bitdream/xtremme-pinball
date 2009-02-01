@@ -11,11 +11,11 @@
 <Background groundColor="0.057 0.221 0.4" skyColor="0.057 0.221 0.4" />
 
 <Collision enabled="false">
-	<Transform DEF="Marco" translation="-117.795105 45.484562 13.181853" scale="65.300293 17.472878 17.472878" rotation="-0.000000 1.000000 0.000000 1.570796">
+	<Transform DEF="Marco" translation="-32.180367 12.425900 3.601142" scale="17.839344 4.773404 4.773404" rotation="-0.000000 1.000000 0.000000 1.570796">
 	<Shape>
 		<Appearance>
 			<Material DEF="MA_MaterialMadera" diffuseColor="0.639 0.517 0.316" specularColor="0.119 0.119 0.119" emissiveColor="0.0 0.0 0.0" 
-				ambientIntensity="0.23" shininess="0.391" transparency="0.0" />	<ImageTexture url="frame.jpg" />		
+				ambientIntensity="0.23" shininess="0.391" transparency="0.0" />	<ImageTexture url="frame.jpg" /> 		
 		</Appearance>
 		<IndexedFaceSet solid="true" coordIndex="2 5 4 1 -1, 0 1 4 6 -1, 0 6 7 3 -1, 2 3 7 5 -1, ">
 			<Coordinate DEF="coord_Marco" 
@@ -26,7 +26,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CuadroITBA" translation="-117.795105 45.484562 13.181853" scale="65.300293 17.472878 17.472878" rotation="0.000000 1.000000 0.000000 1.570796">
+<Transform DEF="CuadroITBA" translation="-32.180367 12.425900 3.601142" scale="17.839344 4.773404 4.773404" rotation="0.000000 1.000000 0.000000 1.570796">
 <Shape>
 	<Appearance>
 		<Material DEF="MA_MaterialCuadro" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
@@ -40,10 +40,10 @@
 </Transform>
 </Collision>
 
-<SpotLight DEF="Luz1" radius="29.585" ambientIntensity="0.0" intensity="0.286" color="1.0 1.0 1.0" beamWidth="0.166" cutOffAngle="0.216" direction="-0.0 -0.948 0.318" location="5.531 59.47 148.191" />
+<SpotLight DEF="Luz1" radius="29.585" ambientIntensity="0.750" intensity="0.873" color="1.0 1.0 1.0" beamWidth="0.166" cutOffAngle="0.785" direction="-0.0 -0.948 0.318" location="1.511 16.247 40.484" />
 
 <Collision enabled="false">
-<Transform DEF="Techo" translation="4.686499 88.157272 26.481514" scale="123.296379 123.296379 24.659275" rotation="-0.000000 -0.707107 0.707107 3.141593">
+<Transform DEF="Techo" translation="1.280302 24.083630 7.234467" scale="33.683258 33.683258 6.736651" rotation="-0.000000 -0.707107 0.707107 3.141593">
 <Shape>
 <Appearance>
 	<Material DEF="MA_MaterialTecho" diffuseColor="1.0 0.992 0.961" specularColor="1.0 0.992 0.961" emissiveColor="0.0 0.0 0.0" 
@@ -58,7 +58,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="ParedEste" translation="127.982872 26.509096 26.481516" scale="123.296379 61.648190 24.659275" rotation="-0.707107 -0.000000 0.707107 3.141593">
+<Transform DEF="ParedEste" translation="34.963562 7.242003 7.234467" scale="33.683258 16.841629 6.736651" rotation="-0.707107 -0.000000 0.707107 3.141593">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialPared" diffuseColor="0.91 0.871 0.737" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
@@ -73,7 +73,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="ParedOeste" translation="-118.609871 26.509096 26.481516" scale="123.296379 61.648190 24.659275" rotation="0.707107 -0.000000 0.707107 3.141593">
+<Transform DEF="ParedOeste" translation="-32.402954 7.242003 7.234467" scale="33.683258 16.841629 6.736651" rotation="0.707107 -0.000000 0.707107 3.141593">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialPared" />
@@ -87,7 +87,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="ParedNorte" translation="4.686499 26.509090 -96.814865" scale="123.296379 61.648190 24.659275" rotation="-1.000000 0.000000 0.000000 0.000000">
+<Transform DEF="ParedNorte" translation="1.280302 7.242002 -26.448792" scale="33.683258 16.841629 6.736651" rotation="-1.000000 0.000000 0.000000 0.000000">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialPared" />
@@ -101,7 +101,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="ParedSur" translation="4.686499 26.509100 149.777908" scale="123.296379 61.648190 24.659275" rotation="1.000000 0.000000 0.000000 3.141593">
+<Transform DEF="ParedSur" translation="1.280302 7.242004 40.917736" scale="33.683258 16.841629 6.736651" rotation="1.000000 0.000000 0.000000 3.141593">
 <Shape>
 <Appearance>
 <Material USE="MA_MaterialPared" />
@@ -115,12 +115,11 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="Piso" translation="4.686499 -35.139091 26.481520" scale="123.296379 123.296379 24.659275" rotation="-1.000000 0.000000 0.000000 1.570796">
+<Transform DEF="Piso" translation="1.280302 -9.599626 7.234468" scale="33.683258 33.683258 6.736651" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialPiso" diffuseColor="0.489 0.367 0.291" specularColor="0.001 0.001 0.001" emissiveColor="0.0 0.0 0.0" 
 ambientIntensity="0.167" shininess="0.338" transparency="0.0" /><ImageTexture url="parket.jpg" /><TextureTransform scale="6 6"/> 
-
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_Piso" 
@@ -130,7 +129,8 @@ ambientIntensity="0.167" shininess="0.338" transparency="0.0" /><ImageTexture ur
 </Transform>
 </Collision>
 
-<PointLight DEF="Luz2" ambientIntensity="0.50" color="1.0 1.0 1.0" intensity="0.873" radius="100.0" location="5.269 83.509 26.926" />
+<PointLight DEF="Luz2" ambientIntensity="0.75" color="1.0 1.0 1.0" intensity="0.873" radius="100.0" location="1.439 22.814 7.356" />
+
 
 </Scene>
 </X3D>
