@@ -24,6 +24,14 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
+	    if ( true /*args[0].equals( "debug" )*/ )
+	    {
+	        System.setProperty( "jme.stats", "set" );
+	    }
+	    else
+	    {
+	        System.setProperty("jme.debug", "FALSE");
+	    }
 		/* Logueos severos desde el root logger */
 		Logger.getLogger("").setLevel(Level.SEVERE);
 		
