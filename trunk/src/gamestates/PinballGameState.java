@@ -99,7 +99,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	private List<DynamicPhysicsNode> balls;
 	
 	/* Sensores del juego */
-	private List<DynamicPhysicsNode> sensors;
+	private List<StaticPhysicsNode> sensors;
 	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
@@ -332,7 +332,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		magnets = new ArrayList<StaticPhysicsNode>(2);
 		
 	    /* Creo la lista de sensores */
-        sensors = new ArrayList<DynamicPhysicsNode>(2);
+        sensors = new ArrayList<StaticPhysicsNode>(2);
 		
 		/* Creo la lista de bolas */
 		balls = new ArrayList<DynamicPhysicsNode>(4);
@@ -811,7 +811,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		// Agregado de bounding volume 
 		visualLostBallSensor.setModelBound(new BoundingBox());
 		visualLostBallSensor.updateModelBound();
-		DynamicPhysicsNode lostBallSensor = Sensor.create(this, "Physic los ball sensor 1", visualLostBallSensor, SensorType.RAMP_SENSOR);
+		StaticPhysicsNode lostBallSensor = Sensor.create(this, "Physic los ball sensor 1", visualLostBallSensor, SensorType.RAMP_SENSOR);
 		rootNode.attachChild(lostBallSensor);
 		
 	}
@@ -948,7 +948,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		return spinners;
 	}
 	
-	public List<DynamicPhysicsNode> getSensors() 
+	public List<StaticPhysicsNode> getSensors() 
 	{
 		return sensors;
 	}
@@ -1008,7 +1008,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		spinners.add(spinner);
 	}
 	
-	public void addSensor(DynamicPhysicsNode sensor)
+	public void addSensor(StaticPhysicsNode sensor)
 	{
 		sensors.add(sensor);
 	}
