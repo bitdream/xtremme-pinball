@@ -179,7 +179,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	{
 		
 		// TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
-		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
+//		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
 		
 		/* Actualizo el timer */
 		timer.update();
@@ -194,12 +194,15 @@ public class PinballGameState extends PhysicsEnhancedGameState
         pinballInputHandler.update(interpolation);
         if (!pause)
         {
+            // TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
+        	super.update(tpf * 3);
+        	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
         
             /* Se modifico la escena, entonces actualizo el grafo */
             // TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
-//            super.update(tpf * 3f);
+            //super.update(tpf * 3f);
             
             // rootNode.updateGeometricState(interpolation, true);   // se hace en el super.update esto     
         }
