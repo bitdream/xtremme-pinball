@@ -1,6 +1,8 @@
 package themes;
 
 import main.Main;
+
+import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -133,12 +135,15 @@ public class CarsThemeGameLogic extends GameLogic
 		{
 			lostLastBallSound.play();
 			
-			// Reubicar la bola en el plunger TODO ver posicion, aveces la reposiciona mal!!!
+			// Bajar la cantidad de vidas y si aun queda alguna, reposicionar la bola TODO
+			
+			
+			// Reubicar la bola en el plunger
 			ball.clearDynamics();
-            ball.setLocalTranslation( new Vector3f(pinball.getBallStartUp()) );
-//            ball.getChild(0).setLocalTranslation( new Vector3f(pinball.getBallStartUp()) );
-//            ball.setLocalRotation( new Quaternion() );
-//            ball.updateGeometricState( 0, false );
+			ball.setLocalTranslation( new Vector3f(Vector3f.ZERO) );
+            ball.setLocalRotation( new Quaternion() );
+            ball.updateGeometricState( 0, false );
+
 		}
 		else // Todavia le quedan bolas en la mesa
 		{			

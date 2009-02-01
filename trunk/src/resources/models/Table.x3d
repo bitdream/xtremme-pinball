@@ -19,8 +19,8 @@
             <MetadataString name="sensorType" value="lost_ball_sensor"/>
         </MetadataSet>
 		<Appearance>
-			<Material DEF="MA_MaterialSensor" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="1.0 0.0 0.0" 
-				ambientIntensity="0.167" shininess="0.098" transparency="0.0" />			
+			<Material DEF="MA_MaterialSensor" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
+				ambientIntensity="0.167" shininess="0.098" transparency="1.0" />			
 		</Appearance>
 		<IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 			<Coordinate DEF="coord_SensorPerder" 

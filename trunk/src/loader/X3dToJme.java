@@ -122,6 +122,7 @@ import components.Flipper;
 import components.Magnet;
 import components.Obstacle;
 import components.Plunger;
+import components.Sensor;
 import components.Spinner;
 import components.Door.DoorType;
 import components.Flipper.FlipperType;
@@ -995,7 +996,7 @@ private Node transformNode;
                        sensorType = SensorType.LOST_BALL_SENSOR;
                    }
                    
-//                   shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
+                   shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
                }
            }
            
