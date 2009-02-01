@@ -1,8 +1,6 @@
 package themes;
 
 import main.Main;
-
-import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -53,7 +51,6 @@ public class CarsThemeGameLogic extends GameLogic
 			
 			// Se actualiza los datos de pantalla de usuario
 			showScore();
-			showMessage("Colision con bumper!");
 			bumperCollisionCnt ++;
 			
 			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo! TODO
@@ -95,41 +92,15 @@ public class CarsThemeGameLogic extends GameLogic
 		score += spinnerScore;
 		// Se actualiza los datos de pantalla de usuario
 		showScore();
-		showMessage("Colision con molinete!");
 	}
 	
 	public void sensorRampCollision()
 	{
 		super.sensorRampCollision();
-		
-		// TODO setear que se paso por la rampa (incrementar un contador o algo)
+
 		rampPassedCnt++;
 		showMessage("Paso por rampa N: " + String.valueOf(rampPassedCnt));
 	}
-
-//	@Override
-//	public void spinnerRampEntranceCollision(Spinner spinner)
-//	{
-//		super.spinnerRampEntranceCollision(spinner);
-//		
-//		score += spinnerScore;
-//		// Se actualiza los datos de pantalla de usuario
-//		showScore();
-//		showMessage("Colision con molinete entrando a rampa!");
-//		
-//		rampUpSound.play();
-//	}
-//
-//	@Override
-//	public void spinnerRampExitCollision(Spinner spinner)
-//	{
-//		super.spinnerRampExitCollision(spinner);
-//		
-//		score += spinnerScore;
-//		// Se actualiza los datos de pantalla de usuario
-//		showScore();
-//		showMessage("Colision con molinete saliendo de rampa!");
-//	}
 
 	@Override
 	public void tilt()
@@ -168,7 +139,6 @@ public class CarsThemeGameLogic extends GameLogic
 //            ball.getChild(0).setLocalTranslation( new Vector3f(pinball.getBallStartUp()) );
 //            ball.setLocalRotation( new Quaternion() );
 //            ball.updateGeometricState( 0, false );
-            
 		}
 		else // Todavia le quedan bolas en la mesa
 		{			
