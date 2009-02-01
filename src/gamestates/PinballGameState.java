@@ -177,6 +177,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	@Override
 	public void update(float tpf)
 	{
+		
+		// TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
+		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
+		
 		/* Actualizo el timer */
 		timer.update();
 		
@@ -195,8 +199,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
             /* Se modifico la escena, entonces actualizo el grafo */
             // TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
-            // super.update(tpf);
-            super.update(tpf * 3f);
+//            super.update(tpf * 3f);
             
             // rootNode.updateGeometricState(interpolation, true);   // se hace en el super.update esto     
         }
@@ -236,9 +239,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	protected void initSystem()
 	{
 	    // para tener en cuenta.. hace mas dinamico el asunto, pero la bola vuela mas es una gadorcha	    
-	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, -17.893f, 3.999f) );
-		
-	    
+//	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, -17.893f, 3.999f) );
+
 	    /* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
 		
@@ -362,7 +364,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText = Text.createDefaultTextLabel("messageText", message);
         messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
+        messageText.setLocalTranslation(new Vector3f(display.getWidth()/6, 5, 1));
         rootNode.attachChild(messageText);
         
         /* Aviso a la logica de juego que empieza uno */
@@ -1699,4 +1701,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
         0.050335f,0.713772f,-0.512891f,0.050335f,0.785562f,-0.534387f,0.050335f,0.851084f,
         -0.553364f,0.050335f,0.909426f,-0.569651f,0.050335f,0.959677f,-0.583074f,0.050335f
         };
+
+    
+	public Vector3f getBallStartUp() 
+	{
+		return ballStartUp;
+	}
 }
