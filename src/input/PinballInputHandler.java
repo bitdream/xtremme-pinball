@@ -8,7 +8,6 @@ import com.jme.input.KeyInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.math.FastMath;
-import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.physics.DynamicPhysicsNode;
 import components.Flipper;
@@ -259,7 +258,7 @@ public class PinballInputHandler extends FirstPersonHandler
 			if(event.getTriggerPressed())
 			{
 				// Intensidad de la fuerza a aplicar
-				float forceIntensity = 500; //90000f;
+				float forceIntensity = 150 /** game.getPinballSettings().getInclinationAngle() / 3*/; //90000f;
 				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
 				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)),
 						0.0f, /*FastMath.sign(FastMath.nextRandomInt(-1, 1)) , */
