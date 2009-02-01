@@ -4,8 +4,7 @@ import gamelogic.GameLogic;
 import input.PinballInputHandler;
 
 import java.io.FileNotFoundException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,22 +31,15 @@ import com.jme.scene.Spatial;
 import com.jme.scene.TexCoords;
 import com.jme.scene.Text;
 import com.jme.scene.TriMesh;
-import com.jme.scene.Spatial.CullHint;
 import com.jme.scene.shape.Box;
-import com.jme.scene.shape.Quad;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
-import com.jme.util.Debug;
+
 import com.jme.util.Timer;
-import com.jme.util.geom.BufferUtils;
-import com.jme.util.geom.NormalGenerator;
-import com.jme.util.stat.StatCollector;
-import com.jme.util.stat.StatType;
-import com.jme.util.stat.graph.DefColorFadeController;
-import com.jme.util.stat.graph.GraphFactory;
-import com.jme.util.stat.graph.LineGrapher;
-import com.jme.util.stat.graph.TabledLabelGrapher;
+
+
 import com.jmetest.physics.Utils;
+
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
 import com.jmex.physics.PhysicsUpdateCallback;
@@ -124,6 +116,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Mensaje al usuario */
 	private String message = "Mensaje inicial";
 	
+	private Text fpsText;
+	
 	/* Mensaje para mostrar al usuario */
 	private Text messageText;
 	
@@ -134,16 +128,16 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	protected Timer timer;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 17.5f, 3.0f, -8.0f ) /*new Vector3f( 15,15,-51 )*/ /*new Vector3f( 1, 16, -58)*/; //1, 16, -58
-	
+	private Vector3f ballStartUp = new Vector3f( 4.88f, 1.2f, -3.0f ) /*new Vector3f( 15,15,-51 )*/ /*new Vector3f( 1, 16, -58)*/; //1, 16, -58
+	//new Vector3f(-3.22f,20,-15.37485f);
 	/* Ubicacion inicial de la camara */
 	private Vector3f cameraStartUp = 
-	    new Vector3f( 0.0f, 63.0f, 16.0f ); 
+	    new Vector3f( 0.0f, 15.0f, 4.0f ); 
 //      new Vector3f(-7.8f,11.6f,-63.6f);
 //	    new Vector3f(0,50,80);
 	/* Lugar al que mira la camara incialmente */
 	private Vector3f cameraLookAt = 
-	    new Vector3f( 0.0f, 43.5f, 0.0f );
+	    new Vector3f( 0.0f, 10.875f, 0.0f );
 //     new Vector3f(-6.8f,11.6f,-62.6f);
 //	    Vector3f.ZERO;
 	    
@@ -177,15 +171,16 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	@Override
 	public void update(float tpf)
 	{
-		
 		// TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
+//		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
+
 //		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
 		
 		/* Actualizo el timer */
 		timer.update();
 		
-		if (debug)
-            StatCollector.update();
+		if (com.jme.util.Debug.debug)
+		    com.jme.util.stat.StatCollector.update();
 		
 		/* Pido al timer el tiempo transcurrido desde la ultima llamada */
 		float interpolation = timer.getTimePerFrame();
@@ -194,14 +189,19 @@ public class PinballGameState extends PhysicsEnhancedGameState
         pinballInputHandler.update(interpolation);
         if (!pause)
         {
+            super.update( tpf * 3);
             // TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
-        	super.update(tpf * 3);
+//        	super.update(tpf * 3);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
         
             /* Se modifico la escena, entonces actualizo el grafo */
             // TODO No deberiamos estar acelerando la fisica, pero bueno, aca esta la llamada, la tenemos 3 veces mas rapida.
+
+            // super.update(tpf);
+//            super.update(tpf*3);
+
             //super.update(tpf * 3f);
             
             // rootNode.updateGeometricState(interpolation, true);   // se hace en el super.update esto     
@@ -209,6 +209,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
         scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
+        fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate()/2 ) );
         
 //    	for (DynamicPhysicsNode bumper : getJumperBumpers()) 
 //    	{
@@ -241,8 +242,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	 */
 	protected void initSystem()
 	{
-	    // para tener en cuenta.. hace mas dinamico el asunto, pero la bola vuela mas es una gadorcha	    
-//	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, -17.893f, 3.999f) );
+	    // para tener en cuenta.. hace mas dinamico el asunto, pero la bola vuela mas es una gadorcha
+//	    final float g = getPhysicsSpace().getDirectionalGravity( null ).y;
+//	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, FastMath.cos( FastMath.DEG_TO_RAD * 10 ) * g, -FastMath.sin( FastMath.DEG_TO_RAD * 10 ) * g) );
 
 	    /* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
@@ -339,7 +341,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		balls = new ArrayList<DynamicPhysicsNode>(4);
 
 		/* Armo la habitacion, la mesa y la bola */
-        loadEnvironment();
+//        loadEnvironment();
         loadTable();
         setUpBall();
 		
@@ -350,7 +352,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //        gameLogic = new themes.CarsThemeGameLogic(this);
 //        buildAndAttachComponents();
 //        inclinePinball();
-//        buildLighting();
+        buildLighting();
         //-----------------------------------------
         
 		/* Actualizo el nodo raiz */
@@ -361,7 +363,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreText = Text.createDefaultTextLabel("scoreText", "Score: " + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3/4, 5, 1));
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3f/4, 5, 1));
         rootNode.attachChild(scoreText);
         
         messageText = Text.createDefaultTextLabel("messageText", message);
@@ -369,6 +371,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageText.setLocalTranslation(new Vector3f(display.getWidth()/6, 5, 1));
         rootNode.attachChild(messageText);
+        
+        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
+        fpsText.setLocalScale( 0.80f );
+        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.5f, 1));
+        rootNode.attachChild(fpsText);
         
         /* Aviso a la logica de juego que empieza uno */
         gameLogic.gameStart();
@@ -567,13 +576,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		//-----------------------------------------
 
 		/* Pongo flippers de prueba */
-		
-        IntBuffer indexBuffer = BufferUtils.createIntBuffer(RflipIndices);
-        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(RflipVertices);
-        FloatBuffer colorBuffer = BufferUtils
-                .createFloatBuffer((float[])null);
-        FloatBuffer normalBuffer = BufferUtils
-                .createFloatBuffer((float[])null);
+        java.nio.IntBuffer indexBuffer = com.jme.util.geom.BufferUtils.createIntBuffer(RflipIndices);
+        java.nio.FloatBuffer vertexBuffer = com.jme.util.geom.BufferUtils.createFloatBuffer(RflipVertices);
+        java.nio. FloatBuffer colorBuffer = com.jme.util.geom.BufferUtils.createFloatBuffer((float[])null);
+        java.nio.FloatBuffer normalBuffer = com.jme.util.geom.BufferUtils.createFloatBuffer((float[])null);
         
         float[] texCoord;
         {
@@ -639,13 +645,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
             texCoord = texCoords;
         }
-        
-        FloatBuffer texCoordBuffer = BufferUtils
+   
+        java.nio.FloatBuffer texCoordBuffer = com.jme.util.geom.BufferUtils
                 .createFloatBuffer(texCoord);
         final TriMesh rightVisualFlipper = 
             new TriMesh("Right visual flipper", vertexBuffer, normalBuffer, colorBuffer,
                 new TexCoords(texCoordBuffer), indexBuffer);
-        new NormalGenerator().generateNormals(rightVisualFlipper, 0);
+        new com.jme.util.geom.NormalGenerator().generateNormals(rightVisualFlipper, 0);
 		//final Box rightVisualFlipper = new Box("Right visual flipper", new Vector3f(), 7, 1, 2);
         
         rightVisualFlipper.getLocalRotation().fromAngleAxis(3.048941f,
@@ -1051,7 +1057,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
         rootNode.attachChild( mainBall );
 
-        final Sphere visualMainBall = new Sphere( "Bola", 25, 25, 1 );
+        final Sphere visualMainBall = new Sphere( "Bola", 10, 10, 0.25f );
         visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
 
         // Agregado de bounding volume 
@@ -1189,12 +1195,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
         return table;
     }
     
-    private boolean debug = true;
     private boolean pause = false;
+    private boolean showDepth = false;
+    private boolean showGraphs = false;
 
     protected void initDebug()
     {
-        if ( debug )
+        if ( com.jme.util.Debug.debug )
         {
             /* Assign key P to action "toggle_pause". (intento de pause) */
             //          KeyBindingManager.getKeyBindingManager().set( "toggle_pause",
@@ -1301,16 +1308,23 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //            KeyBindingManager.getKeyBindingManager().set( "toggle_stats", KeyInput.KEY_F4 );
             pinballInputHandler.addAction( new InputAction()
             {
+                 
                 public void performAction( InputActionEvent evt )
                 {
                     if ( evt.getTriggerPressed() )
                     {
                         showGraphs = !showGraphs;
-                        Debug.updateGraphs = showGraphs;
-                        labGraph.clearControllers();
-                        lineGraph.clearControllers();
-                        labGraph.addController(new DefColorFadeController(labGraph, showGraphs ? .6f : 0f, showGraphs ? .5f : -.5f));
-                        lineGraph.addController(new DefColorFadeController(lineGraph, showGraphs ? .6f : 0f, showGraphs ? .5f : -.5f));
+                        com.jmex.game.state.StatisticsGameState stats = (com.jmex.game.state.StatisticsGameState)com.jmex.game.state.GameStateManager.getInstance().getChild("stats");
+                        if (stats == null) {
+                            stats = new com.jmex.game.state.StatisticsGameState("stats", 1f, 0.25f, 0.75f, true);
+                            com.jmex.game.state.GameStateManager.getInstance().attachChild( stats );
+                        }
+
+                        if (showGraphs) {
+                            stats.setActive( true );
+                        } else {
+                            stats.setActive( false );
+                        }
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F4, InputHandler.AXIS_NONE, false );
@@ -1444,172 +1458,35 @@ public class PinballGameState extends PhysicsEnhancedGameState
             //            KeyBindingManager.getKeyBindingManager().set( "step",
             //                    KeyInput.KEY_ADD );
             // esto debería forzar el update... no creo que valga la pena
-            //            pinballInputHandler.addAction( new InputAction() {
-            //                public void performAction( InputActionEvent evt ) {
-            //                    if ( evt.getTriggerPressed() ) {
-            //                        update();
-            //                        rootNode.updateGeometricState(tpf, true);
-            //                    }
-            //                }
-            //            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ADD, InputHandler.AXIS_NONE, false );
+                        pinballInputHandler.addAction( new InputAction() {
+                            public void performAction( InputActionEvent evt ) {
+                                if ( evt.getTriggerPressed() ) {
+                                    float tpf =  timer.getTimePerFrame();
+                                    update( tpf );
+                                    rootNode.updateGeometricState(tpf, true);
+                                }
+                            }
+                        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ADD, InputHandler.AXIS_NONE, false );
             //            KeyBindingManager.getKeyBindingManager().set( "toggle_depth",
             //                KeyInput.KEY_F3 );
             // esto debería cambiar la profundidad... tampoco creo que valga la pena
-            //          pinballInputHandler.addAction( new InputAction() {
-            //              public void performAction( InputActionEvent evt ) {
-            //                  if ( evt.getTriggerPressed() ) {
-            //                      showDepth = !showDepth;
-            //                  }
-            //              }
-            //              }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F3, InputHandler.AXIS_NONE, false );
+                      pinballInputHandler.addAction( new InputAction() {
+                          public void performAction( InputActionEvent evt ) {
+                              if ( evt.getTriggerPressed() ) {
+                                  showDepth = !showDepth;
+                              }
+                          }
+                          }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F10, InputHandler.AXIS_NONE, false );
+            
+              pinballInputHandler.addAction( new InputAction() {
+                  public void performAction( InputActionEvent evt ) {
+                      if ( evt.getTriggerPressed() ) {
+                          MouseInput.get().setCursorVisible(!MouseInput.get().isCursorVisible());
+                      }
+                  }
+                  }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F11, InputHandler.AXIS_NONE, false );
+
         }
-        
-        statNode = new Node( "Stats node" );
-        statNode.setCullHint( Spatial.CullHint.Never );
-        statNode.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-
-        graphNode = new Node( "Graph node" );
-        graphNode.setCullHint( Spatial.CullHint.Never );
-        statNode.attachChild(graphNode);
-
-        setupStatGraphs();
-        setupStats();
-    }
-    
-    private TabledLabelGrapher tgrapher;
-
-//  private TimedAreaGrapher lgrapher;
-    private LineGrapher lgrapher;
-
-    private Quad lineGraph, labGraph;
-    
-    protected boolean showGraphs = false;
-    
-    /**
-     * The root node for our stats and text.
-     */
-    protected Node statNode;
-
-    /**
-     * The root node for our stats graphs.
-     */
-    protected Node graphNode;
-    
-    protected void setupStats() {
-        lgrapher.addConfig(StatType.STAT_FRAMES, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.green);
-        lgrapher.addConfig(StatType.STAT_FRAMES, LineGrapher.ConfigKeys.Stipple.name(), 0XFF0F);
-        lgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.cyan);
-        lgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        lgrapher.addConfig(StatType.STAT_QUAD_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.lightGray);
-        lgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        lgrapher.addConfig(StatType.STAT_LINE_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.red);
-        lgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        lgrapher.addConfig(StatType.STAT_GEOM_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.gray);
-        lgrapher.addConfig(StatType.STAT_GEOM_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        lgrapher.addConfig(StatType.STAT_TEXTURE_BINDS, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.orange);
-        lgrapher.addConfig(StatType.STAT_TEXTURE_BINDS, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-
-        tgrapher.addConfig(StatType.STAT_FRAMES, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_FRAMES, TabledLabelGrapher.ConfigKeys.Name.name(), "Frames/s:");
-        tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Tris:");
-        tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Quads:");
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Lines:");
-        tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        tgrapher.addConfig(StatType.STAT_GEOM_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_GEOM_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Objs:");
-        tgrapher.addConfig(StatType.STAT_GEOM_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        tgrapher.addConfig(StatType.STAT_TEXTURE_BINDS, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_TEXTURE_BINDS, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Tex binds:");
-        tgrapher.addConfig(StatType.STAT_TEXTURE_BINDS, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        
-        // If you want to try out 
-//        lgrapher.addConfig(StatType.STAT_RENDER_TIMER, TimedAreaGrapher.ConfigKeys.Color.name(), ColorRGBA.blue);
-//        lgrapher.addConfig(StatType.STAT_UNSPECIFIED_TIMER, TimedAreaGrapher.ConfigKeys.Color.name(), ColorRGBA.white);
-//        lgrapher.addConfig(StatType.STAT_STATES_TIMER, TimedAreaGrapher.ConfigKeys.Color.name(), ColorRGBA.yellow);
-//        lgrapher.addConfig(StatType.STAT_DISPLAYSWAP_TIMER, TimedAreaGrapher.ConfigKeys.Color.name(), ColorRGBA.red);
-//
-//        tgrapher.addConfig(StatType.STAT_RENDER_TIMER, TabledLabelGrapher.ConfigKeys.Decimals.name(), 2);
-//        tgrapher.addConfig(StatType.STAT_RENDER_TIMER, TabledLabelGrapher.ConfigKeys.Name.name(), "Render:");
-//      tgrapher.addConfig(StatType.STAT_RENDER_TIMER, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-//        tgrapher.addConfig(StatType.STAT_UNSPECIFIED_TIMER, TabledLabelGrapher.ConfigKeys.Decimals.name(), 2);
-//        tgrapher.addConfig(StatType.STAT_UNSPECIFIED_TIMER, TabledLabelGrapher.ConfigKeys.Name.name(), "Other:");
-//      tgrapher.addConfig(StatType.STAT_UNSPECIFIED_TIMER, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-//        tgrapher.addConfig(StatType.STAT_STATES_TIMER, TabledLabelGrapher.ConfigKeys.Decimals.name(), 2);
-//        tgrapher.addConfig(StatType.STAT_STATES_TIMER, TabledLabelGrapher.ConfigKeys.Name.name(), "States:");
-//      tgrapher.addConfig(StatType.STAT_STATES_TIMER, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-//        tgrapher.addConfig(StatType.STAT_DISPLAYSWAP_TIMER, TabledLabelGrapher.ConfigKeys.Decimals.name(), 2);
-//        tgrapher.addConfig(StatType.STAT_DISPLAYSWAP_TIMER, TabledLabelGrapher.ConfigKeys.Name.name(), "DisplaySwap:");
-//      tgrapher.addConfig(StatType.STAT_DISPLAYSWAP_TIMER, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-//
-//        StatCollector.addTimedStat(StatType.STAT_RENDER_TIMER);
-//        StatCollector.addTimedStat(StatType.STAT_STATES_TIMER);
-//        StatCollector.addTimedStat(StatType.STAT_UNSPECIFIED_TIMER);
-//        StatCollector.addTimedStat(StatType.STAT_DISPLAYSWAP_TIMER);
-    }
-    
-    /**
-     * Set up the graphers we will use and the quads we'll show the stats on.
-     *
-     */
-    protected void setupStatGraphs() {
-        StatCollector.setSampleRate(1000L);
-        StatCollector.setMaxSamples(40);
-
-        lineGraph = new Quad("lineGraph", display.getWidth(), display.getHeight()*.75f) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public void draw(Renderer r) {
-                StatCollector.pause();
-                super.draw(r);
-                StatCollector.resume();
-            }
-        };
-        lgrapher = GraphFactory.makeLineGraph((int)(lineGraph.getWidth()+.5f), (int)(lineGraph.getHeight()+.5f), lineGraph);
-//      lgrapher = GraphFactory.makeTimedGraph((int)(lineGraph.getWidth()+.5f), (int)(lineGraph.getHeight()+.5f), lineGraph);
-        lineGraph.setLocalTranslation((display.getWidth()*.5f), (display.getHeight()*.625f),0);
-        lineGraph.setCullHint(CullHint.Always);
-        lineGraph.getDefaultColor().a = 0;
-        graphNode.attachChild(lineGraph);
-        
-        Text f4Hint = new Text("f4", "F4 - toggle stats") {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public void draw(Renderer r) {
-                StatCollector.pause();
-                super.draw(r);
-                StatCollector.resume();
-            }
-        };
-        f4Hint.setCullHint( Spatial.CullHint.Never );
-        f4Hint.setRenderState( Text.getDefaultFontTextureState() );
-        f4Hint.setRenderState( Text.getFontBlend() );
-        f4Hint.setLocalScale(.8f);
-        f4Hint.setTextColor(ColorRGBA.gray);
-        f4Hint.setLocalTranslation(display.getRenderer().getWidth() - f4Hint.getWidth() - 15, display.getRenderer().getHeight() - f4Hint.getHeight() - 10, 0);
-        graphNode.attachChild(f4Hint);
-
-        labGraph = new Quad("labelGraph", display.getWidth(), display.getHeight()*.25f) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public void draw(Renderer r) {
-                StatCollector.pause();
-                super.draw(r);
-                StatCollector.resume();
-            }
-        };
-        tgrapher = GraphFactory.makeTabledLabelGraph((int)(labGraph.getWidth()+.5f), (int)(labGraph.getHeight()+.5f), labGraph);
-        tgrapher.setColumns(2);
-        tgrapher.setMinimalBackground(false);
-        tgrapher.linkTo(lgrapher);
-        labGraph.setLocalTranslation((display.getWidth()*.5f), (display.getHeight()*.125f),0);
-        labGraph.setCullHint(CullHint.Always);
-        labGraph.getDefaultColor().a = 0;
-        graphNode.attachChild(labGraph);
         
     }
     
