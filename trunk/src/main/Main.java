@@ -102,7 +102,6 @@ public class Main
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(pinballGS);
-		pinballGS.setActive(false);
 		
 		pinballGS.getRootNode().updateRenderState();
 		
