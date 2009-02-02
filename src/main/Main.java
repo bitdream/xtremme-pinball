@@ -1,5 +1,7 @@
 package main;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +41,9 @@ public class Main
 	    }
 		/* Logueos severos desde el root logger */
 		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		/* TODO Carga de bibliotecas nativas */
+		//loadNativeLibraries();
 		
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
@@ -173,4 +178,51 @@ public class Main
 	{
 		return audio;
 	}
+	
+	// TODO Utilizar para cargar las bibliotecas nativas desde el codigo (en vez de desde Eclipse)
+	private static final void loadNativeLibraries()
+	{
+        try
+        {
+        	addDir("lib/ode/native");
+        } catch (IOException e)
+        {
+        	System.err.println("No se pudo cargar las bibliotecas dinamicas.");
+        	e.printStackTrace(System.err);
+        }
+	}
+
+	private static void addDir(String s) throws IOException
+	{
+	    try
+	    {
+	    	Field field = ClassLoader.class.getDeclaredField("usr_paths");
+	    	
+	        field.setAccessible(true);
+	        
+	        String[] paths = (String[])field.get(null);
+	        
+	        for (int i = 0; i < paths.length; i++)
+	        {
+	        	if (s.equals(paths[i]))
+	        	{
+	        		return;
+	        	}
+	        }
+	        
+			String[] tmp = new String[paths.length+1];
+			
+			System.arraycopy(paths, 0, tmp, 0, paths.length);
+			tmp[paths.length] = s;
+			
+			field.set(null,tmp);
+			
+		} catch (IllegalAccessException e)
+		{
+			throw new IOException("Se produjo un fallo al obtener los permisos para definir el library path.");
+		} catch (NoSuchFieldException e)
+		{
+			throw new IOException("Se produjo un fallo al obtener el manejador del campo para definir el library path.");
+		}
+    }
 }

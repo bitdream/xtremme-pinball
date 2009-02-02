@@ -136,16 +136,17 @@ public class LoadingGameState extends BasicGameState
 						e.printStackTrace();
 					}
 				}*/
+		        
+		        /* Atacheo los resultados */
                 pinballGS.getRootNode().attachChild(threadRoom.getScene());    
                 pinballGS.getRootNode().attachChild(threadMachine.getScene());
-                
                 pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(threadTable.getScene()));
+                
 				/* Termino de cargar, cierro la ventana y destruyo el loadinggamestate */
 				progressInfo.close();
 				Main.endLoading();
 				
 				/* Ya se cargo la escena en el pinball creado. Ahora lo inicio. */
-				
 				pinballGS.setGameLogic(threadTable.getTheme());
 				pinballGS.initGame();
 				pinballGS.setActive(true);
