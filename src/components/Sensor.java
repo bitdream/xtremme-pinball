@@ -23,7 +23,7 @@ private static final long serialVersionUID = 1L;
 	/* Tipos de sensor */
 	public enum SensorType {RAMP_SENSOR, LOST_BALL_SENSOR};
 	
-   /* Tipo de SENSOR */
+   /* Tipo de este sensor */
 	private SensorType sensorType;
 	
 	/* Pinball en el que esta */
