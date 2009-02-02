@@ -2,10 +2,15 @@ package gamestates;
 
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
+import com.jme.math.*;
 
 public class PinballGameStateSettings
 {
-	private static float camMoveSpeedDefault = 50, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 8.0f;
+	private static float camMoveSpeedDefault = 15f, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 8.0f;
+	
+	private static Vector3f camStartPosDefault = new Vector3f(0.0f, 15.0f, 9.0f), camStartLookAtDefault = new Vector3f(0.0f, 8.5f, 0.0f); 
+	
+	private Vector3f camStartPos, camStartLookAt;
 	
 	private float camMoveSpeed, camTurnSpeed;
 	
@@ -24,6 +29,8 @@ public class PinballGameStateSettings
 		camMoveSpeed = camMoveSpeedDefault;
 		camTurnSpeed = camTurnSpeedDefault;
 		inclinationAngle = inclinationAngleDefault;
+		camStartLookAt = camStartLookAtDefault;
+		camStartPos = camStartPosDefault;
 		
 		inclinationQuaternion = new Quaternion();
 		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, 0f, 0f);
@@ -89,7 +96,27 @@ public class PinballGameStateSettings
 		this.freq = freq;
 	}
 
-	public boolean isFullscreen()
+	public Vector3f getCamStartPos()
+    {
+        return new Vector3f( camStartPos );
+    }
+
+    public void setCamStartPos( Vector3f camStartPos )
+    {
+        this.camStartPos = camStartPos;
+    }
+
+    public Vector3f getCamStartLookAt()
+    {
+        return new Vector3f( camStartLookAt );
+    }
+
+    public void setCamStartLookAt( Vector3f camStartLookAt )
+    {
+        this.camStartLookAt = camStartLookAt;
+    }
+
+    public boolean isFullscreen()
 	{
 		return fullscreen;
 	}
