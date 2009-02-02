@@ -16,10 +16,18 @@ import components.Spinner;
 
 public abstract class GameLogic
 {
+	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	protected static int MAX_BALLS = 3;
+	
 	protected int score;
 	
 	protected int lifes = 3;
+	
+	// Texto a mostrar al usuario como encabezado de los puntos que tiene
+	protected String scoreText = "Score: ";
+	
+	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
+	protected String ballsText = "Balls: ";	
 	
 	protected PinballGameState pinball;
 	
@@ -47,11 +55,19 @@ public abstract class GameLogic
 	
 	public void showScore()
 	{
+		// TODO Esta logica es temporal!
 		pinball.setScore(score);
-		if ((score == 20 || score == 60 )&& pinball.getBalls().size() < MAX_BALLS)
+		if ((score == 20 || score == 25 )&& pinball.getBalls().size() < MAX_BALLS)
 		{
-			pinball.addBall(/*pinball.getBallStartUp()*/ new Vector3f(-0.6277902f, /*3.686752f*/ 5f, -19.233984f)); //TODO
-			System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
+			pinball.addBall(pinball.getExtraBallStartUp());
+			
+			showExtraBallMessage();
+
+			// TODO sonido de bola extra, por ahora puse este
+			tiltAbuseSound.play();
+			
+			// debug
+			//System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
 		}
 	}
 	
@@ -148,23 +164,27 @@ public abstract class GameLogic
 	// Invocado cuando se pierde una bola
 	public void lostBall(DynamicPhysicsNode ball)
 	{
-		if (getInTableBallQty() == 1) // Era la ultima bola, debe perser una vida
+		// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
+		pinball.getBalls().remove(ball);
+		pinball.getRootNode().detachChild(ball);
+		
+		if (getInTableBallQty() == 0) // Era la ultima bola, debe perder una vida
 		{		
-			// Para que se pueda overridear desde el theme deberia crear un metodo que haga el play de este sonido
-			playLostLastBallSound();
-			
 			// Bajar la cantidad de vidas y actualizarlas en pantalla
 			lifes--;
+			
+			// Actualizar el cartel con las vidas y mostrarlo al usuario
 			showLifes();
-
-			// Si aun queda alguna vida, reposicionar la bola
+			
+			// Si aun queda alguna vida, reponer la bola en el plunger
 			if (lifes > 0)
 			{
-				// Reubicar la bola en el plunger
-				ball.clearDynamics();
-				ball.setLocalTranslation( new Vector3f(Vector3f.ZERO) );
-	            ball.setLocalRotation( new Quaternion() );
-	            ball.updateGeometricState( 0, false );
+				// Para que se pueda overridear desde el theme
+				playLostLastBallSound();
+				
+				// Nueva bola desde la posicion del plunger
+				pinball.addBall(pinball.getBallStartUp());
+
 			}
 			else
 			{
@@ -174,20 +194,14 @@ public abstract class GameLogic
 		else // Todavia le quedan bolas en la mesa
 		{			
 			playLostBallSound();
-			
-			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
-			pinball.getBalls().remove(ball);
-			pinball.getRootNode().detachChild(ball);
 		}
-		
-		System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
 	}
 	
 	public void lostGame(DynamicPhysicsNode ball)
 	{
 		// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
-		pinball.getBalls().remove(ball);
-		pinball.getRootNode().detachChild(ball);
+//		pinball.getBalls().remove(ball);
+//		pinball.getRootNode().detachChild(ball);
 
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
@@ -195,19 +209,17 @@ public abstract class GameLogic
 			((Flipper)flipper.getChild(0)).setActive(false);
 		}
 		
-		//TODO agregar sonido
-		
 		showMessage("Game over");
 	}
 	
 	public void playLostLastBallSound()
 	{
-		// TODO poner sonido de perder default;
+		// TODO poner sonido de perder default -> no habra sonido default
 	}
 	
 	public void playLostBallSound()
 	{
-		// TODO poner sonido de perder default;
+		// TODO poner sonido de perder default -> no habra sonido default
 	}
 	
 	// Invocado cuando comienza el juego
@@ -218,4 +230,20 @@ public abstract class GameLogic
 	
 	// Invocado cuando se va del juego momentaneamente
 	public abstract void leaveGame();
+	
+	
+	public String getScoreText()
+	{
+		return scoreText;
+	}
+	
+	public String getBallsText()
+	{
+		return ballsText;
+	}
+	
+	public void showExtraBallMessage()
+	{
+		showMessage("Extra ball!!!");
+	}
 }

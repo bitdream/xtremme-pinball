@@ -100,6 +100,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Texto con el score para mostrar al usuario */
 	private Text scoreText;
 	
+	/* Texto con la cantidad de bolas restantes, para mostrar al usuario */
+	private Text ballsRemainingText;
+	
 	/* Mensaje al usuario */
 	private String message = "";
 	
@@ -119,6 +122,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/*new Vector3f( 15,15,-51 )*/ 
 	/*new Vector3f( 1, 16, -58)*/
 	/*new Vector3f(-3.22f,20,-15.37485f)*/
+	
+	/* XXX Bola extra que sale rodando por la rampa */
+	private Vector3f extraBallStartUp = new Vector3f(-0.6277902f, 5f, -19.233984f);
 	    
 	/**
 	 * Crea un estado de juego nuevo.
@@ -178,7 +184,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         }
         
         /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
-        scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score + "  " + "Balls: " + lifes);
+        scoreText.getText().replace(0, scoreText.getText().length(), gameLogic.getScoreText() + score);
+        ballsRemainingText.getText().replace(0, ballsRemainingText.getText().length(), gameLogic.getBallsText() + lifes);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
         fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate()/2 ) );
         
@@ -329,16 +336,25 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		rootNode.updateRenderState();
 		
 		// Cateles con el puntaje y los mensajes al usuario
-        scoreText = Text.createDefaultTextLabel("scoreText", "Score: " + String.valueOf(score));
+        scoreText = Text.createDefaultTextLabel("scoreText", gameLogic.getScoreText() + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3f/4.5f, 5, 1));
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth() * 3f/4f, 20, 1));
+        scoreText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(scoreText);
+        
+        ballsRemainingText = Text.createDefaultTextLabel("ballsRemainingText", gameLogic.getBallsText() + String.valueOf(lifes));
+        ballsRemainingText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        ballsRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        ballsRemainingText.setLocalTranslation(new Vector3f(display.getWidth() * 3f/4f, 35, 1));
+        ballsRemainingText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
+        rootNode.attachChild(ballsRemainingText);
         
         messageText = Text.createDefaultTextLabel("messageText", message);
         messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        messageText.setLocalTranslation(new Vector3f(display.getWidth()/6, 5, 1));
+        messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
+        messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(messageText);
         
         /* Aviso a la logica de juego que empieza uno */
@@ -532,6 +548,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
     {
         return ballStartUp;
     }
+	
+	public Vector3f getExtraBallStartUp() 
+	{
+		return extraBallStartUp;
+	}
     
     public LightState getLightState()
     {

@@ -3,11 +3,9 @@ package themes;
 import main.Main;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
-import com.jmex.physics.StaticPhysicsNode;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
-import components.Magnet;
 import components.Plunger;
 import components.Spinner;
 import gamelogic.GameLogic;
@@ -17,6 +15,12 @@ public class CarsThemeGameLogic extends GameLogic
 {
 	private static final int bumperScore = 10, spinnerScore = 5, rampScore = 100;
 	
+	// Texto a mostrar al usuario como encabezado de los puntos que tiene
+	protected String scoreText = "Distance: ";
+	
+	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
+	protected String ballsText = "Fuel: ";	
+		
 	private int bumperCollisionCnt = 0;
 	
 	// Cantidad de veces que paso por la rampa
@@ -30,8 +34,6 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		/* Preparo las pistas de audio que voy a usar */
 		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
-
-		//TODO deberian ir al de autos
 		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-ball.wav"), false);
 		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
 		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/start.wav"), false);
@@ -56,19 +58,17 @@ public class CarsThemeGameLogic extends GameLogic
 			showScore();
 			bumperCollisionCnt ++;
 			
-			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo! TODO
-			if (bumperCollisionCnt > 5)
-			{
-				//bumper.setActive(false);
-				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-				{
-					Magnet m = (Magnet)magnet.getChild(0);
-					m.setActive(false);
-				}
-			}
+			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo!
+//			if (bumperCollisionCnt > 5)
+//			{
+//				//bumper.setActive(false);
+//				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+//				{
+//					Magnet m = (Magnet)magnet.getChild(0);
+//					m.setActive(false);
+//				}
+//			}
 		}
-		
-		//TODO agregando en cada instancia de bumper un cnt de colisiones puedo dar bonus por X colisiones contra el mismo bumper.
 	}
 
 	@Override
@@ -113,15 +113,14 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		// TODO debug
 		showMessage("Paso por rampa N: " + String.valueOf(rampCnt));
-		
-		//TODO aumentar ptos por pasaje de rampa y armar secuencias ...blablabla
+
 	}
 
 	@Override
 	public void tilt()
 	{
 		super.tilt();
-		showMessage("Tilt, don't abuse!");
+		showMessage("Tilt, don't abuse!!!");
 	}
 	
 	@Override
@@ -130,7 +129,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.abuseTilt();
 		
 		// Imprimir en pantalla un cartel que avise el abuso de tilts 
-		showMessage("Too much tilt, flippers disabled!");
+		showMessage("Too much tilt, flippers disabled!!!");
 		
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
@@ -142,9 +141,10 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void lostBall(DynamicPhysicsNode ball)
 	{
-		
 		// Muestro el mensaje de este theme
-		showMessage("Lost ball");
+		showMessage("Crash, be careful!!!");
+		
+		//TODO ver si se perdio una bola que baja la vida y resetear contadores de rampa, etc!
 
 		super.lostBall(ball);
 
@@ -176,7 +176,7 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void gameStart()
 	{
-		showMessage("Gentlemen, start your engines!!!");	
+		showMessage("Start your engines!!!");	
 		
 		gameStartSound.play();
 	}
@@ -197,5 +197,23 @@ public class CarsThemeGameLogic extends GameLogic
 		audio.getMusicQueue().clearTracks();
 		
 		// TODO hacer fadeout!
+	}
+	
+	@Override	
+	public String getScoreText()
+	{
+		return scoreText;
+	}
+	
+	@Override	
+	public String getBallsText()
+	{
+		return ballsText;
+	}
+	
+	@Override
+	public void showExtraBallMessage()
+	{
+		showMessage("Best lap, extra ball!!!");
 	}
 }
