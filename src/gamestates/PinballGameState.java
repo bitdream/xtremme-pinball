@@ -94,6 +94,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Score del juego */
 	private int score = 0;
 	
+	/* Vidas que quedan */
+	private int lifes;
+	
 	/* Texto con el score para mostrar al usuario */
 	private Text scoreText;
 	
@@ -175,7 +178,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         }
         
         /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
-        scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score);
+        scoreText.getText().replace(0, scoreText.getText().length(), "Score: " + score + "  " + "Balls: " + lifes);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
         fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate()/2 ) );
         
@@ -300,6 +303,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //        loadEnvironment();
 //        loadTable();
         setUpBall();
+        
+        // Inicializo las vidas
+        lifes = gameLogic.getLifes();
 		
         
 		// ----------------------------------------
@@ -325,7 +331,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreText = Text.createDefaultTextLabel("scoreText", "Score: " + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3f/4, 5, 1));
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth()* 3f/4.5f, 5, 1));
         rootNode.attachChild(scoreText);
         
         messageText = Text.createDefaultTextLabel("messageText", message);
@@ -499,6 +505,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	{
 		this.score = score;
 	}
+	
+	public void setLifes(int lifes)
+	{
+		this.lifes = lifes;
+	}
 
 	public void setMessage(String message)
 	{
@@ -530,14 +541,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         this.gameLogic = gameLogic;
     }
     
-    public void setLifes( int lifes )
-    {
-        // FIXME sorry no me compilaba y puse esto
-        System.out.println("ERROR: linea 535 en pinball");
-    }
-    
-	
-	private void setUpBall()
+    private void setUpBall()
 	{
 	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
 /* TODO ojo, aca comento esto porque quiero probar solo con IRON
