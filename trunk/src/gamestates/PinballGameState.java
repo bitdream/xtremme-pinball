@@ -165,7 +165,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         {
             /* Se modifico la escena, entonces actualizo el grafo */
          // super.update(tpf);
-        	super.update(tpf * /*3*/ 1);
+        	super.update(tpf * /*3*/ 3);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
