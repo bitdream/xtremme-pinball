@@ -20,9 +20,9 @@ public class CarsThemeGameLogic extends GameLogic
 	private int bumperCollisionCnt = 0;
 	
 	// Cantidad de veces que paso por la rampa
-	private int rampPassedCnt = 0;	
+	private int rampCnt = 0;	
 	
-	private AudioTrack rampUpSound, music, startingSound, endingSound;
+	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, gameStartSound,gameOverSound,  music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
@@ -30,9 +30,13 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		/* Preparo las pistas de audio que voy a usar */
 		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
-		startingSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/start.wav"), false);
-		endingSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/end.wav"), false);
-		
+
+		//TODO deberian ir al de autos
+		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-ball.wav"), false);
+		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/start.wav"), false);
+		gameOverSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/end.wav"), false);
+
 		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
 		music.setLooping(true);
@@ -96,15 +100,19 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	public void sensorRampCollision()
 	{
-		super.sensorRampCollision();
+		// No quiero el sonido default
+		// super.sensorRampCollision();
+		
+		rampUpSound.play();
 
 		score += rampScore;
 		
 		// Se actualizan los datos de pantalla de usuario
 		showScore();
-		rampPassedCnt++;
+		rampCnt++;
 		
-		showMessage("Paso por rampa N: " + String.valueOf(rampPassedCnt));
+		// TODO debug
+		showMessage("Paso por rampa N: " + String.valueOf(rampCnt));
 		
 		//TODO aumentar ptos por pasaje de rampa y armar secuencias ...blablabla
 	}
@@ -113,7 +121,7 @@ public class CarsThemeGameLogic extends GameLogic
 	public void tilt()
 	{
 		super.tilt();
-		showMessage("Tilt, no abuse!!");
+		showMessage("Tilt, don't abuse!");
 	}
 	
 	@Override
@@ -122,7 +130,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.abuseTilt();
 		
 		// Imprimir en pantalla un cartel que avise el abuso de tilts 
-		showMessage("Tilt, flippers deshabilitados!");
+		showMessage("Too much tilt, flippers disabled!");
 		
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
@@ -136,10 +144,22 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		
 		// Muestro el mensaje de este theme
-		showMessage("Bola perdida");
+		showMessage("Lost ball");
 
 		super.lostBall(ball);
 
+	}
+	
+	@Override	
+	public void playLostLastBallSound()
+	{
+		lostLastBallSound.play();
+	}
+	
+	@Override	
+	public void playLostBallSound()
+	{
+		lostBallSound.play();
 	}
 	
 	@Override
@@ -148,13 +168,17 @@ public class CarsThemeGameLogic extends GameLogic
 		super.lostGame(ball);
 		
 		// Mensaje propio de este theme, debe imprimirse luego del default (impreso por super.lostGame())
-		showMessage("Carrera terminada...");
+		showMessage("Race over...");
+		
+		gameOverSound.play();
 	}
 
 	@Override
 	public void gameStart()
 	{
-		showMessage("Gentlemen, start your engines!!!");		
+		showMessage("Gentlemen, start your engines!!!");	
+		
+		gameStartSound.play();
 	}
 
 	@Override

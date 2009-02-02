@@ -9,8 +9,8 @@ import com.jme.util.geom.Debugger;
 import com.jmex.physics.PhysicsDebugger;
 
 
-public class PhysicsEnhancedGameState extends //com.jmex.physics.util.states.PhysicsGameState
-PhysicsMultithreadedGameState
+public class PhysicsEnhancedGameState extends com.jmex.physics.util.states.PhysicsGameState
+//PhysicsMultithreadedGameState
 {
     protected WireframeState wireState;
     
@@ -24,8 +24,8 @@ PhysicsMultithreadedGameState
 	
 	public PhysicsEnhancedGameState(String name)
 	{
-		super(name, 100, game);
-	    //super(name);
+//		super(name, 100, game);
+	    super(name);
 	        
 		display = DisplaySystem.getDisplaySystem();
 		
@@ -72,16 +72,16 @@ PhysicsMultithreadedGameState
         }
     }
     
-    @Override
-    public void setActive( boolean active )
-    {
-        super.setActive( active );
-        setPhysicsEnabled( active );
-    }
-    
-    @Override
-    public void cleanup ()
-    {
-        super.delete();
-    }
+//    @Override
+//    public void setActive( boolean active )
+//    {
+//        super.setActive( active );
+//        setPhysicsEnabled( active );
+//    }
+//    
+//    @Override
+//    public void cleanup ()
+//    {
+//        super.delete();
+//    }
 }
