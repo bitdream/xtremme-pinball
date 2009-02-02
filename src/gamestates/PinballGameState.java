@@ -34,6 +34,7 @@ import com.jme.scene.TriMesh;
 import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
+import com.jme.scene.state.LightState;
 
 import com.jme.util.Timer;
 
@@ -73,9 +74,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
-    
-	/* Nodos de habitacion y maquina, cargados solo una vez */
-	private static Node roomNode = null, machineNode = null;
     
 	/* InputHandler para el pinball */
 	private PinballInputHandler pinballInputHandler;
@@ -161,11 +159,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Adquiero el timer para calcular los FPS */
 		timer = Timer.getTimer();
 		
+		/* Borro todas las luces default */
+        lightState.detachAll();
+		
 		/* Inicializo la camara, el display y los handlers de input */
 		initSystem();
-		
-		/* Inicializo el juego en si */
-		initGame();
 	}
 		
 	/**
@@ -299,23 +297,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
             {
             }
         });
-		initDebug();
-	}
-
-	/**
-	 * Inicializar la escena
-	 */
-	protected void initGame()
-	{
-		/* Preparo la orientacion del sistema de audio */
-		Main.getAudioSystem().getEar().trackOrientation(getCamera());
-		Main.getAudioSystem().getEar().trackPosition(getCamera());
 		
-	    /* Optimizacion - aplico culling a todos los nodos */
-        CullState cs = display.getRenderer().createCullState();
-        cs.setCullFace(CullState.Face.Back);
-        rootNode.setRenderState(cs);
-
 		/* Creo la lista de flippers */
 		flippers = new ArrayList<DynamicPhysicsNode>(4);
 		
@@ -339,10 +321,27 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Creo la lista de bolas */
 		balls = new ArrayList<DynamicPhysicsNode>(4);
+		
+		initDebug();
+	}
+
+	/**
+	 * Inicializar la escena
+	 */
+	public void initGame()
+	{
+		/* Preparo la orientacion del sistema de audio */
+		Main.getAudioSystem().getEar().trackOrientation(getCamera());
+		Main.getAudioSystem().getEar().trackPosition(getCamera());
+		
+	    /* Optimizacion - aplico culling a todos los nodos */
+        CullState cs = display.getRenderer().createCullState();
+        cs.setCullFace(CullState.Face.Back);
+        rootNode.setRenderState(cs);
 
 		/* Armo la habitacion, la mesa y la bola */
 //        loadEnvironment();
-        loadTable();
+//        loadTable();
         setUpBall();
 		
         
@@ -352,7 +351,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //        gameLogic = new themes.CarsThemeGameLogic(this);
 //        buildAndAttachComponents();
 //        inclinePinball();
-        buildLighting();
+//        buildLighting();
         //-----------------------------------------
         
 		/* Actualizo el nodo raiz */
@@ -383,17 +382,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         gameLogic.gameStart();
 	}
 	
-	private void buildLighting()
-	{
-		PointLight light = new PointLight();
-		light.setDiffuse( new ColorRGBA( 0.75f, 0.75f, 0.75f, 0.75f ) );
-	    light.setAmbient( new ColorRGBA( 0.5f, 0.5f, 0.5f, 1.0f ) );
-	    light.setLocation( new Vector3f( 100, 100, 100 ) );
-	    light.setEnabled( true );
-	    
-	    lightState.attach( light );
-	}
-	
 	private void updateComponents(float interpolation)
 	{
 		/* Flippers */
@@ -413,7 +401,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		}
 	}
 
-	private void inclinePinball()
+	public void inclinePinball()
 	{
 		/* Se rota toda la mesa y sus componentes en el eje X */
 		rootNode.setLocalRotation(getPinballSettings().getInclinationQuaternion());
@@ -472,121 +460,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		KeyInput.destroyIfInitalized();
 	}
 	
-	public DynamicPhysicsNode getPlunger()
-	{
-		return plunger;
-	}
-	
-	public List<DynamicPhysicsNode> getFlippers()
-	{
-		return flippers;
-	}
-	
-	public List<DynamicPhysicsNode> getJumperBumpers() 
-	{
-		return jumperBumpers;
-	}
-	
-	public List<StaticPhysicsNode> getNoJumperBumpers() 
-	{
-		return noJumperBumpers;
-	}
-	
-	public List<DynamicPhysicsNode> getDoors() 
-	{
-		return doors;
-	}
-	
-	public List<DynamicPhysicsNode> getSpinners() 
-	{
-		return spinners;
-	}
-	
-	public List<StaticPhysicsNode> getSensors() 
-	{
-		return sensors;
-	}
-	
-	public List<StaticPhysicsNode> getMagnets()
-	{
-		return magnets;
-	}
-	
-	public PinballGameStateSettings getPinballSettings()
-	{
-		return pinballSettings;
-	}
-	
-	public Camera getCamera()
-	{
-		return cam;
-	}
-
-	public PinballInputHandler getPinballInputHandler()
-	{
-		return pinballInputHandler;
-	}
-	
-	public void addJumperBumper(DynamicPhysicsNode bumper)
-	{
-		jumperBumpers.add(bumper);
-	}
-	
-	public void addNoJumperBumper(StaticPhysicsNode bumper)
-	{
-		noJumperBumpers.add(bumper);
-	}
-	
-	public void addMagnet(StaticPhysicsNode magnet)
-	{
-		magnets.add(magnet);
-	}
-
-	public void setPlunger(DynamicPhysicsNode plunger)
-	{
-		this.plunger = plunger;
-	}
-	
-	public void addDoor(DynamicPhysicsNode door)
-	{
-		doors.add(door);
-	}
-	
-	public void addFlipper(DynamicPhysicsNode flipper)
-	{
-		flippers.add(flipper);
-	}
-	
-	public void addSpinner(DynamicPhysicsNode spinner)
-	{
-		spinners.add(spinner);
-	}
-	
-	public void addSensor(StaticPhysicsNode sensor)
-	{
-		sensors.add(sensor);
-	}
-
-	public void setScore(int score)
-	{
-		this.score = score;
-	}
-
-	public void setMessage(String message)
-	{
-		this.message = message;
-	}
-
-	public GameLogic getGameLogic()
-	{
-		return gameLogic;
-	}
-	
-	public List<DynamicPhysicsNode> getBalls()
-	{
-		return balls;
-	}
-	
 	private void setUpBall()
 	{
 	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
@@ -625,92 +498,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         // La agrego a la lista de bolas
         balls.add( mainBall );
 	}
-	
-	private void loadEnvironment()
-    {
-        /* Iluminacion */
-
-        /* borramos todas las luces default */
-        lightState.detachAll();
-
-        /* X3D */
-
-        X3DLoader loader;
-        /* cargamos y attacheamos la habitacion */
-        try
-        {
-            loader = new X3DLoader( X3DLoader.class.getClassLoader().getResource("resources/models/Room.x3d") );
-
-            /* agregamos la fisica */
-            loader.setPinball( this );
-
-            /* agregamos el lightState */
-            loader.setLightState( lightState );
-
-            Node room = loader.loadScene();
-            
-            /* cargamos y attacheamos la habitacion */
-            rootNode.attachChild( room );
-        }
-        catch ( FileNotFoundException e )
-        {
-            e.printStackTrace();
-        }
-        
-        /* cargamos y attacheamos la maquina */
-        try
-        {
-            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource("resources/models/Machine.x3d" ) );
-
-            /* agregamos la fisica */
-            loader.setPinball( this );
-
-            /* agregamos el lightState */
-            loader.setLightState( lightState );
-
-            Spatial machine = loader.loadScene();
-
-            /* cargamos y attacheamos la maquina */
-            rootNode.attachChild( machine );
-        }
-        catch ( FileNotFoundException e )
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    private void loadTable()
-    {
-        X3DLoader loader;
-
-        /* cargamos y attacheamos la mesa */
-        try
-        {
-            //XXX nombre tabla
-            loader = new X3DLoader(  X3DLoader.class.getClassLoader().getResource( "resources/models/Table.x3d" ) );
-
-            /* agregamos la fisica */
-            loader.setPinball( this );
-
-            /* agregamos el lightState */
-            loader.setLightState( lightState );
-
-            tabla = loader.loadScene();
-
-            tabla = inclinePinball( tabla );
-            
-            /* cargamos y attacheamos la tabla */
-            rootNode.attachChild( tabla );
-            
-            this.gameLogic = loader.getTheme(this);
-            
-        }
-        catch ( FileNotFoundException e )
-        {
-            e.printStackTrace();
-        }
-        
-    }
     
     private Node inclinePinball( Node table )
     {
@@ -1138,5 +925,130 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public Vector3f getBallStartUp() 
 	{
 		return ballStartUp;
+	}
+	
+	public DynamicPhysicsNode getPlunger()
+	{
+		return plunger;
+	}
+	
+	public List<DynamicPhysicsNode> getFlippers()
+	{
+		return flippers;
+	}
+	
+	public List<DynamicPhysicsNode> getJumperBumpers() 
+	{
+		return jumperBumpers;
+	}
+	
+	public List<StaticPhysicsNode> getNoJumperBumpers() 
+	{
+		return noJumperBumpers;
+	}
+	
+	public List<DynamicPhysicsNode> getDoors() 
+	{
+		return doors;
+	}
+	
+	public List<DynamicPhysicsNode> getSpinners() 
+	{
+		return spinners;
+	}
+	
+	public List<StaticPhysicsNode> getSensors() 
+	{
+		return sensors;
+	}
+	
+	public List<StaticPhysicsNode> getMagnets()
+	{
+		return magnets;
+	}
+	
+	public PinballGameStateSettings getPinballSettings()
+	{
+		return pinballSettings;
+	}
+	
+	public Camera getCamera()
+	{
+		return cam;
+	}
+	
+	public LightState getLightState()
+	{
+		return lightState;
+	}
+
+	public PinballInputHandler getPinballInputHandler()
+	{
+		return pinballInputHandler;
+	}
+	
+	public void addJumperBumper(DynamicPhysicsNode bumper)
+	{
+		jumperBumpers.add(bumper);
+	}
+	
+	public void addNoJumperBumper(StaticPhysicsNode bumper)
+	{
+		noJumperBumpers.add(bumper);
+	}
+	
+	public void addMagnet(StaticPhysicsNode magnet)
+	{
+		magnets.add(magnet);
+	}
+
+	public void setPlunger(DynamicPhysicsNode plunger)
+	{
+		this.plunger = plunger;
+	}
+	
+	public void addDoor(DynamicPhysicsNode door)
+	{
+		doors.add(door);
+	}
+	
+	public void addFlipper(DynamicPhysicsNode flipper)
+	{
+		flippers.add(flipper);
+	}
+	
+	public void addSpinner(DynamicPhysicsNode spinner)
+	{
+		spinners.add(spinner);
+	}
+	
+	public void addSensor(StaticPhysicsNode sensor)
+	{
+		sensors.add(sensor);
+	}
+
+	public void setScore(int score)
+	{
+		this.score = score;
+	}
+
+	public void setMessage(String message)
+	{
+		this.message = message;
+	}
+
+	public GameLogic getGameLogic()
+	{
+		return gameLogic;
+	}
+	
+	public List<DynamicPhysicsNode> getBalls()
+	{
+		return balls;
+	}
+
+	public void setGameLogic(GameLogic gameLogic)
+	{
+		this.gameLogic = gameLogic;
 	}
 }

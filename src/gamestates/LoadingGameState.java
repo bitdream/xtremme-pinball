@@ -4,8 +4,7 @@ import java.net.URL;
 
 import input.FengJMEInputHandler;
 
-//import loader.LoaderThread;
-//import loader.X3DLoaderTest.LoadThread;
+import loader.LoaderThread;
 import main.Main;
 
 import org.fenggui.Display;
@@ -39,6 +38,9 @@ public class LoadingGameState extends BasicGameState
 
 	/* Angulo de inclinacion requerido para el juego a crear */
 	private float inclinationAngle;
+
+	/* Recurso de la mesa */
+	private URL tableResource;
 	
 
 	public LoadingGameState(String name, float inclinationAngle, URL tableResource)
@@ -46,6 +48,7 @@ public class LoadingGameState extends BasicGameState
 		super(name);
 
 		this.inclinationAngle = inclinationAngle;
+		this.tableResource = tableResource;
 		
 		/* TODO (buscar musica de loading) Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu-loading/music.wav"), false);
@@ -56,7 +59,7 @@ public class LoadingGameState extends BasicGameState
 	}
 
 	/**
-	 * Inicializa el menu.
+	 * Inicializa la informacion de progreso.
 	 */
 	protected void initProgressInfo()
 	{
@@ -79,50 +82,70 @@ public class LoadingGameState extends BasicGameState
 		final Label loadingLabel = FengGUI.createLabel("Load message");
 		progressInfo.addWidget(loadingLabel);
 		
-		/* Thread de loading */ // TODO puedo hacer 3 threads, uno para mesa, room, machine
+		/* Creo el juego nuevo */
+		final PinballGameState pinballGS = Main.newPinballGame(inclinationAngle);
+		
+		/* Thread de loading */
         loadingThread = new Thread(new Runnable() {
 
 			public void run() {
 				
-				
-				double value = 0;
-				
-				// simulate work
+				/* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
+				LoaderThread threadRoom = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
+				Thread loadRoom = new Thread(threadRoom);
+		        
+		        LoaderThread threadMachine = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
+		        Thread loadMachine = new Thread(threadMachine);
+		        
+		        LoaderThread threadTable = new LoaderThread( tableResource, pinballGS );
+		        Thread loadTable = new Thread(threadTable);
+		        
+		        /* Los inicio */
+		        // Secuencial
+		        /*try
+		        {
+		        	loadRoom.start();
+		            loadRoom.join();
+
+		            loadMachine.start();
+		            loadMachine.join();
+		            
+		            loadTable.start();
+		            loadTable.join();
+		        }
+		        catch(Exception e){}*/
+
+		        // Paralelo
+		        loadRoom.start();
+		        loadMachine.start();
+		        loadTable.start();
+		        try
+		        {
+		            loadRoom.join();
+		            loadMachine.join();
+		            loadTable.join();
+		        }
+		        catch(Exception e){}
+		        
 				/*while(value <= 1) {
 					value += Math.random()*0.1;
 					loadingLabel.setText(String.valueOf(value));
 					try {
-						Thread.sleep(200);
+						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				}
-				
-				Thread load = new Thread(new LoaderThread( "resources/models/Room.x3d" ));
-		        load.start();
-		        Thread load1 = new Thread(new LoaderThread( "resources/models/Machine.x3d" ));
-		        load1.start();
-		        Thread load2 = new Thread(new LoaderThread( "resources/models/Table.x3d" ));
-		        load2.start();
+				}*/
 
-		        try {
-		            load.join();
-		            load1.join();
-		            load2.join();
-		        }
-		        catch(Exception e)
-		        {
-		            
-		        }
-				
-				*/
-				
 				/* Termino de cargar, cierro la ventana y destruyo el loadinggamestate */
 				progressInfo.close();
 				Main.endLoading();
 				
-				/* Creo un nuevo juego, le paso el nodo raiz creado por el loader y lo activo */
-				Main.newPinballGame(inclinationAngle).setActive(true);// TODO pasarle el nodo raiz
+				/* Ya se cargo la escena en el pinball creado. Ahora lo inicio. */
+				pinballGS.inclinePinball();
+				pinballGS.setGameLogic(threadTable.getTheme());
+				pinballGS.initGame();
+				pinballGS.setActive(true);
 			}});
 
 		/* Actualizo la pantalla con los nuevos componentes */

@@ -304,5 +304,10 @@ public class X3DLoader
         }
         return null;
     }
-
+    
+    public float getPercentComplete()
+    {
+    	// TODO Hacer!!!!
+    	return 0;
+    }
 }
