@@ -22,7 +22,7 @@ public class CarsThemeGameLogic extends GameLogic
 	// Cantidad de veces que paso por la rampa
 	private int rampPassedCnt = 0;	
 	
-	private AudioTrack rampUpSound, music;
+	private AudioTrack rampUpSound, music, startingSound, endingSound;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
@@ -30,6 +30,8 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		/* Preparo las pistas de audio que voy a usar */
 		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
+		startingSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/start.wav"), false);
+		endingSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/end.wav"), false);
 		
 		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
