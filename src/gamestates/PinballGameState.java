@@ -168,7 +168,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         {
             /* Se modifico la escena, entonces actualizo el grafo */
          // super.update(tpf);
-        	super.update(tpf * /*3*/ 3);
+        	super.update(tpf * /*3*/ 1);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
@@ -384,13 +384,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Limpieza de texturas */
 		//TODO ts.deleteAll();
-		
-		/* Limpieza del mouse */
-		MouseInput.get().removeListeners();
-		MouseInput.destroyIfInitalized();
-		
-		/* Limpieza del teclado */
-		KeyInput.destroyIfInitalized();
+
+		//FIXME esto no tiene sentido aca porque le sacas el input al feng
+//		/* Limpieza del mouse */
+//		MouseInput.get().removeListeners();
+//		MouseInput.destroyIfInitalized();
+//		
+//		/* Limpieza del teclado */
+//		KeyInput.destroyIfInitalized();
 	}
     
     @Override
@@ -578,7 +579,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
         // La agrego a la lista de bolas
         balls.add( mainBall );
-        }
+    }
         
     public Spatial inclinePinball( Spatial table )
     {
@@ -660,7 +661,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 {
                     if ( evt.getTriggerPressed() )
                     {
-                        // falla miserablemente cuando pongamos mas de 1 bola :D
+                        if (balls.size() == 0)
+                            setUpBall();
+                        
                         balls.get( 0 ).clearDynamics();
                         balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
                         balls.get( 0 ).setLocalRotation( new Quaternion() );
@@ -824,7 +827,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     if ( evt.getTriggerPressed() )
                     {
 
-                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( getPhysicsSpace().getDirectionalGravity( null ).y / -getPhysicsSpace().getDirectionalGravity( null ).z);
+                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( -getPhysicsSpace().getDirectionalGravity( null ).z / getPhysicsSpace().getDirectionalGravity( null ).y);
                         
                         if (angle > 89)
                         {
@@ -847,7 +850,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 {
                     if ( evt.getTriggerPressed() )
                     {
-                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( getPhysicsSpace().getDirectionalGravity( null ).y / -getPhysicsSpace().getDirectionalGravity( null ).z);
+                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( -getPhysicsSpace().getDirectionalGravity( null ).z / getPhysicsSpace().getDirectionalGravity( null ).y);
                         
                         if (angle < 2)
                         {

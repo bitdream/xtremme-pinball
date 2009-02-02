@@ -7,11 +7,10 @@ import com.jme.scene.state.WireframeState;
 import com.jme.system.DisplaySystem;
 import com.jme.util.geom.Debugger;
 import com.jmex.physics.PhysicsDebugger;
-import com.jmex.physics.util.states.PhysicsGameState;
 
 
-public class PhysicsEnhancedGameState extends PhysicsGameState
-//testloco.LocoPhysicsMultithreadedGameState
+public class PhysicsEnhancedGameState extends //com.jmex.physics.util.states.PhysicsGameState
+PhysicsMultithreadedGameState
 {
     protected WireframeState wireState;
     
@@ -25,8 +24,8 @@ public class PhysicsEnhancedGameState extends PhysicsGameState
 	
 	public PhysicsEnhancedGameState(String name)
 	{
-		//super(name, game);
-	    super(name);
+		super(name, 100, game);
+	    //super(name);
 	        
 		display = DisplaySystem.getDisplaySystem();
 		
@@ -77,6 +76,12 @@ public class PhysicsEnhancedGameState extends PhysicsGameState
     public void setActive( boolean active )
     {
         super.setActive( active );
-        //setPhysicsEnabled( true );
+        setPhysicsEnabled( active );
+    }
+    
+    @Override
+    public void cleanup ()
+    {
+        super.delete();
     }
 }
