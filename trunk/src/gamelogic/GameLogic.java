@@ -4,6 +4,8 @@ import gamestates.PinballGameState;
 
 import main.Main;
 
+import com.jme.math.Quaternion;
+import com.jme.math.Vector3f;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -19,13 +21,15 @@ public abstract class GameLogic
 {
 	protected int score;
 	
+	protected int lifes = 3;
+	
 	protected PinballGameState pinball;
 	
 	/* Sistema de sonido */
 	protected AudioSystem audio;
 	
 	/* Sonidos default */
-	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound;
+	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound, lostBallSound, lostLastBallSound;
 	
 	public GameLogic(PinballGameState pinball)
 	{
@@ -41,6 +45,9 @@ public abstract class GameLogic
 		tiltSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt.wav"), false);
 		tiltAbuseSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
 		flipperMoveSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/flipperMove.wav"), false);
+		
+		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
+		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
 	}
 	
 	public void showScore()
@@ -48,6 +55,16 @@ public abstract class GameLogic
 		pinball.setScore(score);
 	}
 	
+	public void showLifes()
+	{
+		pinball.setLifes(lifes);
+	}
+	
+	public int getLifes() 
+	{
+		return lifes;
+	}
+
 	public void showMessage(String message)
 	{
 		pinball.setMessage(message);
@@ -129,7 +146,58 @@ public abstract class GameLogic
 	}
 	
 	// Invocado cuando se pierde una bola
-	public abstract void lostBall(DynamicPhysicsNode ball);
+	public void lostBall(DynamicPhysicsNode ball)
+	{
+		if (getInTableBallQty() == 1) // Era la ultima bola, debe perser una vida
+		{		
+			lostLastBallSound.play();
+			
+			// Bajar la cantidad de vidas y actualizarlas en pantalla
+			lifes--;
+			showLifes();
+
+			// TODO Con algo aumentar las vidas (ptos)
+
+			// Si aun queda alguna vida, reposicionar la bola
+			if (lifes > 0)
+			{
+				// Reubicar la bola en el plunger
+				ball.clearDynamics();
+				ball.setLocalTranslation( new Vector3f(Vector3f.ZERO) );
+	            ball.setLocalRotation( new Quaternion() );
+	            ball.updateGeometricState( 0, false );
+			}
+			else
+			{
+				lostGame(ball);
+			}
+		}
+		else // Todavia le quedan bolas en la mesa
+		{			
+			lostBallSound.play();	
+			
+			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
+			pinball.getBalls().remove(ball);
+			pinball.getRootNode().detachChild(ball);
+		}
+	}
+	
+	public void lostGame(DynamicPhysicsNode ball)
+	{
+		// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
+		pinball.getBalls().remove(ball);
+		pinball.getRootNode().detachChild(ball);
+
+		// Desactivar los flippers
+		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+		{
+			((Flipper)flipper.getChild(0)).setActive(false);
+		}
+		
+		//TODO agregar sonido
+		
+		showMessage("Juego terminado");
+	}
 	
 	// Invocado cuando comienza el juego
 	public abstract void gameStart();

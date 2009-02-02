@@ -1,9 +1,6 @@
 package themes;
 
 import main.Main;
-
-import com.jme.math.Quaternion;
-import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
@@ -18,22 +15,20 @@ import gamestates.PinballGameState;
 
 public class CarsThemeGameLogic extends GameLogic
 {
-	private static final int bumperScore = 10, spinnerScore = 5;
+	private static final int bumperScore = 10, spinnerScore = 5, rampScore = 100;
 	
 	private int bumperCollisionCnt = 0;
 	
 	// Cantidad de veces que paso por la rampa
 	private int rampPassedCnt = 0;	
 	
-	private AudioTrack lostBallSound, lostLastBallSound, rampUpSound, music;
+	private AudioTrack rampUpSound, music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
 		/* Preparo las pistas de audio que voy a usar */
-		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
-		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
 		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
 		
 		/* Inicializo la musica */
@@ -92,7 +87,8 @@ public class CarsThemeGameLogic extends GameLogic
 		super.spinnerNormalCollision(spinner);
 		
 		score += spinnerScore;
-		// Se actualiza los datos de pantalla de usuario
+		
+		// Se actualizan los datos de pantalla de usuario
 		showScore();
 	}
 	
@@ -100,15 +96,22 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		super.sensorRampCollision();
 
+		score += rampScore;
+		
+		// Se actualizan los datos de pantalla de usuario
+		showScore();
 		rampPassedCnt++;
+		
 		showMessage("Paso por rampa N: " + String.valueOf(rampPassedCnt));
+		
+		//TODO aumentar ptos por pasaje de rampa y armar secuencias ...blablabla
 	}
 
 	@Override
 	public void tilt()
 	{
 		super.tilt();
-		showMessage("Tilt! Cuidado, no abuse de su uso!");
+		showMessage("Tilt, no abuse!!");
 	}
 	
 	@Override
@@ -117,7 +120,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.abuseTilt();
 		
 		// Imprimir en pantalla un cartel que avise el abuso de tilts 
-		showMessage("Abuso de tilt! Flippers deshabilitados!");
+		showMessage("Tilt, flippers deshabilitados!");
 		
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
@@ -129,32 +132,21 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void lostBall(DynamicPhysicsNode ball)
 	{
+		
+		// Muestro el mensaje de este theme
 		showMessage("Bola perdida");
 
-		if (getInTableBallQty() == 1) // Era la ultima bola
-		{
-			lostLastBallSound.play();
-			
-			// Bajar la cantidad de vidas y si aun queda alguna, reposicionar la bola TODO
-			// Informar la cantidad de vidas que quedan
-			// Con algo aumentar las vidas (ptos)
-			
-			
-			// Reubicar la bola en el plunger
-			ball.clearDynamics();
-			ball.setLocalTranslation( new Vector3f(Vector3f.ZERO) );
-            ball.setLocalRotation( new Quaternion() );
-            ball.updateGeometricState( 0, false );
+		super.lostBall(ball);
 
-		}
-		else // Todavia le quedan bolas en la mesa
-		{			
-			lostBallSound.play();			
-			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
-			pinball.getBalls().remove(ball);
-			pinball.getRootNode().detachChild(ball);
-		}
-
+	}
+	
+	@Override
+	public void lostGame(DynamicPhysicsNode ball)
+	{
+		super.lostGame(ball);
+		
+		// Mensaje propio de este theme, debe imprimirse luego del default (impreso por super.lostGame())
+		showMessage("Carrera terminada...");
 	}
 
 	@Override
