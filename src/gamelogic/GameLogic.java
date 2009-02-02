@@ -1,15 +1,12 @@
 package gamelogic;
 
 import gamestates.PinballGameState;
-
 import main.Main;
-
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
-
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -19,6 +16,7 @@ import components.Spinner;
 
 public abstract class GameLogic
 {
+	protected static int MAX_BALLS = 3;
 	protected int score;
 	
 	protected int lifes = 3;
@@ -29,7 +27,7 @@ public abstract class GameLogic
 	protected AudioSystem audio;
 	
 	/* Sonidos default */
-	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound, lostBallSound, lostLastBallSound;
+	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound;
 	
 	public GameLogic(PinballGameState pinball)
 	{
@@ -45,14 +43,16 @@ public abstract class GameLogic
 		tiltSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt.wav"), false);
 		tiltAbuseSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/tilt-abuse.wav"), false);
 		flipperMoveSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/flipperMove.wav"), false);
-		
-		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
-		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
 	}
 	
 	public void showScore()
 	{
 		pinball.setScore(score);
+		if ((score == 20 || score == 60 )&& pinball.getBalls().size() < MAX_BALLS)
+		{
+			pinball.addBall(/*pinball.getBallStartUp()*/ new Vector3f(-0.6277902f, /*3.686752f*/ 5f, -19.233984f)); //TODO
+			System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
+		}
 	}
 	
 	public void showLifes()
@@ -150,13 +150,12 @@ public abstract class GameLogic
 	{
 		if (getInTableBallQty() == 1) // Era la ultima bola, debe perser una vida
 		{		
-			lostLastBallSound.play();
+			// Para que se pueda overridear desde el theme deberia crear un metodo que haga el play de este sonido
+			playLostLastBallSound();
 			
 			// Bajar la cantidad de vidas y actualizarlas en pantalla
 			lifes--;
 			showLifes();
-
-			// TODO Con algo aumentar las vidas (ptos)
 
 			// Si aun queda alguna vida, reposicionar la bola
 			if (lifes > 0)
@@ -174,12 +173,14 @@ public abstract class GameLogic
 		}
 		else // Todavia le quedan bolas en la mesa
 		{			
-			lostBallSound.play();	
+			playLostBallSound();
 			
 			// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
 			pinball.getBalls().remove(ball);
 			pinball.getRootNode().detachChild(ball);
 		}
+		
+		System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
 	}
 	
 	public void lostGame(DynamicPhysicsNode ball)
@@ -196,7 +197,17 @@ public abstract class GameLogic
 		
 		//TODO agregar sonido
 		
-		showMessage("Juego terminado");
+		showMessage("Game over");
+	}
+	
+	public void playLostLastBallSound()
+	{
+		// TODO poner sonido de perder default;
+	}
+	
+	public void playLostBallSound()
+	{
+		// TODO poner sonido de perder default;
 	}
 	
 	// Invocado cuando comienza el juego

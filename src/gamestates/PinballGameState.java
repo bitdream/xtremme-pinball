@@ -168,7 +168,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         {
             /* Se modifico la escena, entonces actualizo el grafo */
          // super.update(tpf);
-        	super.update(tpf * /*3*/ 1);
+        	super.update(tpf * 3 /*1*/);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
@@ -302,7 +302,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Armo la habitacion, la mesa y la bola */
 //        loadEnvironment();
 //        loadTable();
-        setUpBall();
+        //setUpBall();
+        addBall(this.ballStartUp);
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
@@ -542,44 +543,72 @@ public class PinballGameState extends PhysicsEnhancedGameState
         this.gameLogic = gameLogic;
     }
     
-    private void setUpBall()
+//    private void setUpBall()
+//	{
+//	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
+///* TODO ojo, aca comento esto porque quiero probar solo con IRON
+//        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
+//        final Material customMaterial = new Material( "material de bola" );
+//        // Es pesado
+//        customMaterial.setDensity( 10.0f );
+//        // Detalles de contacto con el otro material
+//        MutableContactInfo contactDetails = new MutableContactInfo();
+//        // Poco rebote
+//        contactDetails.setBounce( 0.5f );
+//        // Poco rozamiento
+//        contactDetails.setMu( 0.5f );
+//        customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
+//*/
+//        /* Nodo dinamico de la bola */
+//        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
+//        mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
+//        rootNode.attachChild( mainBall );
+//
+//        final Sphere visualMainBall = new Sphere( "Bola", 10, 10, 0.25f );
+//        visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
+//
+//        // Agregado de bounding volume 
+//        visualMainBall.setModelBound( new BoundingSphere() );
+//        visualMainBall.updateModelBound();
+//
+//        mainBall.attachChild( visualMainBall );
+//        mainBall.generatePhysicsGeometry();
+////		mainBall.setMaterial( customMaterial );
+//        mainBall.setMaterial(Material.IRON);
+//        // Se computa la masa luego de generar la geometria fisica
+//        mainBall.computeMass();
+//
+//        // La agrego a la lista de bolas
+//        balls.add( mainBall );
+//    }
+    
+
+    public void addBall(Vector3f location)
 	{
-	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
-/* TODO ojo, aca comento esto porque quiero probar solo con IRON
-        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
-        final Material customMaterial = new Material( "material de bola" );
-        // Es pesado
-        customMaterial.setDensity( 10.0f );
-        // Detalles de contacto con el otro material
-        MutableContactInfo contactDetails = new MutableContactInfo();
-        // Poco rebote
-        contactDetails.setBounce( 0.5f );
-        // Poco rozamiento
-        contactDetails.setMu( 0.5f );
-        customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
-*/
         /* Nodo dinamico de la bola */
-        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-        mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
-        rootNode.attachChild( mainBall );
+        final DynamicPhysicsNode ball = getPhysicsSpace().createDynamicNode();
+        ball.setName( PHYSIC_NODE_NAME_FOR_BALLS );
+        rootNode.attachChild( ball );
 
         final Sphere visualMainBall = new Sphere( "Bola", 10, 10, 0.25f );
-        visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
+        visualMainBall.setLocalTranslation( location );
 
         // Agregado de bounding volume 
         visualMainBall.setModelBound( new BoundingSphere() );
         visualMainBall.updateModelBound();
 
-        mainBall.attachChild( visualMainBall );
-        mainBall.generatePhysicsGeometry();
-//		mainBall.setMaterial( customMaterial );
-        mainBall.setMaterial(Material.IRON);
+        ball.attachChild( visualMainBall );
+        ball.generatePhysicsGeometry();
+        ball.setMaterial(Material.IRON);
         // Se computa la masa luego de generar la geometria fisica
-        mainBall.computeMass();
+        ball.computeMass();
 
+        ball.updateGeometricState(0, true);
+        
         // La agrego a la lista de bolas
-        balls.add( mainBall );
+        balls.add( ball );
     }
+    
         
     public Spatial inclinePinball( Spatial table )
     {
@@ -662,12 +691,17 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     if ( evt.getTriggerPressed() )
                     {
                         if (balls.size() == 0)
-                            setUpBall();
+                            //setUpBall();
+                        	addBall(ballStartUp);
                         
                         balls.get( 0 ).clearDynamics();
                         balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
                         balls.get( 0 ).setLocalRotation( new Quaternion() );
                         balls.get( 0 ).updateGeometricState( 0, false );
+                    	
+                        //TODO quitar
+//            			addBall(/*pinball.getBallStartUp()*/ new Vector3f(/*-5.111f, 3.528f, -15.692f*/ -0.6277902f, /*3.686752f*/ 4f, -19.233984f)); //TODO
+//            			System.out.println("Ahora hay: " + getBalls().size() + " bolas");
                     }
                 }
                 
