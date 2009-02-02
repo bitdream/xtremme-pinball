@@ -72,16 +72,16 @@ public class PhysicsEnhancedGameState extends com.jmex.physics.util.states.Physi
         }
     }
     
-//    @Override
-//    public void setActive( boolean active )
-//    {
-//        super.setActive( active );
-//        setPhysicsEnabled( active );
-//    }
-//    
-//    @Override
-//    public void cleanup ()
-//    {
-//        super.delete();
-//    }
+    @Override
+    public void setActive( boolean active )
+    {
+        super.setActive( active );
+        //setPhysicsEnabled( active );
+    }
+    
+    @Override
+    public void cleanup ()
+    {
+        //super.delete();
+    }
 }

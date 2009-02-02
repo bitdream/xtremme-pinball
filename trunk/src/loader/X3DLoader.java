@@ -12,7 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Logger;
 
 import com.jme.scene.Node;
@@ -24,9 +25,8 @@ import com.jmex.model.converters.DTDResolver;
  * 
  * @author Mariano
  */
-public class X3DLoader
+public class X3DLoader extends Observable implements Observer
 {
-    // TODO poner loggers posta
     private static final Logger      logger        = Logger.getLogger( X3DLoader.class.getName() );
 
     private InputStream              x3d;
@@ -109,6 +109,8 @@ public class X3DLoader
             converter.setProperty( "textures", X3DLoader.getStandardTextureDir() );
         }
 
+        converter.setObserver( this );
+        
         converter.setProperty( "pinball", pinball );
 
         //logger.info( "Starting to convert .x3d to .jme" );
@@ -305,9 +307,11 @@ public class X3DLoader
         return null;
     }
     
-    public float getPercentComplete()
+    @Override
+    public void update( Observable o, Object arg )
     {
-    	// TODO Hacer!!!!
-    	return 0;
+        super.setChanged();
+        super.notifyObservers( arg );
     }
+    
 }

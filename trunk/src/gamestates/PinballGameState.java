@@ -22,12 +22,12 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
-import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
+import com.jme.util.NanoTimer;
 import com.jme.util.Timer;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
@@ -116,6 +116,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Timer para los FPS */
 	protected Timer timer;
+    private float lastSampleTime = 0;
 
 	/* XXX Ubicacion inicial de la bola: cable */
 	private Vector3f ballStartUp = new Vector3f( 4.88f, 1.2f, -3.0f ); 
@@ -138,7 +139,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		this.pinballSettings = pinballSettings;
 	
 		/* Adquiero el timer para calcular los FPS */
-		timer = Timer.getTimer();
+		timer = new NanoTimer();//Timer.getTimer();
 		
 		/* Borro todas las luces default */
         lightState.detachAll();
@@ -174,7 +175,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         {
             /* Se modifico la escena, entonces actualizo el grafo */
          // super.update(tpf);
-        	super.update(tpf * 3 /*1*/);
+
+        	super.update(tpf * 3);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
@@ -187,8 +189,15 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreText.getText().replace(0, scoreText.getText().length(), gameLogic.getScoreText() + score);
         ballsRemainingText.getText().replace(0, ballsRemainingText.getText().length(), gameLogic.getBallsText() + lifes);
         messageText.getText().replace(0, messageText.getText().length(), "" + message);
-        fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate()/2 ) );
-        
+                
+        float timeMS = timer.getTime() * 1f/1000000;
+
+        // Only continue if we've gone past our sample time threshold
+        if (timeMS - lastSampleTime > 1000) {
+            fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate() ) );
+            lastSampleTime = timeMS;
+        }
+
 	}
 	
 	/**
@@ -663,6 +672,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
         if (plunger != null)
             ((Plunger)plunger.getChild(0)).recalculateJoints(this);
         
+        //TODO volar 
+        this.tabla = table;
+        
         return table;
     }
     
@@ -671,7 +683,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
     private boolean showDepth = false;
     private boolean showGraphs = false;
     private static final float g = -9.81f; 
-    private Node tabla;
+    private Spatial tabla;
     
     protected void initDebug()
     {

@@ -61,6 +61,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Observer;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -300,6 +301,13 @@ public class X3dToJme extends FormatConverter {
         return this.pinballTheme;
     }
     
+    private Observer observer = null;
+    
+    public void setObserver(Observer observer)
+    {
+        this.observer = observer;
+    }
+    
     /**
      * Creates the X3DLoader.
      * 
@@ -466,6 +474,8 @@ public class X3dToJme extends FormatConverter {
 
         // Process all child nodes
         Node child = scene.getFirstChild();
+        float noChilds = scene.getChildNodes().getLength();
+        int i = 0;
         while (child != null) {
             if (child.getNodeType() != Node.TEXT_NODE
                     && child.getNodeType() != Node.COMMENT_NODE) {
@@ -475,6 +485,8 @@ public class X3dToJme extends FormatConverter {
                 }
             }
             child = child.getNextSibling();
+            i++;
+            observer.update((java.util.Observable)null,i / noChilds);
         }
 
         // Update the bounds of the root node and all children
