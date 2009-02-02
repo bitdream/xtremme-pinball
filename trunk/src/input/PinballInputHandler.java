@@ -69,7 +69,7 @@ public class PinballInputHandler extends FirstPersonHandler
 			if(event.getTriggerPressed())
 			{
 				Main.pauseCurrentPinballGame();
-				Main.activateMenu();
+				Main.newMenu().setActive(true);
 			}
 		}
 		

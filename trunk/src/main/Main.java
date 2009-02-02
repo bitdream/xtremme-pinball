@@ -1,8 +1,10 @@
 package main;
 
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import gamestates.LoadingGameState;
 import gamestates.MenuGameState;
 import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
@@ -10,7 +12,9 @@ import gamestates.PinballGameStateSettings;
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.audio.AudioSystem;
 import com.jmex.game.StandardGame;
+import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
+
 
 public class Main
 {
@@ -18,6 +22,7 @@ public class Main
 	private static StandardGame stdGame;
 	
 	private static AudioSystem audio;
+	
 
 	/**
 	 * Punto de entrada al juego
@@ -61,12 +66,26 @@ public class Main
 		return menuGS;
 	}
 	
-	public static PinballGameState newPinballGame()
+	public static LoadingGameState newLoading(float inclinationAngle, URL tableResource)
+	{
+		/* Creo un nuevo loading screen */
+		LoadingGameState loadingGS = new LoadingGameState("Loading", inclinationAngle, tableResource);
+		
+		/* Lo agrego al GameStateManager */
+		GameStateManager.getInstance().attachChild(loadingGS);
+		loadingGS.setActive(false);
+		
+		loadingGS.getRootNode().updateRenderState();
+		
+		return loadingGS;
+	}
+	
+	public static PinballGameState newPinballGame(float inclinationAngle)
 	{
 		/* Creo las configuraciones */
 		PinballGameStateSettings pinballSettings = new PinballGameStateSettings();
 		
-		// TODO ver que hacer con los settings, probablemente vuelen de aca
+		// TODO ver que hacer con los settings, probablemente vuelen de aca (deberian ser directamente gameSettings y ser globales...)
 		
 		/* Les guardo los valores recogidos de la ventana de configuraciones */
 		pinballSettings.setWidth(stdGame.getSettings().getWidth());
@@ -75,6 +94,8 @@ public class Main
 		pinballSettings.setFreq(stdGame.getSettings().getFrequency());
 		pinballSettings.setFullscreen(stdGame.getSettings().isFullscreen());
 		pinballSettings.setRenderer(stdGame.getSettings().getRenderer());
+		
+		pinballSettings.setInclinationAngle(inclinationAngle);
 		
 		/* Creo un nuevo Pinball */
 		PinballGameState pinballGS = new PinballGameState("Game", pinballSettings);
@@ -101,8 +122,13 @@ public class Main
 	
 	public static void endCurrentPinballGame()
 	{
-		if (GameStateManager.getInstance().getChild("Game") != null)
-			GameStateManager.getInstance().detachChild("Game");
+		GameState gs = GameStateManager.getInstance().getChild("Game");
+		
+		if (gs != null)
+		{
+			gs.setActive(false);
+			GameStateManager.getInstance().detachChild(gs);
+		}
 	}
 	
 	public static void continueCurrentPinballGame()
@@ -111,14 +137,26 @@ public class Main
 			GameStateManager.getInstance().activateChildNamed("Game");
 	}
 	
-	public static void deactivateMenu()
+	public static void endMenu()
 	{
-		GameStateManager.getInstance().deactivateChildNamed("Menu");
+		GameState gs = GameStateManager.getInstance().getChild("Menu");
+		
+		if (gs != null)
+		{
+			gs.setActive(false);
+			GameStateManager.getInstance().detachChild(gs);
+		}
 	}
-	
-	public static void activateMenu()
+
+	public static void endLoading()
 	{
-		GameStateManager.getInstance().activateChildNamed("Menu");
+		GameState gs = GameStateManager.getInstance().getChild("Loading");
+		
+		if (gs != null)
+		{
+			gs.setActive(false);
+			GameStateManager.getInstance().detachChild("Loading");
+		}
 	}
 	
 	public static void shutdownGame()

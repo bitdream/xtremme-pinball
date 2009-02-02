@@ -12,8 +12,7 @@ import org.fenggui.composite.Window;
 import org.fenggui.event.ButtonPressedEvent;
 import org.fenggui.event.IButtonPressedListener;
 import org.fenggui.layout.RowLayout;
-import org.fenggui.util.Point;
-import org.fenggui.util.Spacing;
+import org.fenggui.layout.StaticLayout;
 import org.lwjgl.opengl.GL13;
 
 import com.jme.input.MouseInput;
@@ -63,9 +62,9 @@ public class MenuGameState extends BasicGameState
 		/* Creo el menu */
 		final Window menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
 		menu.setTitle("Main menu");
-		menu.setPosition(new Point(50, 200));
+		menu.setSize(200, 200);
 		menu.getContentContainer().setLayoutManager(new RowLayout(false));
-		menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
+		//menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
 
 		/* Boton de continuar */
 		continueButton = FengGUI.createButton(menu.getContentContainer(), "Continue");
@@ -74,11 +73,14 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 
+				/* Cierro la ventana */
+				menu.close();
+				
 				/* Continuo el juego actual */
 				Main.continueCurrentPinballGame();
 				
 				/* Desactivo el gamestate de menu */
-				Main.deactivateMenu();
+				Main.endMenu();
 
 			}
 		});
@@ -89,15 +91,20 @@ public class MenuGameState extends BasicGameState
 		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
+				
+				/* Cierro la ventana */
+				menu.close();
 
-				/* Desactivo el gamestate de menu */
-				Main.deactivateMenu();
+				/* Destruyo el gamestate de menu */
+				Main.endMenu();
 
 				/* Mato el juego actual si hay alguno */
 				Main.endCurrentPinballGame();
 				
-				/* Creo un juego nuevo y lo inicio */
-				Main.newPinballGame().setActive(true);
+				/* TODO (aca hacer la ventanita modal de selecc de mapa e inclinacion) Creo un loading nuevo y lo inicio */
+				LoadingGameState lgs = Main.newLoading(8f, MenuGameState.class.getClassLoader().getResource( "resources/models/Table.x3d" ));
+				lgs.setActive(true);
+				lgs.startLoading();
 			}
 		});
 		
@@ -108,23 +115,28 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0)
 			{
+				/* Cierro la ventana */
+				menu.close();
+				
 				/* Acabo con todo el juego */
 				Main.shutdownGame();
 			}
 		});
  
-		/* Comprime lo posible los botones */
-		//menu.pack(); TODO darle algo de estilo al menu y agregarle un fondo
+		//TODO darle algo de estilo al menu y agregarle un fondo
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
+
+		/* Centro la ventana */
+		StaticLayout.center(menu, fengGUIdisplay);
 	}
 	
 	@Override
 	public void setActive(boolean active)
 	{
 		super.setActive(active);
-
+		// TODO si hay juego en transcurso, el action (que falta agregar) en ESC me deberia hacer continue, sino salir
 		if (active)
 		{
 			/* Hago visible al cursor */
