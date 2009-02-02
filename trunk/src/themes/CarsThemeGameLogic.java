@@ -152,7 +152,7 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void gameStart()
 	{
-		showMessage("Gana la carrera!!!");		
+		showMessage("Gentlemen, start your engines!!!");		
 	}
 
 	@Override

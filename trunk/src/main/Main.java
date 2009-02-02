@@ -127,6 +127,7 @@ public class Main
 		if (gs != null)
 		{
 			gs.setActive(false);
+			gs.cleanup();
 			GameStateManager.getInstance().detachChild(gs);
 		}
 	}
