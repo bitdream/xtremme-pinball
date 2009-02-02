@@ -5,11 +5,13 @@ import gamestates.PinballGameState;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 
 import com.jme.scene.Spatial;
 
 
-public class LoaderThread implements Runnable
+public class LoaderThread implements Runnable, Observer
 {
 
     private URL resource;
@@ -33,6 +35,8 @@ public class LoaderThread implements Runnable
         	/* Creo el loader de este recurso X3D */
             loader = new X3DLoader(resource);
 
+            loader.addObserver( this );
+            
             /* Le fijo su pinball */
             loader.setPinball(pinballGS);
 
@@ -49,9 +53,13 @@ public class LoaderThread implements Runnable
         }
     }
     
+    private Float percentageComplete = 0f;
     public float getPercentComplete()
     {
-    	return loader.getPercentComplete();
+        synchronized ( percentageComplete )
+        {
+            return this.percentageComplete;    
+        }
     }
     
     public GameLogic getTheme()
@@ -62,5 +70,19 @@ public class LoaderThread implements Runnable
     public Spatial getScene()
     {
         return this.scene;
+    }
+
+    @Override
+    public void update( Observable o, Object arg )
+    {
+        if ( arg instanceof Float )
+        {
+            Float percentage = (Float) arg;
+            synchronized ( percentageComplete )
+            {
+                this.percentageComplete = percentage;                
+            }
+
+        }
     }
 }
