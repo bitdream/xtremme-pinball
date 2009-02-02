@@ -4,7 +4,7 @@ import java.net.URL;
 
 import input.FengJMEInputHandler;
 
-import loader.LoaderThread;
+//import loader.LoaderThread;
 //import loader.X3DLoaderTest.LoadThread;
 import main.Main;
 
