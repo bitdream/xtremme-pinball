@@ -48,6 +48,7 @@ public class Main
 		// TODO cablear que siempre use LWJGL, y ver porque solo aparece 1 vez (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
 		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
 		
+		gamestates.PhysicsEnhancedGameState.game = stdGame;
 		/* Doy comienzo al juego */
 		stdGame.start();
 		

@@ -11,6 +11,7 @@ import com.jmex.physics.util.states.PhysicsGameState;
 
 
 public class PhysicsEnhancedGameState extends PhysicsGameState
+//testloco.LocoPhysicsMultithreadedGameState
 {
     protected WireframeState wireState;
     
@@ -20,10 +21,13 @@ public class PhysicsEnhancedGameState extends PhysicsGameState
 
 	protected LightState lightState;
 	
+	public static com.jmex.game.StandardGame game;
+	
 	public PhysicsEnhancedGameState(String name)
 	{
-		super(name);
-		
+		//super(name, game);
+	    super(name);
+	        
 		display = DisplaySystem.getDisplaySystem();
 		
 		cam = display.getRenderer().getCamera();
@@ -67,5 +71,12 @@ public class PhysicsEnhancedGameState extends PhysicsGameState
         if ( showPhysics ) {
             PhysicsDebugger.drawPhysics( getPhysicsSpace(), r );
         }
+    }
+    
+    @Override
+    public void setActive( boolean active )
+    {
+        super.setActive( active );
+        //setPhysicsEnabled( true );
     }
 }

@@ -92,13 +92,13 @@ public class LoadingGameState extends BasicGameState
 				
 				/* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
 				LoaderThread threadRoom = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
-				Thread loadRoom = new Thread(threadRoom);
+				Thread loadRoom = new Thread(threadRoom, "roomLoadThread");
 		        
 		        LoaderThread threadMachine = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
-		        Thread loadMachine = new Thread(threadMachine);
+		        Thread loadMachine = new Thread(threadMachine, "machineLoadThread");
 		        
 		        LoaderThread threadTable = new LoaderThread( tableResource, pinballGS );
-		        Thread loadTable = new Thread(threadTable);
+		        Thread loadTable = new Thread(threadTable, "tableLoadThread");
 		        
 		        /* Los inicio */
 		        // Secuencial
@@ -136,13 +136,16 @@ public class LoadingGameState extends BasicGameState
 						e.printStackTrace();
 					}
 				}*/
-
+                pinballGS.getRootNode().attachChild(threadRoom.getScene());    
+                pinballGS.getRootNode().attachChild(threadMachine.getScene());
+                
+                pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(threadTable.getScene()));
 				/* Termino de cargar, cierro la ventana y destruyo el loadinggamestate */
 				progressInfo.close();
 				Main.endLoading();
 				
 				/* Ya se cargo la escena en el pinball creado. Ahora lo inicio. */
-				pinballGS.inclinePinball();
+				
 				pinballGS.setGameLogic(threadTable.getTheme());
 				pinballGS.initGame();
 				pinballGS.setActive(true);

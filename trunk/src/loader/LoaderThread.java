@@ -18,6 +18,7 @@ public class LoaderThread implements Runnable
     
     private X3DLoader loader;
     
+    private Spatial scene;
     
     public LoaderThread(URL resource, PinballGameState pinballGS)
     {
@@ -39,13 +40,7 @@ public class LoaderThread implements Runnable
             loader.setLightState(pinballGS.getLightState());
 
             /* Obtengo la escena de ese X3D */
-            Spatial scene = loader.loadScene();
-            
-            synchronized (pinballGS.getRootNode())
-            {
-                /* Attacheo lo creado */
-            	pinballGS.getRootNode().attachChild(scene);    
-            }
+            scene = loader.loadScene();
             
         }
         catch ( FileNotFoundException e )
@@ -62,5 +57,10 @@ public class LoaderThread implements Runnable
     public GameLogic getTheme()
     {
     	return loader.getTheme(pinballGS);
+    }
+    
+    public Spatial getScene()
+    {
+        return this.scene;
     }
 }

@@ -261,7 +261,7 @@ public class X3DLoader
     public GameLogic getTheme( PinballGameState p )
     {
         // acabo de aprender algo de java :P
-        return X3DLoader.<GameLogic> createInstance( this.theme, p );
+        return X3DLoader.<GameLogic> createInstance( this.theme, pinball );
     }
 
     /* codigo inspectoresco :D */
