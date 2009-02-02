@@ -41,7 +41,7 @@ public class MenuGameState extends BasicGameState
 		super(name);
 		
 		/* Inicializo la musica */
-		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu-loading/music.wav"), false);
+		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu/music.wav"), false);
 		music.setLooping(true);
 		
 		/* Inicializo el menu */

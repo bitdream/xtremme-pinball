@@ -172,6 +172,9 @@ public class Main
 		
 		/* Termino con el sistema de sonido TODO no anda? */
 		getAudioSystem().fadeOutAndClear(2f);
+		
+//		if (AudioSystem.isCreated())
+//            AudioSystem.getSystem().cleanup();
 	}
 
 	public static AudioSystem getAudioSystem()
