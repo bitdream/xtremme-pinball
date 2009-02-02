@@ -51,7 +51,7 @@ public class LoadingGameState extends BasicGameState
 		this.tableResource = tableResource;
 		
 		/* TODO (buscar musica de loading) Inicializo la musica */
-		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu-loading/music.wav"), false);
+		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/loading/music.wav"), false);
 		music.setLooping(true);
 		
 		/* Inicializo la informacion del progreso */
@@ -79,7 +79,7 @@ public class LoadingGameState extends BasicGameState
 		//progressInfo.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
 		
 		/* Creo el mensaje de progreso */
-		final Label loadingLabel = FengGUI.createLabel("Load message");
+		final Label loadingLabel = FengGUI.createLabel("");
 		progressInfo.addWidget(loadingLabel);
 		
 		/* Creo el juego nuevo */
