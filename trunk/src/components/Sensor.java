@@ -34,7 +34,7 @@ private static final long serialVersionUID = 1L;
 	
 	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
 	// El tiempo debe ser grande pq la cantidad de colisiones detectadas depende de la velocidad de la bola
-	private static final long windowTimeForCollisions = 5000; 
+	private static final long windowTimeForCollisions = 500; 
 	
 
 	/**
