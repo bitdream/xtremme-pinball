@@ -314,10 +314,18 @@ public class PinballGameState extends PhysicsEnhancedGameState
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
         
+        // cartel de fps: no mover que se percha!!!!
+        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
+        fpsText.setLocalScale( 0.80f );
+        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.95f, 1));
+        rootNode.attachChild(fpsText);
+        
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
 		rootNode.updateRenderState();
-		
+
 		// Cateles con el puntaje y los mensajes al usuario
         scoreText = Text.createDefaultTextLabel("scoreText", gameLogic.getScoreText() + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
@@ -339,13 +347,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
         messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(messageText);
-        
-        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
-        fpsText.setLocalScale( 0.80f );
-        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.95f, 1));
-        rootNode.attachChild(fpsText);
         
         /* Aviso a la logica de juego que empieza uno */
         gameLogic.gameStart();
