@@ -29,6 +29,8 @@ public abstract class GameLogic
 	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
 	protected String ballsText = "Balls: ";	
 	
+	protected boolean tiltAbused = false;
+	
 	protected PinballGameState pinball;
 	
 	/* Sistema de sonido */
@@ -71,12 +73,8 @@ public abstract class GameLogic
 			pinball.addBall(pinball.getExtraBallStartUp());
 			
 			showExtraBallMessage();
+			playExtraBallSound();
 
-			// TODO sonido de bola extra, por ahora puse este
-			tiltAbuseSound.play();
-			
-			// debug
-			//System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
 		}
 	}
 	public void showLifes()
@@ -165,6 +163,17 @@ public abstract class GameLogic
 	{
 		tiltAbuseSound.play();
 		
+		tiltAbused = true;
+		
+		// Desactivar los flippers
+		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+		{
+			((Flipper)flipper.getChild(0)).setActive(false);
+		}
+		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
+		// TODO deshabilitar spinners (no contar sus ptos seteando a cero su score o con if dentro de su colision) y bumpers y magnet -> parte de esto va en el theme
+
+		
 		/* TODO Corto la musica (fade out) y recordar recomenzarla */
 		
 	}
@@ -204,7 +213,23 @@ public abstract class GameLogic
 				// Nueva bola desde la posicion del plunger
 				pinball.addBall(pinball.getBallStartUp());
 				
-				//TODO resetear cnt de rampa, secuancias, etc.
+				// Si se perdieron las bolas por estar deshabilitados los flippers debido a abuso de tilt, rehabilitarlos
+				if (tiltAbused)
+				{
+					for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+					{
+						((Flipper)flipper.getChild(0)).setActive(true);
+					}
+					//TODO habilitar bumpers y demas
+					
+					// Reinicio la variable
+					tiltAbused = false;
+					
+					// TODO Pablo continua la musica aca
+				}
+
+				
+				//TODO resetear cnt de rampa, secuencias, etc.
 
 			}
 			else
@@ -241,6 +266,11 @@ public abstract class GameLogic
 	public void playLostBallSound()
 	{
 		// TODO poner sonido de perder default -> no habra sonido default
+	}
+	
+	public void playExtraBallSound()
+	{
+		// TODO poner sonido de extra ball default
 	}
 	
 	// Invocado cuando comienza el juego

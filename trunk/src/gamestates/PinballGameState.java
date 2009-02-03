@@ -716,10 +716,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
                         balls.get( 0 ).setLocalRotation( new Quaternion() );
                         balls.get( 0 ).updateGeometricState( 0, false );
-                    	
-                        //TODO quitar
-//            			addBall(/*pinball.getBallStartUp()*/ new Vector3f(/*-5.111f, 3.528f, -15.692f*/ -0.6277902f, /*3.686752f*/ 4f, -19.233984f)); //TODO
-//            			System.out.println("Ahora hay: " + getBalls().size() + " bolas");
                     }
                 }
                 

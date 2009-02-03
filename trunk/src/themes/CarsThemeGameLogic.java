@@ -97,6 +97,7 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		super.spinnerNormalCollision(spinner);
 		
+		// TODO no sumar si hay abuso de tilt
 		score += spinnerScore;
 		
 		// Se actualizan los datos de pantalla de usuario
@@ -110,6 +111,7 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		rampUpSound.play();
 
+		// TODO no sumar si hay abuso de tilt
 		score += rampScore;
 		
 		// Se actualizan los datos de pantalla de usuario
@@ -136,20 +138,32 @@ public class CarsThemeGameLogic extends GameLogic
 		// Imprimir en pantalla un cartel que avise el abuso de tilts 
 		showMessage("Too much tilt, flippers disabled!!!");
 		
-		// Desactivar los flippers
-		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
-		{
-			((Flipper)flipper.getChild(0)).setActive(false);
-		}
+//		// Desactivar los flippers
+//		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+//		{
+//			((Flipper)flipper.getChild(0)).setActive(false);
+//		}
+//		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
+//		// TODO deshabilitar spinners (no contar sus ptos seteando a cero su score o con if dentro de su colision) y bumpers y magnet
+//	
+//		// Variable booleana de deshabilitado por tilt
+	
 	}
 
 	@Override
 	public void lostBall(DynamicPhysicsNode ball)
 	{
-		// Muestro el mensaje de este theme
-		showMessage("Crash, be careful!!!");
-		
-		//TODO ver si se perdio una bola que baja la vida y resetear contadores de rampa, etc!
+		// Muestro el mensaje de este theme TODO customizar el msg segun haya perdido la unica bola o no
+		if (getInTableBallQty() == 1)
+		{
+			showMessage("Crash, be careful!!!");
+			//TODO ver si se perdio una bola que baja la vida y resetear contadores de rampa, etc!
+			
+		}
+		else
+		{
+			showMessage("Slow down, be careful!!!");
+		}	
 
 		super.lostBall(ball);
 
@@ -165,6 +179,12 @@ public class CarsThemeGameLogic extends GameLogic
 	public void playLostBallSound()
 	{
 		lostBallSound.play();
+	}
+
+	@Override	
+	public void playExtraBallSound()
+	{
+		extraBallSound.play();
 	}
 	
 	@Override
