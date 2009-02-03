@@ -105,14 +105,13 @@ public class CarsThemeGameLogic extends GameLogic
 		if (!tiltAbused)
 		{
 			score += spinnerScore;
-		}
-		
-		// Se actualizan los datos de pantalla de usuario
-		showScore();
-		spinnerCollisionCnt++;
-		
-		// TODO debug
-		System.out.println("Spinner cnt: " + spinnerCollisionCnt);
+			// Se actualizan los datos de pantalla de usuario
+			showScore();
+			spinnerCollisionCnt++;
+			// TODO debug
+			//System.out.println("Spinner cnt: " + spinnerCollisionCnt);
+		}		
+
 	}
 	
 	public void sensorRampCollision()
@@ -124,13 +123,12 @@ public class CarsThemeGameLogic extends GameLogic
 		if (!tiltAbused)
 		{
 			score += rampScore;
+			// Se actualizan los datos de pantalla de usuario
+			showScore();
+			rampCnt++;
+			// TODO debug
+			//System.out.println("Rampa cnt: " + rampCnt);
 		}
-		
-		// Se actualizan los datos de pantalla de usuario
-		showScore();
-		rampCnt++;
-		// TODO debug
-		System.out.println("Rampa cnt: " + rampCnt);
 	}
 
 	@Override
