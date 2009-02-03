@@ -104,7 +104,7 @@ public class PinballInputHandler extends FirstPersonHandler
 				{
 					Flipper actualFlipper = (Flipper)flipper.getChild(0);
 				
-					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
+					if (actualFlipper.isRightFlipper())
 					{
 						/* Dejo de usar este flipper */
 						actualFlipper.setInUse(false);
@@ -141,7 +141,7 @@ public class PinballInputHandler extends FirstPersonHandler
 				{
 					Flipper actualFlipper = (Flipper)flipper.getChild(0);
 				
-					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
+					if (actualFlipper.isLeftFlipper())
 					{
 						/* Dejo de usar este flipper */
 						actualFlipper.setInUse(false);
