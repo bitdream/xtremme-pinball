@@ -33,7 +33,7 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto?
+	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto? -> para desactivar las estadisticas y que vaya mas rapido
 	    {
 	        System.setProperty( "jme.stats", "set" );
 	    }
@@ -113,7 +113,7 @@ public class Main
 		pinballSettings.setFullscreen(stdGame.getSettings().isFullscreen());
 		pinballSettings.setRenderer(stdGame.getSettings().getRenderer());
 		
-		//pinballSettings.setInclinationAngle(settings.inclinationAngle);
+		pinballSettings.setInclinationAngle(settings.getInclinationAngle());
 		
 		/* Creo un nuevo Pinball */
 		PinballGameState pinballGS = new PinballGameState("Game", pinballSettings);

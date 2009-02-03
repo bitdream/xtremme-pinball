@@ -4,23 +4,28 @@ import gamelogic.GameLogic;
 import input.PinballInputHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
 import main.Main;
 
+import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
+import com.jme.input.ChaseCamera;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
+import com.jme.input.thirdperson.ThirdPersonMouseLook;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
+import com.jme.scene.CameraNode;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Sphere;
@@ -51,7 +56,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!!xtremme pinball";
+	private static final String GAME_NAME = "!!!xtremme pinball";
 	private static final String GAME_VERSION = "0.5";
 	
 	/* Logger de la clase Pinball */
@@ -208,10 +213,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	 */
 	protected void initSystem()
 	{
-	    // para tener en cuenta.. hace mas dinamico el asunto, pero la bola vuela mas es una gadorcha
-//	    final float g = getPhysicsSpace().getDirectionalGravity( null ).y;
-//	    getPhysicsSpace().setDirectionalGravity( new Vector3f(0, FastMath.cos( FastMath.DEG_TO_RAD * 10 ) * g, -FastMath.sin( FastMath.DEG_TO_RAD * 10 ) * g) );
-
 	    /* Fijo el nombre a la ventana */
 		display.setTitle(GAME_NAME + " v" + GAME_VERSION);
 		
@@ -250,8 +251,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Aplicar los cambios al jugador */
         cam.update();
         
-        
-	
 		/* Quiero que ese input handler sea leido en cada paso que haga el motor de fisica,
 		 * de modo tal que las fuerzas que acciones continuas apliquen (ej: plunger) se realicen */
 		getPhysicsSpace().addToUpdateCallbacks(new PhysicsUpdateCallback() {
@@ -696,7 +695,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     {
                         cam.setLocation( pinballSettings.getCamStartPos() );
 
-                        cam.lookAt( pinballSettings.getCamStartLookAt(), new Vector3f( 0.0f, 1.0f, -1.0f ) );
+                        cam.lookAt( pinballSettings.getCamStartLookAt(), new Vector3f( 0.0f, 1.0f, 0.0f ) );
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_HOME, InputHandler.AXIS_NONE, false );
@@ -851,6 +850,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         message = "cam[" + String.format( "%.2f", pos.x ) + ";" + String.format( "%.2f", pos.y ) + ";" + String.format( "%.2f", pos.z ) + "]";
                         messageText.getText().replace(0, messageText.getText().length(), "" + message);
                         System.out.println( "Camera at: " + display.getRenderer().getCamera().getLocation() );
+                        System.out.println( "Camera facing to " + display.getRenderer().getCamera().getDirection());
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F9, InputHandler.AXIS_NONE, false );

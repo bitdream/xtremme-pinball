@@ -13,8 +13,6 @@ import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.pass.BasicPassManager;
-import com.jme.renderer.pass.ShadowedRenderPass;
-import com.jme.scene.CameraNode;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
@@ -32,7 +30,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
     /**
      * nodo de la camara: para detectar colisiones con las paredes (no funciona)
      */
-    private CameraNode         cn;
+//    private com.jme.scene.CameraNode         cn;
 
     /**
      * nodo dinamico de la bola: guardado para reiniciar la simulacion
@@ -46,7 +44,7 @@ public class X3DLoaderTest extends SimplePhysicsGame
         app.start();
     }
 
-    private static ShadowedRenderPass sPass     = new ShadowedRenderPass();
+//    private static com.jme.renderer.pass.ShadowedRenderPass sPass     = new com.jme.renderer.pass.ShadowedRenderPass();
     protected BasicPassManager        pManager;
     protected Node                    occluders = new Node( "occluders" );
 
