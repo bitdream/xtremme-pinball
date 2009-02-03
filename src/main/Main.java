@@ -183,7 +183,7 @@ public class Main
 		stdGame.shutdown();
 		
 		/* Termino con el sistema de sonido TODO no anda? */
-		getAudioSystem().fadeOutAndClear(2f);
+		getAudioSystem().fadeOutAndClear(2);
 		
 //		if (AudioSystem.isCreated())
 //            AudioSystem.getSystem().cleanup();
