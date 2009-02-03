@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL13;
 
 import com.jme.input.MouseInput;
 import com.jmex.audio.AudioTrack;
+import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.game.state.BasicGameState;
 
 
@@ -42,6 +43,7 @@ public class MenuGameState extends BasicGameState
 		
 		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu/music.wav"), false);
+		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
 		
 		/* Inicializo el menu */
@@ -144,21 +146,20 @@ public class MenuGameState extends BasicGameState
 			
 			/* Si hay juegos en transcurso, muestro el boton de continue */
 			continueButton.setVisible(Main.hasInCourseGame());
-		
+
 			/* Inicio su musica */
-			Main.getAudioSystem().getMusicQueue().clearTracks();
 			Main.getAudioSystem().getMusicQueue().addTrack(music);
-			Main.getAudioSystem().getMusicQueue().play();
+			Main.getAudioSystem().getMusicQueue().setCurrentTrack(music);
+			
+			/* Si era la primera instancia del menu todavia no estaba en ejecucion la musica */
+			if (!Main.getAudioSystem().getMusicQueue().isPlaying())
+				Main.getAudioSystem().getMusicQueue().play();
+
 		}
 		else
 		{
 			/* Oculto el cursor */
 			MouseInput.get().setCursorVisible(false);
-			
-			/* Detengo su musica */
-			Main.getAudioSystem().getMusicQueue().clearTracks();
-			
-			// TODO hacer fadeout!
 		}
 	}
 	
@@ -169,6 +170,9 @@ public class MenuGameState extends BasicGameState
 		
 		/* Actualizo el controlador de input */
         fengGUIInputHandler.update(tpf);
+        
+        /* Actualizo el sistema de sonido */
+        Main.getAudioSystem().update();
 	}
 	
 	@Override
