@@ -58,6 +58,7 @@ public class LoadingGameState extends BasicGameState
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/loading/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
+		music.setVolume(Main.getMusicVolume());
 		
 		/* Inicializo la informacion del progreso */
 		initProgressInfo();

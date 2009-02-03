@@ -12,6 +12,7 @@ import components.Spinner;
 import gamelogic.GameLogic;
 import gamestates.PinballGameState;
 
+
 public class CarsThemeGameLogic extends GameLogic
 {
 	private static final int bumperScore = 10, spinnerScore = 5, rampScore = 100;
@@ -45,6 +46,7 @@ public class CarsThemeGameLogic extends GameLogic
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
+		music.setVolume(Main.getMusicVolume());
 	}
 
 	@Override
@@ -179,7 +181,9 @@ public class CarsThemeGameLogic extends GameLogic
 	@Override
 	public void gameStart()
 	{
-		showMessage("Start your engines!!!");	
+		showMessage("Start your engines!!!");
+		
+		gameStartSound.play();
 	}
 
 	@Override

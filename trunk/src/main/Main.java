@@ -26,6 +26,7 @@ public class Main
 	
 	private static AudioSystem audio;
 	
+	private static float musicVolume = 07.f;
 
 	/**
 	 * Punto de entrada al juego
@@ -239,4 +240,9 @@ public class Main
 			throw new IOException("Se produjo un fallo al obtener el manejador del campo para definir el library path.");
 		}
     }
+
+	public static float getMusicVolume()
+	{
+		return musicVolume;
+	}
 }
