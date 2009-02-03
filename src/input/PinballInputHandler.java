@@ -30,6 +30,18 @@ public class PinballInputHandler extends FirstPersonHandler
 	//Intervalo de tiempo luego del cual se blanquearan los tilts anteriores y se podra seguir usandolo sin penalizacion
 	private static long tiltFreeTimeInterval = 5000; // Son 5 segundos
 	
+	private boolean tiltActive = true;
+	
+	public boolean isTiltActive() 
+	{
+		return tiltActive;
+	}
+
+	public void setTiltActive(boolean tiltActive) 
+	{
+		this.tiltActive = tiltActive;
+	}
+
 	public PinballInputHandler(PinballGameState game)
 	{
 		/* Llamo al constructor de FirstPersonHandler pasandole las velocidades de camara del juego */
@@ -201,6 +213,11 @@ public class PinballInputHandler extends FirstPersonHandler
 			Vector3f cameraMovement = new Vector3f(3,3,3);
 			Vector3f initCameraPos = game.getCamera().getLocation();
 
+			// Si el tilt no esta activo, no hago nada
+			if(!tiltActive)
+			{
+				return;
+			}
 			
 			if(event.getTriggerPressed())
 			{
