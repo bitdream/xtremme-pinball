@@ -2,8 +2,6 @@ package gamelogic;
 
 import gamestates.PinballGameState;
 import main.Main;
-import com.jme.math.Quaternion;
-import com.jme.math.Vector3f;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -163,6 +161,9 @@ public abstract class GameLogic
 	{
 		tiltAbuseSound.play();
 		
+		/* Corto la musica actual (pero sigo en ejecucion por si abren el menu en el medio */
+		audio.getMusicQueue().getCurrentTrack().fadeOut(1.5f);
+
 		tiltAbused = true;
 		
 		// Desactivar los flippers
@@ -172,10 +173,6 @@ public abstract class GameLogic
 		}
 		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
 		// TODO deshabilitar spinners (no contar sus ptos seteando a cero su score o con if dentro de su colision) y bumpers y magnet -> parte de esto va en el theme
-
-		
-		/* TODO Corto la musica (fade out) y recordar recomenzarla */
-		
 	}
 	
 	// Invocado cuando se pierde una bola
@@ -224,8 +221,8 @@ public abstract class GameLogic
 					
 					// Reinicio la variable
 					tiltAbused = false;
-					
-					// TODO Pablo continua la musica aca
+
+					audio.getMusicQueue().getCurrentTrack().fadeIn(1, 1);
 				}
 
 				

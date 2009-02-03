@@ -212,6 +212,9 @@ public class CarsThemeGameLogic extends GameLogic
 		/* Inicio su musica */
 		audio.getMusicQueue().addTrack(music);
 		audio.getMusicQueue().setCurrentTrack(music);
+		
+		if (tiltAbused)
+			audio.getMusicQueue().getCurrentTrack().setVolume(0);
 	}
 
 	@Override
