@@ -5,9 +5,12 @@ import main.Main;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.StaticPhysicsNode;
+
 import components.Bumper;
 import components.Door;
 import components.Flipper;
+import components.Magnet;
 import components.Plunger;
 import components.Spinner;
 
@@ -28,6 +31,8 @@ public abstract class GameLogic
 	protected String ballsText = "Balls: ";	
 	
 	protected boolean tiltAbused = false;
+	
+	protected boolean gameFinished = false;
 	
 	protected PinballGameState pinball;
 	
@@ -164,6 +169,7 @@ public abstract class GameLogic
 		/* Corto la musica actual (pero sigo en ejecucion por si abren el menu en el medio */
 		audio.getMusicQueue().getCurrentTrack().fadeOut(1.5f);
 
+		// Seteo la variable de aviso
 		tiltAbused = true;
 		
 		// Desactivar los flippers
@@ -171,8 +177,23 @@ public abstract class GameLogic
 		{
 			((Flipper)flipper.getChild(0)).setActive(false);
 		}
-		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
-		// TODO deshabilitar spinners (no contar sus ptos seteando a cero su score o con if dentro de su colision) y bumpers y magnet -> parte de esto va en el theme
+		// Desactivar bumpers
+		for (DynamicPhysicsNode bumper : pinball.getJumperBumpers()) 
+		{
+			((Bumper)bumper.getChild(0)).setActive(false);
+		}
+		for (StaticPhysicsNode bumper : pinball.getNoJumperBumpers()) 
+		{
+			((Bumper)bumper.getChild(0)).setActive(false);
+		}		
+		// Desactivar los magnets
+		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+		{
+			((Magnet)magnet.getChild(0)).setActive(false);
+		}
+		// Desactivar tilt
+		pinball.getPinballInputHandler().setTiltActive(false);
+		
 	}
 	
 	// Invocado cuando se pierde una bola
@@ -213,21 +234,27 @@ public abstract class GameLogic
 				// Si se perdieron las bolas por estar deshabilitados los flippers debido a abuso de tilt, rehabilitarlos
 				if (tiltAbused)
 				{
+					// Habilitar flippers, bumpers y poner en false el boolean para rehabilitar puntos y tilt
 					for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
 					{
 						((Flipper)flipper.getChild(0)).setActive(true);
 					}
-					//TODO habilitar bumpers y demas
+					for (DynamicPhysicsNode bumper : pinball.getJumperBumpers()) 
+					{
+						((Bumper)bumper.getChild(0)).setActive(true);
+					}
+					for (StaticPhysicsNode bumper : pinball.getNoJumperBumpers()) 
+					{
+						((Bumper)bumper.getChild(0)).setActive(true);
+					}	
+					
+					pinball.getPinballInputHandler().setTiltActive(true);
 					
 					// Reinicio la variable
 					tiltAbused = false;
 
 					audio.getMusicQueue().getCurrentTrack().fadeIn(1, 1);
 				}
-
-				
-				//TODO resetear cnt de rampa, secuencias, etc.
-
 			}
 			else
 			{
@@ -242,15 +269,17 @@ public abstract class GameLogic
 	
 	public void lostGame(DynamicPhysicsNode ball)
 	{
-		// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
-//		pinball.getBalls().remove(ball);
-//		pinball.getRootNode().detachChild(ball);
-
 		// Desactivar los flippers
 		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
 		{
 			((Flipper)flipper.getChild(0)).setActive(false);
 		}
+		
+		// Desactivar el tilt
+		pinball.getPinballInputHandler().setTiltActive(false);
+		gameFinished = true;
+		
+		// TODO mostrar cartel para presionar N para nuevo juego con la misma mesa. -> si lo presiona, reiniciar toda la logica y activar componentes!
 		
 		showMessage("Game over");
 	}

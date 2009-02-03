@@ -97,8 +97,11 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		super.spinnerNormalCollision(spinner);
 		
-		// TODO no sumar si hay abuso de tilt
-		score += spinnerScore;
+		// No sumar si hay abuso de tilt
+		if (!tiltAbused)
+		{
+			score += spinnerScore;
+		}
 		
 		// Se actualizan los datos de pantalla de usuario
 		showScore();
@@ -111,16 +114,15 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		rampUpSound.play();
 
-		// TODO no sumar si hay abuso de tilt
-		score += rampScore;
+		// No sumar si hay abuso de tilt
+		if (!tiltAbused)
+		{
+			score += rampScore;
+		}
 		
 		// Se actualizan los datos de pantalla de usuario
 		showScore();
 		rampCnt++;
-		
-		// TODO debug
-		showMessage("Paso por rampa N: " + String.valueOf(rampCnt));
-
 	}
 
 	@Override
@@ -135,29 +137,37 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		super.abuseTilt();
 		
-		// Imprimir en pantalla un cartel que avise el abuso de tilts 
+		// Imprimir en pantalla un cartel que avise el abuso de tilts de este theme
 		showMessage("Too much tilt, flippers disabled!!!");
 		
-//		// Desactivar los flippers
-//		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
-//		{
-//			((Flipper)flipper.getChild(0)).setActive(false);
-//		}
-//		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
-//		// TODO deshabilitar spinners (no contar sus ptos seteando a cero su score o con if dentro de su colision) y bumpers y magnet
-//	
-//		// Variable booleana de deshabilitado por tilt
+		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
 	
 	}
 
 	@Override
 	public void lostBall(DynamicPhysicsNode ball)
 	{
-		// Muestro el mensaje de este theme TODO customizar el msg segun haya perdido la unica bola o no
+		// Detectar si ya se hizo la llamada para esta bola, en tal caso no estara en la lista
+		boolean firstTime;
+
+		// Si es la primera vez que se llama a este metodo por esta bola (colisiones multiples) 
+		firstTime = pinball.getBalls().contains(ball);
+		
+		if (!firstTime)
+		{
+			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones)
+			return;
+		}
+		
+		
+		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
 			showMessage("Crash, be careful!!!");
-			//TODO ver si se perdio una bola que baja la vida y resetear contadores de rampa, etc!
+			
+			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, etc
+			rampCnt = 0;
+			bumperCollisionCnt = 0;
 			
 		}
 		else
@@ -193,7 +203,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.lostGame(ball);
 		
 		// Mensaje propio de este theme, debe imprimirse luego del default (impreso por super.lostGame())
-		showMessage("Race over...");
+		showMessage("Race over..."); // TODO agregar press N to new game
 		
 		gameOverSound.play();
 	}
