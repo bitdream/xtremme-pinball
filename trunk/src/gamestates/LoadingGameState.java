@@ -38,7 +38,7 @@ public class LoadingGameState extends BasicGameState
 	private LoadWorker loadingThread;
 
 	/* Angulo de inclinacion requerido para el juego a crear */
-	private float inclinationAngle;
+	private PinballGameStateSettings settings;
 
 	/* Recurso de la mesa */
 	private URL tableResource;
@@ -47,11 +47,11 @@ public class LoadingGameState extends BasicGameState
 	private Label loadingLabel;
 	private Window progressInfo;
 
-	public LoadingGameState(String name, float inclinationAngle, URL tableResource)
+	public LoadingGameState(String name, PinballGameStateSettings settings, URL tableResource)
 	{
 		super(name);
 
-		this.inclinationAngle = inclinationAngle;
+		this.settings = settings;
 		this.tableResource = tableResource;
 		
 		/* TODO (buscar musica de loading) Inicializo la musica */
@@ -104,7 +104,7 @@ public class LoadingGameState extends BasicGameState
 	public void startLoading()
 	{
         /* Creo el juego nuevo */
-        final PinballGameState pinballGS = Main.newPinballGame(inclinationAngle);
+        final PinballGameState pinballGS = Main.newPinballGame(settings);
         
         loadingThread.setPinball(pinballGS);
         
@@ -124,7 +124,7 @@ public class LoadingGameState extends BasicGameState
 	public void setActive(boolean active)
 	{
 		super.setActive(active);
-
+		
 		if (active)
 		{
 			/* Muestro el cursor */
@@ -153,9 +153,11 @@ public class LoadingGameState extends BasicGameState
 		    endLoad();
 		    this.loadingThread.endWork();
 		}
-		
-		/* Actualizo el controlador de input */
-        fengGUIInputHandler.update(tpf);
+		else
+		{
+		    /* Actualizo el controlador de input */
+		    fengGUIInputHandler.update(tpf);
+		}
         
         /* Actualizo el sistema de sonido */
         Main.getAudioSystem().update();

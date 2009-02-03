@@ -36,6 +36,8 @@ public class MenuGameState extends BasicGameState
 	/* Musica del menu */
 	private AudioTrack music;
 	
+	/* Settings del pinball */
+	private PinballGameStateSettings settings;
 
 	public MenuGameState(String name)
 	{
@@ -45,6 +47,8 @@ public class MenuGameState extends BasicGameState
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
+		
+		settings = new PinballGameStateSettings();
 		
 		/* Inicializo el menu */
 		initMenu();
@@ -104,7 +108,7 @@ public class MenuGameState extends BasicGameState
 				Main.endCurrentPinballGame();
 				
 				/* TODO (aca hacer la ventanita modal de selecc de mapa e inclinacion) Creo un loading nuevo y lo inicio */
-				LoadingGameState lgs = Main.newLoading(8f, MenuGameState.class.getClassLoader().getResource( "resources/models/Table.x3d" ));
+				LoadingGameState lgs = Main.newLoading(settings, MenuGameState.class.getClassLoader().getResource( "resources/models/Table.x3d" ));
 				lgs.setActive(true);
 				lgs.startLoading();
 			}
