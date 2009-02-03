@@ -15,7 +15,15 @@ import gamestates.PinballGameState;
 
 public class CarsThemeGameLogic extends GameLogic
 {
-	private static final int bumperScore = 10, spinnerScore = 5, rampScore = 100;
+	// Puntajes que otorga cada componente
+	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 5, RAMP_SCORE = 50;
+	
+	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
+	private static final int MAX_BALLS = 3;
+	
+	// Multiplicadores para decidir el incremento de vidas y bolas
+	private static final int EXTRA_LIFE_STEP = /*1000*/ 500; //TODO ajustar valores
+	private static final int EXTRA_BALL_STEP = /*500*/ 200; //TODO ajustar valores
 	
 	// Texto a mostrar al usuario como encabezado de los puntos que tiene
 	protected String scoreText = "Distance: ";
@@ -27,14 +35,20 @@ public class CarsThemeGameLogic extends GameLogic
 	private int bumperCollisionCnt = 0;	
 	private int rampCnt = 0;	
 	private int spinnerCollisionCnt = 0;
+	private int thisBallScore = 0;
+	private int extraLifesCnt = 1;
+	private int extraBallsCnt = 1;
 	
+
+	
+	// Sonidos
 	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
-		/* Preparo las pistas de audio que voy a usar */
+		// Preparo las pistas de audio que voy a usar 
 		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/ramp-up.wav"), false);
 		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-ball.wav"), false);
 		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/lost-last-ball.wav"), false);
@@ -42,7 +56,7 @@ public class CarsThemeGameLogic extends GameLogic
 		gameOverSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/end.wav"), false);
 		extraBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/extra-ball.wav"), false);
 		
-		/* Inicializo la musica */
+		// Inicializo la musica
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
@@ -58,14 +72,16 @@ public class CarsThemeGameLogic extends GameLogic
 		// El abuso de tilt lo desactiva asi que no se realizara la sumatoria de puntos
 		if (bumper.isActive())
 		{
-			score += bumperScore;
+			// Actualizo el score global y el hecho con esta bola (en esta mano)
+			score += BUMPER_SCORE;
+			thisBallScore += BUMPER_SCORE;
 			
 			// Se actualiza los datos de pantalla de usuario
 			showScore();
 			bumperCollisionCnt ++;
 			
 			// TODO debug
-			System.out.println("Bumper cnt: " + bumperCollisionCnt);
+			//System.out.println("Bumper cnt: " + bumperCollisionCnt);
 			
 			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo!
 //			if (bumperCollisionCnt > 5)
@@ -104,7 +120,9 @@ public class CarsThemeGameLogic extends GameLogic
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
 		{
-			score += spinnerScore;
+			score += SPINNER_SCORE;
+			thisBallScore += SPINNER_SCORE;
+			
 			// Se actualizan los datos de pantalla de usuario
 			showScore();
 			spinnerCollisionCnt++;
@@ -122,7 +140,9 @@ public class CarsThemeGameLogic extends GameLogic
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
 		{
-			score += rampScore;
+			score += RAMP_SCORE;
+			thisBallScore += RAMP_SCORE;
+			
 			// Se actualizan los datos de pantalla de usuario
 			showScore();
 			rampCnt++;
@@ -165,14 +185,13 @@ public class CarsThemeGameLogic extends GameLogic
 			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones) asi que la ignoro
 			return;
 		}
-		
-		
+				
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
 			showMessage("Crash, be careful!!!");
 			
-			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, etc
+			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
 			newBallCntsReset();
 		}
 		else
@@ -184,8 +203,70 @@ public class CarsThemeGameLogic extends GameLogic
 
 	}
 	
+	@Override
+	public void showScore()
+	{
+		super.showScore();
+		
+		// Ver si hay que hacer cosas adicionales
+		analyzeScore();
+
+	}
+	
+	// Segun el puntaje actual agrega bolas extra, vidas, etc
+	private void analyzeScore()
+	{
+		// Bola extra?
+		if ((score >= EXTRA_BALL_STEP * extraBallsCnt) && /*pinball.getBalls().size()*/ getInTableBallQty() < MAX_BALLS)
+		{
+			// Agrego una bola extra
+			pinball.addBall(pinball.getExtraBallStartUp());
+			extraBallsCnt++;
+			
+			// Mensaje y sonido al usuario
+			showExtraBallMessage();
+			playExtraBallSound();			
+		}
+		
+		// Vida extra?
+		if (thisBallScore >= EXTRA_LIFE_STEP * extraLifesCnt)
+		{
+			extraLifesCnt++;			
+			
+			// Mensaje y sonido al usuario
+			lifes++;
+			showLifes();
+			showExtraLifeMessage();
+			playExtraLifeSound();			
+		}
+		
+	}
+	
+	private void playExtraBallSound()
+	{
+		extraBallSound.play();
+	}
+	
+	private void showExtraBallMessage()
+	{
+		showMessage("Best lap, extra ball!!!");
+	}
+	
+	private void playExtraLifeSound()
+	{
+		// TODO encontrar sonido
+	}
+	
+	private void showExtraLifeMessage()
+	{
+		showMessage("Lap record, extra fuel!!!");
+	}
+	
+	// Llamado al perder una vida
+	// TODO ver si lo voy a hacer asi
 	private void newBallCntsReset()
 	{
+		thisBallScore = 0;
 		rampCnt = 0;
 		bumperCollisionCnt = 0;
 		spinnerCollisionCnt = 0;
@@ -201,12 +282,6 @@ public class CarsThemeGameLogic extends GameLogic
 	public void playLostBallSound()
 	{
 		lostBallSound.play();
-	}
-
-	@Override	
-	public void playExtraBallSound()
-	{
-		extraBallSound.play();
 	}
 	
 	@Override
@@ -255,11 +330,5 @@ public class CarsThemeGameLogic extends GameLogic
 	public String getBallsText()
 	{
 		return ballsText;
-	}
-	
-	@Override
-	public void showExtraBallMessage()
-	{
-		showMessage("Best lap, extra ball!!!");
 	}
 }

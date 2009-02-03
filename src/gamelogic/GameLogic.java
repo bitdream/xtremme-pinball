@@ -17,9 +17,6 @@ import components.Spinner;
 
 public abstract class GameLogic
 {
-	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
-	protected static int MAX_BALLS = 3;
-	
 	protected int score;
 	
 	protected int lifes = 3;
@@ -61,25 +58,9 @@ public abstract class GameLogic
 	public void showScore()
 	{
 		pinball.setScore(score);
-		
-		// Ver si hay que hacer cosas adicionales
-		analyzeScore();
 
 	}
 	
-	// Segun el puntaje actual agrega bolas extra
-	private void analyzeScore()
-	{
-		// TODO Esta logica es temporal!
-		if ((score == 20 || score == 25 )&& pinball.getBalls().size() < MAX_BALLS)
-		{
-			pinball.addBall(pinball.getExtraBallStartUp());
-			
-			showExtraBallMessage();
-			playExtraBallSound();
-
-		}
-	}
 	public void showLifes()
 	{
 		pinball.setLifes(lifes);
@@ -200,17 +181,18 @@ public abstract class GameLogic
 	public void lostBall(DynamicPhysicsNode ball)
 	{
 		// Detectar si ya se hizo la llamada para esta bola, en tal caso no estara en la lista
-		boolean wasAlreadyRemoved;
+//		boolean wasAlreadyRemoved;
 
 		// Quitar a esta bola de la lista que mantiene el pinball 
-		wasAlreadyRemoved = ! pinball.getBalls().remove(ball);
+		/*wasAlreadyRemoved = ! */pinball.getBalls().remove(ball);
 		
-		if (wasAlreadyRemoved)
+		// No lo hago pq lo hago desde la logica del theme
+/*		if (wasAlreadyRemoved)
 		{
 			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones)
 			return;
 		}
-		
+*/		
 		// Desattachearla del rootNode para que no se siga renderizando
 		pinball.getRootNode().detachChild(ball);
 		
@@ -294,11 +276,6 @@ public abstract class GameLogic
 		// No habra sonido default
 	}
 	
-	public void playExtraBallSound()
-	{
-		// TODO poner sonido de extra ball default
-	}
-	
 	// Invocado cuando comienza el juego
 	public abstract void gameStart();
 	
@@ -317,10 +294,5 @@ public abstract class GameLogic
 	public String getBallsText()
 	{
 		return ballsText;
-	}
-	
-	public void showExtraBallMessage()
-	{
-		showMessage("Extra ball!!!");
 	}
 }
