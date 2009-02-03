@@ -72,7 +72,6 @@ public class LoaderThread implements Runnable, Observer
         return this.scene;
     }
 
-    @Override
     public void update( Observable o, Object arg )
     {
         if ( arg instanceof Float )

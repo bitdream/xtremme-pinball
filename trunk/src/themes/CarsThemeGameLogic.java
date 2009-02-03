@@ -2,6 +2,7 @@ package themes;
 
 import main.Main;
 import com.jmex.audio.AudioTrack;
+import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.physics.DynamicPhysicsNode;
 import components.Bumper;
 import components.Door;
@@ -26,7 +27,7 @@ public class CarsThemeGameLogic extends GameLogic
 	// Cantidad de veces que paso por la rampa
 	private int rampCnt = 0;	
 	
-	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, gameStartSound,gameOverSound,  music;
+	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, gameStartSound, gameOverSound, music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
@@ -41,6 +42,7 @@ public class CarsThemeGameLogic extends GameLogic
 
 		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
+		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
 	}
 
@@ -177,26 +179,20 @@ public class CarsThemeGameLogic extends GameLogic
 	public void gameStart()
 	{
 		showMessage("Start your engines!!!");	
-		
-		gameStartSound.play();
 	}
 
 	@Override
 	public void enterGame()
 	{
 		/* Inicio su musica */
-		audio.getMusicQueue().clearTracks();
 		audio.getMusicQueue().addTrack(music);
-		audio.getMusicQueue().play();
+		audio.getMusicQueue().setCurrentTrack(music);
 	}
 
 	@Override
 	public void leaveGame()
 	{
-		/* Detengo su musica */
-		audio.getMusicQueue().clearTracks();
-		
-		// TODO hacer fadeout!
+
 	}
 	
 	@Override	

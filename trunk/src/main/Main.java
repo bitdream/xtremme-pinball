@@ -13,6 +13,7 @@ import gamestates.PinballGameStateSettings;
 
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.audio.AudioSystem;
+import com.jmex.audio.MusicTrackQueue.RepeatType;
 import com.jmex.game.StandardGame;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
@@ -31,7 +32,7 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-	    if ( true /*args[0].equals( "debug" )*/ )
+	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto?
 	    {
 	        System.setProperty( "jme.stats", "set" );
 	    }
@@ -48,6 +49,16 @@ public class Main
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
 		
+		/* Sin fade in */
+		audio.getMusicQueue().setCrossfadeinTime(0);
+		
+		/* Con fade out */
+		audio.getMusicQueue().setCrossfadeoutTime(2f);
+		
+		/* No quiero que las pistas se repitan por default */
+		audio.getMusicQueue().setRepeatType(RepeatType.ONE);
+	
+		/* Inicializacion del juego principal */
 		stdGame = new StandardGame("xtremme-pinball");
 		
 		// TODO cablear que siempre use LWJGL, y ver porque solo aparece 1 vez (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)

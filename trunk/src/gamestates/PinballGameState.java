@@ -52,7 +52,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!xtremme pinball";
+	private static final String GAME_NAME = "!!xtremme pinball";
 	private static final String GAME_VERSION = "0.5";
 	
 	/* Logger de la clase Pinball */
@@ -198,6 +198,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
             lastSampleTime = timeMS;
         }
 
+        /* Actualizo el sistema de sonido */
+        Main.getAudioSystem().update();
 	}
 	
 	/**
@@ -428,7 +430,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Notifico a la logica de juego cada vez que
          * ingreso, reingreso o salgo del juego (para ir al menu) */
         if (active)
-            gameLogic.enterGame();
+//            {gameLogic.enterGame();Main.getAudioSystem().getMusicQueue().clearTracks();
+//			Main.getAudioSystem().getMusicQueue().addTrack(Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false));
+//			Main.getAudioSystem().getMusicQueue().play();}
+        	gameLogic.enterGame();
         else
             gameLogic.leaveGame();
     }

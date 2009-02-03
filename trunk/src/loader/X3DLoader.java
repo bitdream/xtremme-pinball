@@ -307,7 +307,6 @@ public class X3DLoader extends Observable implements Observer
         return null;
     }
     
-    @Override
     public void update( Observable o, Object arg )
     {
         super.setChanged();
