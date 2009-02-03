@@ -36,7 +36,7 @@ public class Bumper extends Node implements ActivableComponent
 	private static PinballGameState pinballInstance;
 	
 	// Intensidad de la fuerza repulsora a aplicar sobre la bola  
-	private static float forceToBallIntensity = 600f; // Grande para que sea un golpe seco y no haya colisiones espureas
+	private static float forceToBallIntensity = 400f; // Grande para que sea un golpe seco y no haya colisiones espureas
 	//TODO antes 900f. hacer la intensidad de modo que sea suficiente para mover la bola con cualquier angulo de inclinacion permitido! 
 	//Magic number probado con angulo de 15 y repele con fuerza. HACERLO EN FUNCION DEL ANGULO DE INCLINACION DE LA MESA.
 	// POSIBLE FORMULA: cte*(max_angle - pinball_angle) -> MAL
