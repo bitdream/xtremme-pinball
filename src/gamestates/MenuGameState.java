@@ -47,6 +47,7 @@ public class MenuGameState extends BasicGameState
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
+		music.setVolume(Main.getMusicVolume());
 		
 		settings = new PinballGameStateSettings();
 		
