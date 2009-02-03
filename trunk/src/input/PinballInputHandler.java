@@ -46,12 +46,10 @@ public class PinballInputHandler extends FirstPersonHandler
 		addAction(new OpenMenuAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers derechos */
-		// TODO addAction(new RightFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, true); //KeyInput.KEY_RSHIFT
-		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RCONTROL, InputHandler.AXIS_NONE, false); //KeyInput.KEY_RSHIFT
+		addAction(new RightFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_M, InputHandler.AXIS_NONE, false);
 		
 		/* Golpear con flippers izquierdos */
-		// TODO addAction(new LeftFlippersAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, true); // KeyInput.KEY_LSHIFT
-		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_LCONTROL, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
+		addAction(new LeftFlippersActionOnce(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_Z, InputHandler.AXIS_NONE, false); // KeyInput.KEY_LSHIFT
 		
 		/* Activar plunger */
 		addAction(new ChargePlungerAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_RETURN, InputHandler.AXIS_NONE, false);
@@ -74,34 +72,6 @@ public class PinballInputHandler extends FirstPersonHandler
 		}
 		
 	}
-	
-	/* TODO (quitada para usar velocs y accels) Accion para golpear con flippers derechos */
-//	private class RightFlippersAction extends InputAction
-//	{
-//		private final Vector3f forceToApply = new Vector3f();
-//		
-//		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
-//
-//		public void performAction(InputActionEvent event)
-//		{
-//			if(event.getTriggerPressed())
-//			{
-//				/* Presiona la tecla, fijo la fuerza a aplicar */
-//				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
-//
-//				for (DynamicPhysicsNode flipper : game.getFlippers())
-//				{
-//					Flipper actualFlipper = (Flipper)flipper.getChild(0);
-//					/* Aplico la fuerza sobre los flippers derechos */
-//					if (actualFlipper.isRightFlipper() && actualFlipper.isActive())
-//					{
-//						flipper.addForce(forceToApply.rotate(rot));
-//					}
-//				}
-//			}
-//		}
-//		
-//	}
 	
 	/* Accion para golpear con flippers derechos por unica vez */
 	private class RightFlippersActionOnce extends InputAction
@@ -139,33 +109,6 @@ public class PinballInputHandler extends FirstPersonHandler
 			}
 		}
 	}
-	
-	/* TODO (quitada para usar velocs y accels) Accion para golpear con flippers izquierdos */
-//	private class LeftFlippersAction extends InputAction
-//	{
-//		private final Vector3f forceToApply = new Vector3f();
-//		
-//		private Quaternion rot = game.getPinballSettings().getInclinationQuaternion();
-//
-//		public void performAction(InputActionEvent event)
-//		{
-//			if(event.getTriggerPressed())
-//			{
-//				/* Presiona la tecla, fijo la fuerza a aplicar */
-//				forceToApply.set(Flipper.flipperHitForce).multLocal(event.getTime());
-//
-//				for (DynamicPhysicsNode flipper : game.getFlippers())
-//				{
-//					Flipper actualFlipper = (Flipper)flipper.getChild(0);
-//					/* Aplico la fuerza sobre los flippers izquierdos */
-//					if (actualFlipper.isLeftFlipper() && actualFlipper.isActive())
-//					{
-//						flipper.addForce(forceToApply.rotate(rot));
-//					}
-//				}
-//			}
-//		}
-//	}
 	
 	/* Accion para golpear con flippers izquierdos por unica vez */
 	private class LeftFlippersActionOnce extends InputAction
