@@ -19,7 +19,7 @@ public abstract class GameLogic
 {
 	protected int score;
 	
-	protected int lifes = 3;
+	protected int lifes = 15;
 	
 	// Texto a mostrar al usuario como encabezado de los puntos que tiene
 	protected String scoreText = "Score: ";

@@ -22,11 +22,11 @@ public class Magnet extends Node implements ActivableComponent
 	private Geometry visualModel;
 	
 	// Intensidad de la fuerza
-	private static int force = 100; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
+	private static int force = 800; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
 	
-	//TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa (xed final)
+	//TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa
 	// Radio del campo de la fuerza magnetica
-	private static int forceFieldRadius = 10; // Testeado con los sig valores: bolas de radio 1 e iman un Box("Visual magnet 1", new Vector3f(), 2f, 4f, 2f);
+	private static int forceFieldRadius = 5; 
 	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
 	private static float maxRadius = 3; //Valor de testeo: 3 cuando las bolas son de radio 1

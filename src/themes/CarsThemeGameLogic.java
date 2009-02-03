@@ -4,11 +4,15 @@ import main.Main;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.physics.DynamicPhysicsNode;
+import com.jmex.physics.StaticPhysicsNode;
+
 import components.Bumper;
 import components.Door;
 import components.Flipper;
+import components.Magnet;
 import components.Plunger;
 import components.Spinner;
+import components.Bumper.BumperType;
 import gamelogic.GameLogic;
 import gamestates.PinballGameState;
 
@@ -16,7 +20,7 @@ import gamestates.PinballGameState;
 public class CarsThemeGameLogic extends GameLogic
 {
 	// Puntajes que otorga cada componente
-	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 5, RAMP_SCORE = 50;
+	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 5, RAMP_SCORE = 50, COMPLETE_SEQ_SCORE = 300;
 	
 	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	private static final int MAX_BALLS = 3;
@@ -39,7 +43,10 @@ public class CarsThemeGameLogic extends GameLogic
 	private int extraLifesCnt = 1;
 	private int extraBallsCnt = 1;
 	
-
+	// Contador de pasos para la secuencia bumper saltarin -> spinner -> rampa sin perder vidas
+	private int completeSeqCnt = 0;
+	
+	private boolean MagnetsActive = false;
 	
 	// Sonidos
 	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, music;
@@ -80,19 +87,15 @@ public class CarsThemeGameLogic extends GameLogic
 			showScore();
 			bumperCollisionCnt ++;
 			
-			// TODO debug
-			//System.out.println("Bumper cnt: " + bumperCollisionCnt);
-			
-			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo!
-//			if (bumperCollisionCnt > 5)
-//			{
-//				//bumper.setActive(false);
-//				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-//				{
-//					Magnet m = (Magnet)magnet.getChild(0);
-//					m.setActive(false);
-//				}
-//			}
+			if (bumper.getBumperType().equals(BumperType.JUMPER))
+			{
+				// Inicio de secuencia bumper saltarin -> spinner -> rampa
+				completeSeqCnt = 1;
+				
+				// Mensaje al usuario diciendo el proximo paso a seguir
+				showMessage("To overtake next car go to the spinners!!!"); 
+				//FIXME estos mensajes seran tapados por los de vida extra y bola extra llamados por showScore, ver si poner ambos al mismo tiempo o como solucionarlo con el HUD
+			}
 		}
 	}
 
@@ -126,8 +129,18 @@ public class CarsThemeGameLogic extends GameLogic
 			// Se actualizan los datos de pantalla de usuario
 			showScore();
 			spinnerCollisionCnt++;
-			// TODO debug
-			//System.out.println("Spinner cnt: " + spinnerCollisionCnt);
+			
+			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
+			if (completeSeqCnt == 1)
+			{
+				completeSeqCnt = 2;  //Se realizo el segundo paso de la secuencia
+				// Mensaje al usuario diciendo el proximo paso a seguir
+				showMessage("Opponent overtaked. Go through the ramp to get the checkpoint!!!");
+			}
+			else
+			{
+				completeSeqCnt = 0; //Reseteo la secuencia
+			}
 		}		
 
 	}
@@ -139,15 +152,29 @@ public class CarsThemeGameLogic extends GameLogic
 
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
-		{
-			score += RAMP_SCORE;
-			thisBallScore += RAMP_SCORE;
+		{						
+			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
+			if (completeSeqCnt == 2)
+			{
+				// Otorgar el bonus por secuencia completa
+				score += COMPLETE_SEQ_SCORE;
+				thisBallScore += COMPLETE_SEQ_SCORE;
+				
+				// Mensaje al usuario diciendo avisando del bonus obtenido
+				showMessage("Checkpoint!!!");
+			}
+			else
+			{
+				// Solo sumar los puntos de pasaje por rampa
+				score += RAMP_SCORE;
+				thisBallScore += RAMP_SCORE;
+			}
+			// Reinicio la secuencia siempre
+			completeSeqCnt = 0;  
 			
 			// Se actualizan los datos de pantalla de usuario
 			showScore();
 			rampCnt++;
-			// TODO debug
-			//System.out.println("Rampa cnt: " + rampCnt);
 		}
 	}
 
@@ -189,18 +216,28 @@ public class CarsThemeGameLogic extends GameLogic
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
-			showMessage("Crash, be careful!!!");
+			showMessage("Pits stop!!!");
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
 			newBallCntsReset();
 		}
 		else
 		{
-			showMessage("Slow down, be careful!!!");
+			showMessage("Accident in front of you, slow down!!!");
 		}	
-
+		
+		if (MagnetsActive)
+		{
+			// Desactivar los magnets si es que alguno estaba activo 
+			for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+			{
+				((Magnet)magnet.getChild(0)).setActive(false);
+			}
+			showDisabledMagnetsMessage();
+			
+			MagnetsActive = false;
+		}
 		super.lostBall(ball);
-
 	}
 	
 	@Override
@@ -217,7 +254,7 @@ public class CarsThemeGameLogic extends GameLogic
 	private void analyzeScore()
 	{
 		// Bola extra?
-		if ((score >= EXTRA_BALL_STEP * extraBallsCnt) && /*pinball.getBalls().size()*/ getInTableBallQty() < MAX_BALLS)
+		if ((score >= EXTRA_BALL_STEP * extraBallsCnt) && getInTableBallQty() < MAX_BALLS)
 		{
 			// Agrego una bola extra
 			pinball.addBall(pinball.getExtraBallStartUp());
@@ -225,7 +262,22 @@ public class CarsThemeGameLogic extends GameLogic
 			
 			// Mensaje y sonido al usuario
 			showExtraBallMessage();
-			playExtraBallSound();			
+			playExtraBallSound();	
+			
+			// Cada 3 bolas extra, activar los imanes hasta que una bola se pierda
+			if ( (extraBallsCnt - 1) != 0 && (extraBallsCnt - 1) % 3 == 0)
+			{
+				// Activar los magnets 
+				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+				{
+					((Magnet)magnet.getChild(0)).setActive(true);
+				}
+				MagnetsActive = true;
+				
+				// Mensaje y sonido al usuario
+				showActiveMagnetsMessage();
+				playActiveMagnetsSound();
+			}
 		}
 		
 		// Vida extra?
@@ -239,7 +291,6 @@ public class CarsThemeGameLogic extends GameLogic
 			showExtraLifeMessage();
 			playExtraLifeSound();			
 		}
-		
 	}
 	
 	private void playExtraBallSound()
@@ -262,11 +313,27 @@ public class CarsThemeGameLogic extends GameLogic
 		showMessage("Lap record, extra fuel!!!");
 	}
 	
+	private void playActiveMagnetsSound()
+	{
+		// TODO encontrar sonido
+	}
+	
+	private void showActiveMagnetsMessage()
+	{
+		showMessage("Oil in the course, magnets active!!!");
+	}
+	
+	private void showDisabledMagnetsMessage()
+	{
+		showMessage("Magnets disabled!!!");
+	}
+	
 	// Llamado al perder una vida
 	// TODO ver si lo voy a hacer asi
 	private void newBallCntsReset()
 	{
 		thisBallScore = 0;
+		completeSeqCnt = 0;
 		rampCnt = 0;
 		bumperCollisionCnt = 0;
 		spinnerCollisionCnt = 0;
@@ -290,7 +357,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.lostGame(ball);
 		
 		// Mensaje propio de este theme, debe imprimirse luego del default (impreso por super.lostGame())
-		showMessage("Race over..."); // TODO agregar press N to new game
+		showMessage("Broke engine, race over..."); // TODO agregar press N to new game
 		
 		gameOverSound.play();
 	}
