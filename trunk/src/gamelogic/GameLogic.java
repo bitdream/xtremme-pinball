@@ -55,8 +55,17 @@ public abstract class GameLogic
 	
 	public void showScore()
 	{
-		// TODO Esta logica es temporal!
 		pinball.setScore(score);
+		
+		// Ver si hay que hacer cosas adicionales
+		analyzeScore();
+
+	}
+	
+	// Segun el puntaje actual agrega bolas extra
+	private void analyzeScore()
+	{
+		// TODO Esta logica es temporal!
 		if ((score == 20 || score == 25 )&& pinball.getBalls().size() < MAX_BALLS)
 		{
 			pinball.addBall(pinball.getExtraBallStartUp());
@@ -70,7 +79,6 @@ public abstract class GameLogic
 			//System.out.println("Ahora hay: " + pinball.getBalls().size() + " bolas");
 		}
 	}
-	
 	public void showLifes()
 	{
 		pinball.setLifes(lifes);
@@ -164,8 +172,19 @@ public abstract class GameLogic
 	// Invocado cuando se pierde una bola
 	public void lostBall(DynamicPhysicsNode ball)
 	{
-		// Quitar a esta bola de la lista que mantiene el pinball y desattachearla del rootNode para que no se siga renderizando
-		pinball.getBalls().remove(ball);
+		// Detectar si ya se hizo la llamada para esta bola, en tal caso no estara en la lista
+		boolean wasAlreadyRemoved;
+
+		// Quitar a esta bola de la lista que mantiene el pinball 
+		wasAlreadyRemoved = ! pinball.getBalls().remove(ball);
+		
+		if (wasAlreadyRemoved)
+		{
+			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones)
+			return;
+		}
+		
+		// Desattachearla del rootNode para que no se siga renderizando
 		pinball.getRootNode().detachChild(ball);
 		
 		if (getInTableBallQty() == 0) // Era la ultima bola, debe perder una vida
@@ -184,6 +203,8 @@ public abstract class GameLogic
 				
 				// Nueva bola desde la posicion del plunger
 				pinball.addBall(pinball.getBallStartUp());
+				
+				//TODO resetear cnt de rampa, secuancias, etc.
 
 			}
 			else

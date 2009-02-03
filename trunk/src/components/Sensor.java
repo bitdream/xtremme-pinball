@@ -97,28 +97,51 @@ private static final long serialVersionUID = 1L;
                     return;
                 }
                 
-                // Tiempo en el que se dio esta colision
-                long now = System.currentTimeMillis();
+                // Solo el sensor de rampa tiene ventana de tiempo, para poder detectar dos bolas que se pierden casi juntas
+                if (sensor.getSensorType() == SensorType.LOST_BALL_SENSOR)
+        		{    		
+        			pinballInstance.getGameLogic().lostBall(ball);
+        		}
+        		else 
+        		{
+        			 // Tiempo en el que se dio esta colision
+                    long now = System.currentTimeMillis();
+                    
+                    // Tiempo de la ultima colision considerada
+                    long lastColl = sensor.getLastConsideredCollisionTime();
+                    
+                    // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
+                    if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
+                    {   
+                    	pinballInstance.getGameLogic().sensorRampCollision();
+                    	sensor.setLastConsideredCollisionTime(now);
+                    }
+                    // Sino no hago nada pq es una colision repetida                    
+                }       		
                 
-                // Tiempo de la ultima colision considerada
-                long lastColl = sensor.getLastConsideredCollisionTime();
                 
-                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
-                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
-                {   
-            		// Dependiendo del tipo de sensor, se llama a metodos diferentes de la logica del juego
-            		if (sensor.getSensorType() == SensorType.LOST_BALL_SENSOR)
-            		{    		
-            			pinballInstance.getGameLogic().lostBall(ball);
-            		}
-            		else 
-            		{
-            			pinballInstance.getGameLogic().sensorRampCollision();
-            		}
-            		
-                    sensor.setLastConsideredCollisionTime(now);
-                }
-                // Sino no hago nada pq es una colision repetida       		
+//                // Tiempo en el que se dio esta colision
+//                long now = System.currentTimeMillis();
+//                
+//                // Tiempo de la ultima colision considerada
+//                long lastColl = sensor.getLastConsideredCollisionTime();
+//                
+//                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
+//                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
+//                {   
+//            		// Dependiendo del tipo de sensor, se llama a metodos diferentes de la logica del juego
+//            		if (sensor.getSensorType() == SensorType.LOST_BALL_SENSOR)
+//            		{    		
+//            			pinballInstance.getGameLogic().lostBall(ball);
+//            		}
+//            		else 
+//            		{
+//            			pinballInstance.getGameLogic().sensorRampCollision();
+//            		}
+//            		
+//                    sensor.setLastConsideredCollisionTime(now);
+//                }
+//                // Sino no hago nada pq es una colision repetida       		
         	}
         }, collisionEventHandler, false );
 		
