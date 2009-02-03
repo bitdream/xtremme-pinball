@@ -15,7 +15,6 @@ import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
-import com.jme.light.PointLight;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
@@ -158,8 +157,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		 * la llamada, la tenemos 3 veces mas rapida.
 		 */
 
-//		super.update(tpf * 3f); // Con esto el juego anda mas fluido, no ponerlo dentro del if (!pause)!!!
-
 		/* Actualizo el timer */
 		timer.update();
 		
@@ -174,15 +171,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
         if (!pause)
         {
             /* Se modifico la escena, entonces actualizo el grafo */
-         // super.update(tpf);
-
         	super.update(tpf * 3);
         	
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
-        
-//            super.update(tpf * 3f);
-            
         }
         
         /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
@@ -316,31 +308,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
         cs.setCullFace(CullState.Face.Back);
         rootNode.setRenderState(cs);
 
-
 		/* Armo la habitacion, la mesa y la bola */
-//        loadEnvironment();
-//        loadTable();
-        //setUpBall();
         addBall(this.ballStartUp);
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
-		
-        
-		// ----------------------------------------
-		// TODO volar: es para debug
-//        buildTable();
-//        gameLogic = new themes.CarsThemeGameLogic(this);
-//        buildAndAttachComponents();
-//        inclinePinball();
-//        buildLighting();
-        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
-        fpsText.setLocalScale( 0.80f );
-        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.5f, 1));
-        rootNode.attachChild(fpsText);
-        //-----------------------------------------
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -368,6 +340,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(messageText);
         
+        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
+        fpsText.setLocalScale( 0.80f );
+        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.95f, 1));
+        rootNode.attachChild(fpsText);
+        
         /* Aviso a la logica de juego que empieza uno */
         gameLogic.gameStart();
 	}
@@ -391,17 +370,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		}
 	}
 
-	private void buildLighting()
-    {
-        PointLight light = new PointLight();
-        light.setDiffuse( new ColorRGBA( 0.75f, 0.75f, 0.75f, 0.75f ) );
-        light.setAmbient( new ColorRGBA( 0.5f, 0.5f, 0.5f, 1.0f ) );
-        light.setLocation( new Vector3f( 100, 100, 100 ) );
-        light.setEnabled( true );
-        
-        lightState.attach( light );
-    }
-	
 	/**
 	 * Se la llama para limpiar el juego una vez finalizado
 	 */
@@ -694,6 +662,18 @@ public class PinballGameState extends PhysicsEnhancedGameState
     {
         if ( com.jme.util.Debug.debug )
         {
+            boolean luces = false;
+            if (luces)
+            {
+                com.jme.light.PointLight light = new com.jme.light.PointLight();
+                light.setDiffuse( new ColorRGBA( 0.75f, 0.75f, 0.75f, 0.75f ) );
+                light.setAmbient( new ColorRGBA( 0.5f, 0.5f, 0.5f, 1.0f ) );
+                light.setLocation( new Vector3f( 100, 100, 100 ) );
+                light.setEnabled( true );
+                
+                lightState.attach( light );
+            }
+
             // P pausa fisica
             pinballInputHandler.addAction( new InputAction()
             {
@@ -729,7 +709,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     if ( evt.getTriggerPressed() )
                     {
                         if (balls.size() == 0)
-                            //setUpBall();
                         	addBall(ballStartUp);
                         
                         balls.get( 0 ).clearDynamics();

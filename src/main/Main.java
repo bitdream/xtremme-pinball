@@ -83,10 +83,10 @@ public class Main
 		return menuGS;
 	}
 	
-	public static LoadingGameState newLoading(float inclinationAngle, URL tableResource)
+	public static LoadingGameState newLoading(PinballGameStateSettings settings, URL tableResource)
 	{
 		/* Creo un nuevo loading screen */
-		LoadingGameState loadingGS = new LoadingGameState("Loading", inclinationAngle, tableResource);
+		LoadingGameState loadingGS = new LoadingGameState("Loading", settings, tableResource);
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(loadingGS);
@@ -97,7 +97,7 @@ public class Main
 		return loadingGS;
 	}
 	
-	public static PinballGameState newPinballGame(float inclinationAngle)
+	public static PinballGameState newPinballGame(PinballGameStateSettings settings)
 	{
 		/* Creo las configuraciones */
 		PinballGameStateSettings pinballSettings = new PinballGameStateSettings();
@@ -112,7 +112,7 @@ public class Main
 		pinballSettings.setFullscreen(stdGame.getSettings().isFullscreen());
 		pinballSettings.setRenderer(stdGame.getSettings().getRenderer());
 		
-		pinballSettings.setInclinationAngle(inclinationAngle);
+		//pinballSettings.setInclinationAngle(settings.inclinationAngle);
 		
 		/* Creo un nuevo Pinball */
 		PinballGameState pinballGS = new PinballGameState("Game", pinballSettings);
