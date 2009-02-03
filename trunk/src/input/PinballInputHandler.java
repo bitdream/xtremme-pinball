@@ -2,6 +2,7 @@ package input;
 
 import gamestates.PinballGameState;
 import main.Main;
+
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
@@ -9,6 +10,7 @@ import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.math.FastMath;
 import com.jme.math.Vector3f;
+import com.jme.renderer.Camera;
 import com.jmex.physics.DynamicPhysicsNode;
 import components.Flipper;
 import components.Plunger;
@@ -72,7 +74,46 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		/* Hacer el tilt */
 		addAction(new tiltAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_SPACE, InputHandler.AXIS_NONE, false);
-	}
+        
+		addAction(new ChangeCameraAction(game.getCamera(), game.getPinballSettings().getCamStartPos(), game.getPinballSettings().getCamStartLookAt()), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_1, InputHandler.AXIS_NONE, false );
+        
+        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.92f, 0.5f, 1.0f ), new Vector3f(-0.92f,0.90f,-1.30f)), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_2, InputHandler.AXIS_NONE, false );
+        
+        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.90f, 13.5f, -21.5f ), new Vector3f( -0.90f, -15.5f, 0f )), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_3, InputHandler.AXIS_NONE, false );
+        
+        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( 27, 19, 27 ), new Vector3f( 0f, 5f, 0f )), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_4, InputHandler.AXIS_NONE, false );
+    }
+    
+
+	/* accion de la camara */
+    private class ChangeCameraAction extends InputAction
+    {
+        private Vector3f location, lookAtpos;
+        private Camera   cam;
+    
+        public ChangeCameraAction( Camera cam, Vector3f location, Vector3f lookAtpos )
+        {
+            this.cam = cam;
+            this.location = location;
+            this.lookAtpos = lookAtpos;
+        }
+    
+        public void performAction( InputActionEvent evt )
+        {
+            if ( evt.getTriggerPressed() )
+            {
+                cam.setLocation( new Vector3f(location) );
+                
+                cam.lookAt( new Vector3f(lookAtpos), new Vector3f( 0.0f, 1.0f, 0.0f ) );
+            }
+        
+    	}
+    }
+
 	
 	/* Accion para abrir el menu de juego */
 	private class OpenMenuAction extends InputAction
