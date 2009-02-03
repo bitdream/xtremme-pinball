@@ -23,10 +23,10 @@ public class CarsThemeGameLogic extends GameLogic
 	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
 	protected String ballsText = "Fuel: ";	
 		
-	private int bumperCollisionCnt = 0;
-	
-	// Cantidad de veces que paso por la rampa
+	// Contadores
+	private int bumperCollisionCnt = 0;	
 	private int rampCnt = 0;	
+	private int spinnerCollisionCnt = 0;
 	
 	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, music;
 	
@@ -55,6 +55,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.bumperCollision(bumper);
 		
 		// Si el bumper esta activo, se hace la suma de puntos y de colisiones contra bumpers
+		// El abuso de tilt lo desactiva asi que no se realizara la sumatoria de puntos
 		if (bumper.isActive())
 		{
 			score += bumperScore;
@@ -62,6 +63,9 @@ public class CarsThemeGameLogic extends GameLogic
 			// Se actualiza los datos de pantalla de usuario
 			showScore();
 			bumperCollisionCnt ++;
+			
+			// TODO debug
+			System.out.println("Bumper cnt: " + bumperCollisionCnt);
 			
 			// Si colisiono mas de x veces desactivo los imanes. Solo para testeo!
 //			if (bumperCollisionCnt > 5)
@@ -105,13 +109,15 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		// Se actualizan los datos de pantalla de usuario
 		showScore();
+		spinnerCollisionCnt++;
+		
+		// TODO debug
+		System.out.println("Spinner cnt: " + spinnerCollisionCnt);
 	}
 	
 	public void sensorRampCollision()
 	{
-		// No quiero el sonido default
-		// super.sensorRampCollision();
-		
+		// Sinido de este theme para el pasaje por rampa
 		rampUpSound.play();
 
 		// No sumar si hay abuso de tilt
@@ -123,6 +129,8 @@ public class CarsThemeGameLogic extends GameLogic
 		// Se actualizan los datos de pantalla de usuario
 		showScore();
 		rampCnt++;
+		// TODO debug
+		System.out.println("Rampa cnt: " + rampCnt);
 	}
 
 	@Override
@@ -140,7 +148,8 @@ public class CarsThemeGameLogic extends GameLogic
 		// Imprimir en pantalla un cartel que avise el abuso de tilts de este theme
 		showMessage("Too much tilt, flippers disabled!!!");
 		
-		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano
+		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano, esto se logra desactivando bumpers y puntaje
+		// de todos los componentes. Ya esta hecho en cada componente (los no desactivables hacen uso de la variable tiltAbused)
 	
 	}
 
@@ -155,7 +164,7 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		if (!firstTime)
 		{
-			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones)
+			// El sensor ya habia hecho la llamada para esta bola (por multiples colisiones) asi que la ignoro
 			return;
 		}
 		
@@ -166,9 +175,7 @@ public class CarsThemeGameLogic extends GameLogic
 			showMessage("Crash, be careful!!!");
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, etc
-			rampCnt = 0;
-			bumperCollisionCnt = 0;
-			
+			newBallCntsReset();
 		}
 		else
 		{
@@ -177,6 +184,13 @@ public class CarsThemeGameLogic extends GameLogic
 
 		super.lostBall(ball);
 
+	}
+	
+	private void newBallCntsReset()
+	{
+		rampCnt = 0;
+		bumperCollisionCnt = 0;
+		spinnerCollisionCnt = 0;
 	}
 	
 	@Override	

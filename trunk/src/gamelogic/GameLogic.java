@@ -286,12 +286,12 @@ public abstract class GameLogic
 	
 	public void playLostLastBallSound()
 	{
-		// TODO poner sonido de perder default -> no habra sonido default
+		// No habra sonido default
 	}
 	
 	public void playLostBallSound()
 	{
-		// TODO poner sonido de perder default -> no habra sonido default
+		// No habra sonido default
 	}
 	
 	public void playExtraBallSound()

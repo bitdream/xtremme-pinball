@@ -205,21 +205,31 @@ public class PinballInputHandler extends FirstPersonHandler
 		// Arreglo de tiempos
 		long [] tiltArrayTimes = new long[tiltsAllowed]; 
 		
-		//Ultimo tiempo en que se hizo tilt
+		// Ultimo tiempo en que se hizo tilt
 		long lastTiltTime = 0;
+		
+		// Indica si queda pendiente reposicionar la camara
+		boolean pendingRestore = false;
 		
 		public void performAction(InputActionEvent event)
 		{
 			Vector3f cameraMovement = new Vector3f(3,3,3);
 			Vector3f initCameraPos = game.getCamera().getLocation();
 
-			// Si el tilt no esta activo, no hago nada
-			if(!tiltActive)
+			// Si el tilt no esta activo, no debo permitir hacer tilt (aunque si reposicionar la camara)
+	
+			if ( !event.getTriggerPressed() && (tiltActive || pendingRestore) )
 			{
-				return;
+				// Se solto la tecla de tilt. Vuelvo la camara a la posicion original. A pesar de q el tilt este desactivo!
+				game.getCamera().setLocation(initCameraPos.subtract(cameraMovement));
+				
+				if (pendingRestore)
+				{
+					pendingRestore = false;
+				}				
+				
 			}
-			
-			if(event.getTriggerPressed())
+			else if(event.getTriggerPressed() && tiltActive)
 			{
 				// Intensidad de la fuerza a aplicar
 				float forceIntensity = 150 /** game.getPinballSettings().getInclinationAngle() / 3*/; //90000f;
@@ -274,6 +284,9 @@ public class PinballInputHandler extends FirstPersonHandler
 				 {
 					 /* Aviso a la logica de juego */
 					 game.getGameLogic().abuseTilt();
+					 
+					 // Queda pendiente restorear la posicion de la camara cuando se suelte la tecla de tilt (el tilt ya va a estar desactivado)
+					 pendingRestore = true;
 				 }
 				 else
 				 {
@@ -281,11 +294,6 @@ public class PinballInputHandler extends FirstPersonHandler
 					 game.getGameLogic().tilt();
 				 }			
 
-			}
-			else if (!event.getTriggerPressed())
-			{
-				// Se solto la tecla de tilt. Vuelvo la camara a la posicion original.
-				game.getCamera().setLocation(initCameraPos.subtract(cameraMovement));
 			}
 		
 		}
