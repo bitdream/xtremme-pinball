@@ -5,12 +5,10 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import gamestates.LoadingGameState;
 import gamestates.MenuGameState;
 import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
-
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.MusicTrackQueue.RepeatType;
@@ -18,7 +16,7 @@ import com.jmex.editors.swing.settings.GameSettingsPanel;
 import com.jmex.game.StandardGame;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
-import com.jme.app.AbstractGame;
+
 
 public class Main
 {
@@ -33,7 +31,7 @@ public class Main
 	 * Punto de entrada al juego
 	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) //throws InterruptedException
+	public static void main(String[] args)
 	{
 	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto? -> para desactivar las estadisticas y que vaya mas rapido
 	    {
@@ -63,16 +61,18 @@ public class Main
 	
 		/* Inicializacion del juego principal */
 		stdGame = new StandardGame("xtremme-pinball");
+		//You can make a new GameSettings object from the code in AbstractGame.getAttributes() and then initialize StandardGame like this
+		// StandardGame game = new StandardGame("Game", GameType.GRAPHICAL, settings);
 		
-		// (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
+		// (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro, HKEY_CURRENT_USER\Software\JavaSoft\Prefs\)
 		// TODO si se pone algo diferente a AlwaysShow, igual simpre lo muestra, el prompt deberia ser condicional segun se tenga o no 
-		// el archivo de config, pero hay que hacerlo por codigo, jme ya lo deberia hacer...
+		// el archivo de config, pero hay que hacerlo por codigo.
 		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
-
+		
 		try
 		{
 	        // show the GameSettingsPanel
-	        if (!GameSettingsPanel.prompt(stdGame.getSettings()))
+	        if (!GameSettingsPanel.prompt(stdGame.getSettings(), "Xtremme-pinball Settings"))
 	        {
 	            // user pressed Cancel
 	            return;
