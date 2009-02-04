@@ -381,7 +381,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// Desactivar los magnets si es que alguno estaba activo 
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
-			((Magnet)magnet.getChild(0)).setActive(true /*false*/); // TODO para debug de imanes ponerle FALSE despues
+			((Magnet)magnet.getChild(0)).setActive(false);
 		}
 		magnetsActive = false;
 	}
@@ -410,13 +410,13 @@ public class CarsThemeGameLogic extends GameLogic
 		extraLifesCnt = 1;
 		extraBallsCnt = 1;
 		
-		// TODO para debug de imanes. Ponerle false despues. Quitarlo todo!!!
-		// Desactivar los magnets si es que alguno estaba activo 
-		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-		{
-			((Magnet)magnet.getChild(0)).setActive(/*false*/true); 
-		}
-		magnetsActive = false;
+//		// TODO para debug de imanes. Ponerle false despues. Quitarlo todo!!!
+//		// Desactivar los magnets si es que alguno estaba activo 
+//		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+//		{
+//			((Magnet)magnet.getChild(0)).setActive(/*false*/true); 
+//		}
+//		magnetsActive = false;
 	}
 
 	@Override
