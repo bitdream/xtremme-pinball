@@ -2,13 +2,10 @@ package gamestates;
 
 import gamelogic.GameLogic;
 import input.PinballInputHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
 import main.Main;
-
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
@@ -337,7 +334,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText = Text.createDefaultTextLabel("messageText", message);
         messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        messageText.setLocalTranslation(new Vector3f(display.getWidth()/4, 5, 1));
+        messageText.setLocalTranslation(new Vector3f(display.getWidth()/ /*4*/ 6, 5, 1));
         messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(messageText);
         
