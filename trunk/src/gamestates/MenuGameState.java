@@ -60,11 +60,8 @@ public class MenuGameState extends BasicGameState
 	
 	/* Control de dropdown para la mesa elegida */
 	private ComboBox<Theme> tableList;
-	
-	
-	/* Los botones de los menues */
-//	private GameMenuButton play, cont, quit;
-	
+
+	/* Directorio donde se guardan los temas */
 	private static final String THEMES_DIRECTORY = "resources/models/themes/";
 
 	
