@@ -52,6 +52,18 @@ public class PinballInputHandler extends FirstPersonHandler
 	{
 		this.tiltActive = tiltActive;
 	}
+	
+	private boolean newGameActive = false;
+	
+	public boolean isNewGameActive() 
+	{
+		return newGameActive;
+	}
+
+	public void setNewGameActive(boolean newGameActive) 
+	{
+		this.newGameActive = newGameActive;
+	}
 
 	public PinballInputHandler(PinballGameState game)
 	{
@@ -62,6 +74,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		setActions();
 	}
+	
 	
 	private void setActions()
 	{
@@ -83,6 +96,9 @@ public class PinballInputHandler extends FirstPersonHandler
 		
 		/* Hacer el tilt */
 		addAction(new tiltAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_SPACE, InputHandler.AXIS_NONE, false);
+		
+		/* Nuevo juego */
+		addAction(new NewGameAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_N, InputHandler.AXIS_NONE, false);
         
 		addAction(new ChangeCameraAction(game.getCamera(), game.getPinballSettings().getCamStartPos(), game.getPinballSettings().getCamStartLookAt()), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_1, InputHandler.AXIS_NONE, false );
@@ -99,6 +115,20 @@ public class PinballInputHandler extends FirstPersonHandler
     }
     
 
+	/* Accion de comenzar nuevo juego luego de perder */
+    private class NewGameAction extends InputAction
+    {
+        public void performAction( InputActionEvent evt )
+        {
+        	// Tecla con efecto solo si se acaba de terminar un juego
+            if ( evt.getTriggerPressed() && newGameActive )
+            {
+           		game.reinitGame();
+            }        
+    	}
+    }
+    
+    
 	/* accion de la camara */
     private class ChangeCameraAction extends InputAction
     {

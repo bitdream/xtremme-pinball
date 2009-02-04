@@ -24,7 +24,7 @@ public class Magnet extends Node implements ActivableComponent
 	// Intensidad de la fuerza
 	private static int force = 800; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
 	
-	//TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa
+	// TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa
 	// Radio del campo de la fuerza magnetica
 	private static int forceFieldRadius = 5; 
 	

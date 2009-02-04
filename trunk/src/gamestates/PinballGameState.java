@@ -306,7 +306,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         rootNode.setRenderState(cs);
 
 		/* Armo la habitacion, la mesa y la bola */
-        addBall(this.ballStartUp);
+//        addBall(this.ballStartUp); -> hecho desde la logica (metodo startGame())
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
@@ -319,10 +319,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.95f, 1));
         rootNode.attachChild(fpsText);
         
-		/* Actualizo el nodo raiz */
-		rootNode.updateGeometricState(0.0f, true);
-		rootNode.updateRenderState();
-
 		// Cateles con el puntaje y los mensajes al usuario
         scoreText = Text.createDefaultTextLabel("scoreText", gameLogic.getScoreText() + String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
@@ -345,11 +341,27 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
         rootNode.attachChild(messageText);
         
+		/* Actualizo el nodo raiz */
+		rootNode.updateGeometricState(0.0f, true);
+		rootNode.updateRenderState();
+        
         /* Aviso a la logica de juego que empieza uno */
         gameLogic.gameStart();
         
         /* Una vez que esta todo seteado, dejamos tocar las teclas */
         pinballInputHandler.setEnabled( true );  
+	}
+	
+	// Para poder reiniciar el juego. Es invocado por el inputHandler (tecla N)
+	public void reinitGame()
+	{
+		//initGame();
+		gameLogic.gameStart();
+		
+        // Inicializo las vidas
+        lifes = gameLogic.getLifes();
+
+        // Los carteles ya fueron creados en el initGame() y sus valores los setea la logica
 	}
 	
 	private void updateComponents(float interpolation)

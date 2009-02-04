@@ -17,9 +17,9 @@ import components.Spinner;
 
 public abstract class GameLogic
 {
+	protected static int INITIAL_LIFES = 3;
+	protected int lifes = INITIAL_LIFES;
 	protected int score;
-	
-	protected int lifes = 15;
 	
 	// Texto a mostrar al usuario como encabezado de los puntos que tiene
 	protected String scoreText = "Score: ";
@@ -27,9 +27,10 @@ public abstract class GameLogic
 	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
 	protected String ballsText = "Balls: ";	
 	
-	protected boolean tiltAbused = false;
+	// Texto a mostrar al usuario cuando se termina el juego
+	protected String gameOverMessage = "Game over. Press N to start a new game.";
 	
-	protected boolean gameFinished = false;
+	protected boolean tiltAbused = false;
 	
 	protected PinballGameState pinball;
 	
@@ -259,11 +260,12 @@ public abstract class GameLogic
 		
 		// Desactivar el tilt
 		pinball.getPinballInputHandler().setTiltActive(false);
-		gameFinished = true;
 		
-		// TODO mostrar cartel para presionar N para nuevo juego con la misma mesa. -> si lo presiona, reiniciar toda la logica y activar componentes!
+		showMessage(gameOverMessage);
 		
-		showMessage("Game over");
+		// Para recibir si presiona N y hay que reiniciar el juego
+		pinball.getPinballInputHandler().setNewGameActive(true);
+		
 	}
 	
 	public void playLostLastBallSound()
@@ -277,7 +279,51 @@ public abstract class GameLogic
 	}
 	
 	// Invocado cuando comienza el juego
-	public abstract void gameStart();
+	public void gameStart()
+	{
+		// Vaciar la lista de bolas. Deberia estarlo, pero lo hago por las dudas
+		pinball.getBalls().clear();
+		
+		// Crear la bola inicial
+		pinball.addBall(pinball.getBallStartUp());
+		
+		// Activar los componentes y reiniciar la logica del juego
+		restarLogic();
+		
+		// Actualizo en pantalla el puntaje del nuevo juego (0) y las vidas
+		showScore();
+		showLifes();
+	}
+	
+	public void restarLogic()
+	{
+		// Reiniciar vidas, puntos, tiltAbused y lo comun a todos los juegos
+		// El theme debera overridearlo y reiniciar sus contadores y logica propia
+		lifes = INITIAL_LIFES;
+		score = 0;
+		
+		// Habilitar flippers, bumpers y poner en false el boolean para rehabilitar puntos y tilt
+		for (DynamicPhysicsNode flipper : pinball.getFlippers()) 
+		{
+			((Flipper)flipper.getChild(0)).setActive(true);
+		}
+		for (DynamicPhysicsNode bumper : pinball.getJumperBumpers()) 
+		{
+			((Bumper)bumper.getChild(0)).setActive(true);
+		}
+		for (StaticPhysicsNode bumper : pinball.getNoJumperBumpers()) 
+		{
+			((Bumper)bumper.getChild(0)).setActive(true);
+		}	
+		
+		pinball.getPinballInputHandler().setTiltActive(true);
+		
+		// Desactivar la tecla N de nuevo juego
+		pinball.getPinballInputHandler().setNewGameActive(false);
+		
+		// Reinicio la variable
+		tiltAbused = false;
+	}
 	
 	// Invocado cuando retorna al juego (o entra por vez primera)
 	public abstract void enterGame();

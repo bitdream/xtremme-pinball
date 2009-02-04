@@ -29,12 +29,6 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int EXTRA_LIFE_STEP = /*1000*/ 500; //TODO ajustar valores
 	private static final int EXTRA_BALL_STEP = /*500*/ 200; //TODO ajustar valores
 	
-	// Texto a mostrar al usuario como encabezado de los puntos que tiene
-	protected String scoreText = "Distance: ";
-	
-	// Texto a mostrar al usuario como encabezado de las bolas (vidas) que le quedan
-	protected String ballsText = "Fuel: ";	
-		
 	// Contadores
 	private int bumperCollisionCnt = 0;	
 	private int rampCnt = 0;	
@@ -46,7 +40,7 @@ public class CarsThemeGameLogic extends GameLogic
 	// Contador de pasos para la secuencia bumper saltarin -> spinner -> rampa sin perder vidas
 	private int completeSeqCnt = 0;
 	
-	private boolean MagnetsActive = false;
+	private boolean magnetsActive = false;
 	
 	// Sonidos
 	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, music;
@@ -68,6 +62,10 @@ public class CarsThemeGameLogic extends GameLogic
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
 		music.setVolume(Main.getMusicVolume());
+		
+		scoreText = "Distance: ";
+		ballsText = "Fuel: ";		
+		gameOverMessage = "Broke engine, race over... Press N to start a new game.";
 	}
 
 	@Override
@@ -94,7 +92,8 @@ public class CarsThemeGameLogic extends GameLogic
 				
 				// Mensaje al usuario diciendo el proximo paso a seguir
 				showMessage("To overtake next car go to the spinners!!!"); 
-				//FIXME estos mensajes seran tapados por los de vida extra y bola extra llamados por showScore, ver si poner ambos al mismo tiempo o como solucionarlo con el HUD
+				// FIXME estos mensajes seran tapados por los de vida extra y bola extra llamados por showScore, 
+				// ver si poner ambos al mismo tiempo o como solucionarlo con el HUD
 			}
 		}
 	}
@@ -226,7 +225,7 @@ public class CarsThemeGameLogic extends GameLogic
 			showMessage("Accident in front of you, slow down!!!");
 		}	
 		
-		if (MagnetsActive)
+		if (magnetsActive)
 		{
 			// Desactivar los magnets si es que alguno estaba activo 
 			for (StaticPhysicsNode magnet : pinball.getMagnets()) 
@@ -235,7 +234,7 @@ public class CarsThemeGameLogic extends GameLogic
 			}
 			showDisabledMagnetsMessage();
 			
-			MagnetsActive = false;
+			magnetsActive = false;
 		}
 		super.lostBall(ball);
 	}
@@ -272,7 +271,7 @@ public class CarsThemeGameLogic extends GameLogic
 				{
 					((Magnet)magnet.getChild(0)).setActive(true);
 				}
-				MagnetsActive = true;
+				magnetsActive = true;
 				
 				// Mensaje y sonido al usuario
 				showActiveMagnetsMessage();
@@ -329,7 +328,7 @@ public class CarsThemeGameLogic extends GameLogic
 	}
 	
 	// Llamado al perder una vida
-	// TODO ver si lo voy a hacer asi
+	// TODO ver si lo voy a hacer asi -> varios contadores no se usan!
 	private void newBallCntsReset()
 	{
 		thisBallScore = 0;
@@ -355,18 +354,18 @@ public class CarsThemeGameLogic extends GameLogic
 	public void lostGame(DynamicPhysicsNode ball)
 	{
 		super.lostGame(ball);
-		
-		// Mensaje propio de este theme, debe imprimirse luego del default (impreso por super.lostGame())
-		showMessage("Broke engine, race over..."); // TODO agregar press N to new game
-		
+
+		// Sonido de juego finalizado
 		gameOverSound.play();
 	}
 
 	@Override
 	public void gameStart()
 	{
-		showMessage("Start your engines!!!");
+		super.gameStart();
 		
+		// Mensaje y sonido de nuevo juego
+		showMessage("Start your engines!!!");		
 		gameStartSound.play();
 	}
 
@@ -379,6 +378,27 @@ public class CarsThemeGameLogic extends GameLogic
 		
 		if (tiltAbused)
 			audio.getMusicQueue().getCurrentTrack().setVolume(0);
+	}
+	
+	@Override public void restarLogic()
+	{
+		super.restarLogic();
+		
+		// Reiniciar contadores intenos y activar los no activados por super.restartLogic()
+		
+		// Reinicio variables que valen durante 1 vida
+		newBallCntsReset();
+		
+		// Reinicio el resto de las variables
+		extraLifesCnt = 1;
+		extraBallsCnt = 1;
+		
+		// Desactivar los magnets si es que alguno estaba activo 
+		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+		{
+			((Magnet)magnet.getChild(0)).setActive(false);
+		}
+		magnetsActive = false;
 	}
 
 	@Override
