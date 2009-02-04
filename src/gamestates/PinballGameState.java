@@ -563,7 +563,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         ball.setName( PHYSIC_NODE_NAME_FOR_BALLS );
         rootNode.attachChild( ball );
 
-        final Sphere visualMainBall = new Sphere( "Bola", 10, 10, 0.25f );
+        final Sphere visualMainBall = new Sphere( "Bola", /*10*/25, /*10*/25, 0.25f );
         visualMainBall.setLocalTranslation( location );
 
         // Agregado de bounding volume 
