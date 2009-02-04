@@ -371,7 +371,7 @@ public class MenuGameState extends BasicGameState
 	private void populateTableList(ComboBox<Theme> list)
 	{
 		URL themesDirURL = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY);
-		File themesDir = new File(themesDirURL.getPath());
+		File themesDir = new File(themesDirURL.getPath().replace("%20", " ")); //TODO aca toque, agregue el replace
 		
 		/* Obtengo todos los archivos en el directorio de themes */
 		File[] files = themesDir.listFiles();
@@ -380,7 +380,7 @@ public class MenuGameState extends BasicGameState
 		String themeFilename;
 		Theme theme;
 		Pattern x3dFiles = Pattern.compile(".*\\.x3d", Pattern.CASE_INSENSITIVE);
-		
+
 		for (int i = 0; i < files.length; i++)
 		{
 			/* Obtengo el nombre de archivo del theme */

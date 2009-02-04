@@ -47,8 +47,8 @@ public class X3DLoader extends Observable implements Observer
     {
         try
         {
-            this.x3d = new FileInputStream( x3dFilename.getFile() );
-            this.x3dFileName = x3dFilename.getPath();
+            this.x3d = new FileInputStream( x3dFilename.getFile().replace("%20", " ") ); //TODO aca toque, agregue el replace
+            this.x3dFileName = x3dFilename.getPath(); 
         }
         catch ( FileNotFoundException e )
         {
