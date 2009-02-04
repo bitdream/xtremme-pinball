@@ -21,15 +21,15 @@ public class Magnet extends Node implements ActivableComponent
 	// Modelo visual del bumper
 	private Geometry visualModel;
 	
-	// Intensidad de la fuerza
-	private static int force = 800; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
+	// Intensidad de la fuerza. Seteada desde el codigo de abajo en funcion del angulo de inclinacion
+	private static int force = 1000; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
 	
 	// TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa
 	// Radio del campo de la fuerza magnetica
-	private static int forceFieldRadius = 5; 
+	private static int forceFieldRadius = 5; // La bola tiene radio 0.25 
 	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
-	private static float maxRadius = 3; //Valor de testeo: 3 cuando las bolas son de radio 1
+	private static float maxRadius = 3;
 	
 	// Esta activo este magnet?
 	public boolean active = false;
@@ -46,6 +46,27 @@ public class Magnet extends Node implements ActivableComponent
         
         // Genero su fisica 
 		magnetNode.generatePhysicsGeometry(true);
+		
+		//TODO hacer testeos
+		// La fuerza dependera del angulo de inclinacion de la mesa
+		float angle = pinball.getPinballSettings().getInclinationAngle();
+		if ( angle < 3)
+		{
+			force = 200;
+		}
+		else if (angle < 6)
+		{
+			force = 500;
+		}
+		else if (angle < 8)
+		{
+			force = 800;
+		}
+		else // Pensado para un angulo maximo de 10
+		{
+			force = 1000;
+		}
+		
 		
 		// Efecto de iman en cada paso fisico
 		pinball.getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
@@ -69,8 +90,7 @@ public class Magnet extends Node implements ActivableComponent
 	 		                     */	 
 	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getLocalTranslation()).normalize();	         
 	 		                    
-	 		                    // Aplicar la fuerza atractora. Formula magica. TODO ajustar la fuerza para un mejor comportamiento
-	 		                    // Es inversamente proporcional a la distancia
+	 		                    // Aplicar la fuerza atractora. Es inversamente proporcional a la distancia
 	 		                    ball.addForce(direction.mult(force*ball.getMass()).divide(100/maxRadius*distance));              
 	 	                    }
 	 	            }
