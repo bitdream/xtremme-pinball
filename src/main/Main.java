@@ -14,10 +14,11 @@ import gamestates.PinballGameStateSettings;
 import com.jme.app.AbstractGame.ConfigShowMode;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.MusicTrackQueue.RepeatType;
+import com.jmex.editors.swing.settings.GameSettingsPanel;
 import com.jmex.game.StandardGame;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
-
+import com.jme.app.AbstractGame;
 
 public class Main
 {
@@ -30,8 +31,9 @@ public class Main
 
 	/**
 	 * Punto de entrada al juego
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws InterruptedException
 	{
 	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto? -> para desactivar las estadisticas y que vaya mas rapido
 	    {
@@ -62,9 +64,18 @@ public class Main
 		/* Inicializacion del juego principal */
 		stdGame = new StandardGame("xtremme-pinball");
 		
-		// TODO Ver porque solo aparece 1 vez (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
+		// (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
+		// TODO si se pone algo diferente a AlwaysShow, igual simpre lo muestra, el prompt deberia ser condicional segun se tenga o no 
+		// el archivo de config, pero hay que hacerlo por codigo, jme ya lo deberia hacer...
 		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
-		
+
+        // show the GameSettingsPanel
+        if (!GameSettingsPanel.prompt(stdGame.getSettings()))
+        {
+            // user pressed Cancel
+            return;
+        }        
+        
 		gamestates.PhysicsEnhancedGameState.game = stdGame;
 		/* Doy comienzo al juego */
 		stdGame.start();
