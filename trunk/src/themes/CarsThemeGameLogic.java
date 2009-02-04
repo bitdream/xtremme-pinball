@@ -5,7 +5,6 @@ import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
-
 import components.Bumper;
 import components.Door;
 import components.Flipper;
@@ -26,8 +25,8 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int MAX_BALLS = 3;
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas
-	private static final int EXTRA_LIFE_STEP = /*1000*/ 500; //TODO ajustar valores
-	private static final int EXTRA_BALL_STEP = /*500*/ 200; //TODO ajustar valores
+	private static final int EXTRA_LIFE_STEP = /*1000*/ 500; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = /*500*/ 70; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -138,20 +137,25 @@ public class CarsThemeGameLogic extends GameLogic
 			}
 			else
 			{
+				if(completeSeqCnt == 2)
+				{
+					// No obedecio la secuencia (hizo spinner -> spinner), cartel indicador
+					showMessage("Next time obey team orders. Sequence aborted!!!");
+				}
+				
 				completeSeqCnt = 0; //Reseteo la secuencia
 			}
 		}		
-
 	}
 	
 	public void sensorRampCollision()
 	{
-		// Sinido de este theme para el pasaje por rampa
-		rampUpSound.play();
-
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
-		{						
+		{				
+			// Sonido de este theme para el pasaje por rampa
+			rampUpSound.play();
+			
 			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
 			if (completeSeqCnt == 2)
 			{
@@ -167,6 +171,12 @@ public class CarsThemeGameLogic extends GameLogic
 				// Solo sumar los puntos de pasaje por rampa
 				score += RAMP_SCORE;
 				thisBallScore += RAMP_SCORE;
+				
+				if(completeSeqCnt == 1)
+				{
+					// No obedecio la secuencia, cartel indicador
+					showMessage("Next time obey team orders. Sequence aborted!!!");
+				}
 			}
 			// Reinicio la secuencia siempre
 			completeSeqCnt = 0;  
@@ -215,10 +225,10 @@ public class CarsThemeGameLogic extends GameLogic
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
-			showMessage("Pits stop!!!");
+			showMessage("Pits stop, lost ball!!!");
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
-			newBallCntsReset();
+			newBallCntsReset();			
 		}
 		else
 		{
@@ -328,7 +338,7 @@ public class CarsThemeGameLogic extends GameLogic
 	}
 	
 	// Llamado al perder una vida
-	// TODO ver si lo voy a hacer asi -> varios contadores no se usan!
+	// TODO Varios contadores no se usan!
 	private void newBallCntsReset()
 	{
 		thisBallScore = 0;
@@ -367,6 +377,13 @@ public class CarsThemeGameLogic extends GameLogic
 		// Mensaje y sonido de nuevo juego
 		showMessage("Start your engines!!!");		
 		gameStartSound.play();
+		
+		// Desactivar los magnets si es que alguno estaba activo 
+		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+		{
+			((Magnet)magnet.getChild(0)).setActive(true /*false*/); // TODO para debug de imanes ponerle FALSE despues
+		}
+		magnetsActive = false;
 	}
 
 	@Override
@@ -393,10 +410,11 @@ public class CarsThemeGameLogic extends GameLogic
 		extraLifesCnt = 1;
 		extraBallsCnt = 1;
 		
+		// TODO para debug de imanes. Ponerle false despues. Quitarlo todo!!!
 		// Desactivar los magnets si es que alguno estaba activo 
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
-			((Magnet)magnet.getChild(0)).setActive(false);
+			((Magnet)magnet.getChild(0)).setActive(/*false*/true); 
 		}
 		magnetsActive = false;
 	}
