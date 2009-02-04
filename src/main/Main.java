@@ -26,6 +26,8 @@ public class Main
 	private static AudioSystem audio;
 	
 	private static float musicVolume = 0.55f;
+	
+	private static LoadingGameState loadingGS = null;
 
 	/**
 	 * Punto de entrada al juego
@@ -106,13 +108,11 @@ public class Main
 	public static LoadingGameState newLoading(PinballGameStateSettings settings, URL tableResource)
 	{
 		/* Creo un nuevo loading screen */
-		LoadingGameState loadingGS = new LoadingGameState("Loading", settings, tableResource);
+		loadingGS = new LoadingGameState(settings, tableResource);
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(loadingGS);
 		loadingGS.setActive(false);
-		
-		loadingGS.getRootNode().updateRenderState();
 		
 		return loadingGS;
 	}
@@ -179,12 +179,10 @@ public class Main
 
 	public static void endLoading()
 	{
-		GameState gs = GameStateManager.getInstance().getChild("Loading");
-		
-		if (gs != null)
+		if (loadingGS != null)
 		{
-			gs.setActive(false);
-			GameStateManager.getInstance().detachChild("Loading");
+			loadingGS.setActive(false);
+			GameStateManager.getInstance().detachChild(loadingGS);
 		}
 	}
 	

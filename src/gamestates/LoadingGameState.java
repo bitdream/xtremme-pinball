@@ -1,6 +1,8 @@
 package gamestates;
 
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 import input.FengJMEInputHandler;
 
@@ -22,6 +24,7 @@ import org.lwjgl.opengl.GL13;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+import com.jme.util.GameTaskQueueManager;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jmex.audio.AudioTrack;
@@ -29,20 +32,10 @@ import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.game.state.BasicGameState;
 
 
-public class LoadingGameState extends BasicGameState
+public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 {
-	/* Pantalla para FengGUI */
-	private Display fengGUIdisplay;
-	
-	/* Input Handler de FengGUI, sirve para que FengGUI capture las teclas
-	 * y las envie al display de JME para ser capturadas por los otros handlers */
-	private FengJMEInputHandler fengGUIInputHandler;
-	
 	/* Musica de loading */
 	private AudioTrack music;
-	
-	/* Thread que hace la carga */
-	private LoadWorker loadingThread;
 
 	/* Configuracion del a crear */
 	private PinballGameStateSettings settings;
@@ -50,17 +43,12 @@ public class LoadingGameState extends BasicGameState
 	/* Recurso de la mesa */
 	private URL tableResource;
 	
-	/* El contenedor general */
-	private Container c;
+	/* El cargador */
+	private LoadWorker loadWorker;
+
 	
-	/* Ventana de progreso */
-	private Label loadingLabel;
-	// TODO private ProgressBar pb;
-
-	public LoadingGameState(String name, PinballGameStateSettings settings, URL tableResource)
+	public LoadingGameState(PinballGameStateSettings settings, URL tableResource)
 	{
-		super(name);
-
 		this.settings = settings;
 		this.tableResource = tableResource;
 		
@@ -79,49 +67,7 @@ public class LoadingGameState extends BasicGameState
 	 */
 	protected void initProgressInfo()
 	{
-		/* Obtengo un display en Feng con LWJGL */
-		fengGUIdisplay = new Display(new LWJGLBinding());
- 
-		/* Inicializo el input handler de FengGUI */
-		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
-	
-		/* Creo el contenedor general */
-		c = new Container();
-		c.getAppearance().add(new PlainBackground(Color.BLUE));
-		fengGUIdisplay.addWidget(c);
-		c.getAppearance().setPadding(new Spacing(10, 10));
-		c.setLayoutManager(new RowLayout(false));
-		
-		/* Creo el mensaje de progreso */
-		loadingLabel = FengGUI.createLabel(c, "");
-		
-		/* TODO progress bar
-		pb = FengGUI.createProgressBar(progressInfo.getContentContainer());
-        pb.setText("Working");
-        pb.setSize(250, 25);
-        pb.setShrinkable(false);
-        pb.setX(25);
-        pb.setY(25);*/
-		
-		/* Thread de loading */
-        loadingThread = new LoadWorker();
-
-        // TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
-        fengGUIInputHandler.addAction( new InputAction() {
-
-            @Override
-            public void performAction( InputActionEvent evt )
-            {
-                loadingThread.stopLoading();
-            }
-        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
-        
-		/* Actualizo la pantalla con los nuevos componentes */
-		fengGUIdisplay.layout();
-		
-		/* Centro los elementos */
-		StaticLayout.center(c, fengGUIdisplay);
-		StaticLayout.center(loadingLabel, c);
+		// TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
 	}
 	
 	/**
@@ -132,21 +78,14 @@ public class LoadingGameState extends BasicGameState
         /* Creo el juego nuevo */
         final PinballGameState pinballGS = Main.newPinballGame(settings);
         
-        loadingThread.setPinball(pinballGS);
-        
-	    Thread t = new Thread(loadingThread, "LoadingThread");
-	    t.start();
-
+        /* Agrego como tarea la carga */
+        LoadWorker loadWorker = new LoadWorker(pinballGS);
+        GameTaskQueueManager.getManager().update(loadWorker);
 	}
 
 	private void endLoad()
 	{
-        /* Termino de cargar */
-        
-		/* Remuevo todo lo que esta en el contenedor */
-		c.removeAllWidgets();
-		
-		/* Destruyo el loadinggamestate */
+        /* Termino de cargar, destruyo el loadinggamestate */
         Main.endLoading();
 	}
 	
@@ -176,20 +115,15 @@ public class LoadingGameState extends BasicGameState
 	{
 		super.update(tpf);
 
-		this.loadingLabel.setText( this.loadingThread.getPercentageString(this.loadingLabel.getText()) );
+		setProgress(loadWorker.getPercentage(), "Loading");
 		
-		if (this.loadingThread.isCompleted())
+		if (loadWorker.isCompleted())
 		{
 		    endLoad();
-		    this.loadingThread.endWork();
+		    loadWorker.endWork();
 		}
-		else
-		{
-		    /* Actualizo el controlador de input */
-		    fengGUIInputHandler.update(tpf);
-		}
-        
-        /* Actualizo el sistema de sonido */
+
+		/* Actualizo el sistema de sonido */
         Main.getAudioSystem().update();
 	}
 	
@@ -197,52 +131,35 @@ public class LoadingGameState extends BasicGameState
 	public void render(float tpf)
 	{
 		super.render(tpf);
-		
-		/* Para que la GUI se muestre bien */
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		
-		/* Muestro la pantalla de FengGUI */
-		fengGUIdisplay.display();
 	}
 	
-	private class LoadWorker implements Runnable {
+	private class LoadWorker implements Callable<Void>
+	{
 	    private PinballGameState pinballGS;
 	    private LoaderThread roomLoader, machineLoader, tableLoader;
 	    private Thread roomThread, machineThread, tableThread; 
 	    private Boolean complete = false, started = false;
-	    private float percentage = 0f;
-	    
-	    // no funca y no tengo ganas de pollear en el loader
-	    public void stopLoading()
-	    {
-	        // seniales no capturadas en ningun lado
-//	        this.roomThread.interrupt();
-//	        this.machineThread.interrupt();
-//            this.tableThread.interrupt();
-            System.out.println("Stopping load is not working yet");
-	    }
-	    
-	    public void setPinball(PinballGameState pinballGS)
-	    {
-	        this.pinballGS = pinballGS;
-	    }
-	    
-	    public synchronized boolean isCompleted()
+		private float percentage = 0f;
+		
+		public LoadWorker(PinballGameState pinballGS)
+		{
+			super();
+			this.pinballGS = pinballGS;
+		}
+		
+		public synchronized boolean isCompleted()
 	    {
 	        return this.complete;
 	    }
 	    
-	    public synchronized String getPercentageString(String old)
+	    public synchronized float getPercentage()
 	    {
-	        if (started) 
+	        if (started)
 	        {
-	            float percent = (machineLoader.getPercentComplete() + roomLoader.getPercentComplete() + tableLoader.getPercentComplete());
-	            if ( percentage == percent ) // float identity
-	                return old;
-	            percentage = percent;
+	            percentage = (machineLoader.getPercentComplete() + roomLoader.getPercentComplete() + tableLoader.getPercentComplete());
 	        }
-	        
-	        return String.format( "%.2f %%", percentage / 3 * 100 );
+
+	        return (percentage / 3) * 100;
 	    }
 	    
 	    public void endWork() 
@@ -251,25 +168,24 @@ public class LoadingGameState extends BasicGameState
             pinballGS.initGame();
             pinballGS.setActive(true);
 	    }
-	    
-        public void run() {
-            
-            /* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
+
+		public Void call() throws Exception
+		{
+			/* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
             roomLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
             roomThread = new Thread(roomLoader, "roomLoadThread");
             
             machineLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
             machineThread = new Thread(machineLoader, "machineLoadThread");
             
-            tableResource = LoadingGameState.class.getClassLoader().getResource( "resources/models/themes/Cars.x3d" );
             tableLoader = new LoaderThread( tableResource, pinballGS );
-            tableThread = new Thread(tableLoader, "tableLoadThread");
+            Thread loadTable = new Thread(tableLoader, "tableLoadThread");
             
             // Paralelizo
             roomThread.start();
             machineThread.start();
             tableThread.start();
-            synchronized ( started )
+            synchronized (started)
             {
                 started = true;
             }
@@ -281,8 +197,6 @@ public class LoadingGameState extends BasicGameState
             }
             catch(InterruptedException e)
             {
-//                System.out.println("chau");
-//                System.exit( 1 );
             }
             
             /* Atacheo los resultados */
@@ -295,7 +209,8 @@ public class LoadingGameState extends BasicGameState
             {
                 this.complete = true;    
             }
-            
-        }
+			
+			return null;
+		}
 	}
 }
