@@ -48,7 +48,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!!!xtremme pinball";
+	private static final String GAME_NAME = "!!!!xtremme pinball";
 	private static final String GAME_VERSION = "0.5";
 	
 	/* Logger de la clase Pinball */
@@ -883,56 +883,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_DELETE, InputHandler.AXIS_NONE, false );
-            
-            //estas son para debug... es mala idea pasarlas a estable porque se rompe la tabla
-            // PGUP subir angulo visual
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        float angle = getPinballSettings().getInclinationAngle();
-                        
-                        if (angle > 9)
-                        {
-                            angle = 1;
-                        }
-                        else
-                        {
-                            angle += 1;
-                        }
-                        
-                        getPinballSettings().setInclinationAngle( angle );
-                        inclinePinball( tabla );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_PGUP, InputHandler.AXIS_NONE, false );
-            
-            // PGDOWN bajar angulo visual
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        float angle = getPinballSettings().getInclinationAngle();
-                        
-                        if (angle < 2)
-                        {
-                            angle = 10;
-                        }
-                        else
-                        {
-                            angle -= 1;
-                        }
-                        
-                        getPinballSettings().setInclinationAngle( angle );
-                        inclinePinball( tabla );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_PGDN, InputHandler.AXIS_NONE, false );
-            
             
             /* libres para pruebas */
             pinballInputHandler.addAction( new InputAction() {

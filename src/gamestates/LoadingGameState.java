@@ -7,13 +7,16 @@ import input.FengJMEInputHandler;
 import loader.LoaderThread;
 import main.Main;
 
+import org.fenggui.Container;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
 import org.fenggui.Label;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
-import org.fenggui.composite.Window;
+import org.fenggui.decorator.background.PlainBackground;
 import org.fenggui.layout.RowLayout;
 import org.fenggui.layout.StaticLayout;
+import org.fenggui.util.Color;
+import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
 
 import com.jme.input.MouseInput;
@@ -37,15 +40,18 @@ public class LoadingGameState extends BasicGameState
 	/* Thread que hace la carga */
 	private LoadWorker loadingThread;
 
-	/* Angulo de inclinacion requerido para el juego a crear */
+	/* Configuracion del a crear */
 	private PinballGameStateSettings settings;
 
 	/* Recurso de la mesa */
 	private URL tableResource;
 	
-	/* ventana de progreso */
+	/* El contenedor general */
+	private Container c;
+	
+	/* Ventana de progreso */
 	private Label loadingLabel;
-	private Window progressInfo;
+	// TODO private ProgressBar pb;
 
 	public LoadingGameState(String name, PinballGameStateSettings settings, URL tableResource)
 	{
@@ -54,11 +60,11 @@ public class LoadingGameState extends BasicGameState
 		this.settings = settings;
 		this.tableResource = tableResource;
 		
-		/* TODO (buscar musica de loading) Inicializo la musica */
+		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/loading/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
-		music.setVolume(Main.getMusicVolume());
+		music.setTargetVolume(Main.getMusicVolume());
 		
 		/* Inicializo la informacion del progreso */
 		initProgressInfo();
@@ -77,16 +83,23 @@ public class LoadingGameState extends BasicGameState
 		
 		// TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
  
-		/* Creo la ventana de progreso */
-		progressInfo = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
-		progressInfo.setTitle("Loading...");
-		progressInfo.setSize(200, 200);
-		progressInfo.getContentContainer().setLayoutManager(new RowLayout(false));
-		//progressInfo.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
+		/* Creo el contenedor general */
+		c = new Container();
+		c.getAppearance().add(new PlainBackground(Color.BLUE));
+		fengGUIdisplay.addWidget(c);
+		c.getAppearance().setPadding(new Spacing(10, 10));
+		c.setLayoutManager(new RowLayout(false));
 		
 		/* Creo el mensaje de progreso */
-		loadingLabel = FengGUI.createLabel("");
-		progressInfo.addWidget(loadingLabel);
+		loadingLabel = FengGUI.createLabel(c, "");
+		
+		/* TODO progress bar
+		pb = FengGUI.createProgressBar(progressInfo.getContentContainer());
+        pb.setText("Working");
+        pb.setSize(250, 25);
+        pb.setShrinkable(false);
+        pb.setX(25);
+        pb.setY(25);*/
 		
 		/* Thread de loading */
         loadingThread = new LoadWorker();
@@ -95,8 +108,8 @@ public class LoadingGameState extends BasicGameState
 		fengGUIdisplay.layout();
 		
 		/* Centro los elementos */
-		StaticLayout.center(progressInfo, fengGUIdisplay);
-		StaticLayout.center(loadingLabel, progressInfo);
+		StaticLayout.center(c, fengGUIdisplay);
+		StaticLayout.center(loadingLabel, c);
 	}
 	
 	/**
@@ -116,8 +129,12 @@ public class LoadingGameState extends BasicGameState
 
 	private void endLoad()
 	{
-        /* Termino de cargar, cierro la ventana y destruyo el loadinggamestate */
-        progressInfo.close();
+        /* Termino de cargar */
+        
+		/* Remuevo todo lo que esta en el contenedor */
+		c.removeAllWidgets();
+		
+		/* Destruyo el loadinggamestate */
         Main.endLoading();
 	}
 	

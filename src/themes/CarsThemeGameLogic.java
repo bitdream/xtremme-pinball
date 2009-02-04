@@ -60,7 +60,7 @@ public class CarsThemeGameLogic extends GameLogic
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
-		music.setVolume(Main.getMusicVolume());
+		music.setTargetVolume(Main.getMusicVolume());
 		
 		scoreText = "Distance: ";
 		ballsText = "Fuel: ";		
