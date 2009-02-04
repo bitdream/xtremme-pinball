@@ -31,7 +31,7 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="SensorRampa1" translation="-0.144000 0.927609 -19.532402" scale="0.273823 0.273823 0.028005" rotation="-0.000000 1.000000 -0.000000 1.570796">
+<Transform DEF="SensorRampa" translation="-0.144000 0.927609 -19.532402" scale="0.273823 0.273823 0.028005" rotation="-0.000000 1.000000 -0.000000 1.570796">
 <Shape>
 <MetadataSet>
     <MetadataString name="type" value="Sensor"/>
