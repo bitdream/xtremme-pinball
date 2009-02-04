@@ -33,7 +33,7 @@ public class Main
 	 * Punto de entrada al juego
 	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws InterruptedException
+	public static void main(String[] args) //throws InterruptedException
 	{
 	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto? -> para desactivar las estadisticas y que vaya mas rapido
 	    {
@@ -69,12 +69,20 @@ public class Main
 		// el archivo de config, pero hay que hacerlo por codigo, jme ya lo deberia hacer...
 		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
 
-        // show the GameSettingsPanel
-        if (!GameSettingsPanel.prompt(stdGame.getSettings()))
-        {
-            // user pressed Cancel
-            return;
-        }        
+		try
+		{
+	        // show the GameSettingsPanel
+	        if (!GameSettingsPanel.prompt(stdGame.getSettings()))
+	        {
+	            // user pressed Cancel
+	            return;
+	        } 
+		}
+		catch(InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+       
         
 		gamestates.PhysicsEnhancedGameState.game = stdGame;
 		/* Doy comienzo al juego */
