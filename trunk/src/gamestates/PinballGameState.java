@@ -4,28 +4,23 @@ import gamelogic.GameLogic;
 import input.PinballInputHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
 import main.Main;
 
-import com.jme.bounding.BoundingBox;
 import com.jme.bounding.BoundingSphere;
-import com.jme.input.ChaseCamera;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
-import com.jme.input.thirdperson.ThirdPersonMouseLook;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
-import com.jme.scene.CameraNode;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
 import com.jme.scene.shape.Sphere;
@@ -291,6 +286,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* activamos el debug */
 		initDebug();
+		
+		/* desactivamos el input hasta que no se pueda jugar */
+		pinballInputHandler.setEnabled( false );
 	}
 
 	/**
@@ -349,6 +347,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
         /* Aviso a la logica de juego que empieza uno */
         gameLogic.gameStart();
+        
+        /* Una vez que esta todo seteado, dejamos tocar las teclas */
+        pinballInputHandler.setEnabled( true );  
 	}
 	
 	private void updateComponents(float interpolation)
@@ -546,46 +547,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         this.gameLogic = gameLogic;
     }
     
-//    private void setUpBall()
-//	{
-//	    logger.info( "Construyendo pelota (haciendo pelota el pinball :)" );
-///* TODO ojo, aca comento esto porque quiero probar solo con IRON
-//        // Defino un materia personalizado para poder setear las propiedades de interaccion con la mesa
-//        final Material customMaterial = new Material( "material de bola" );
-//        // Es pesado
-//        customMaterial.setDensity( 10.0f );
-//        // Detalles de contacto con el otro material
-//        MutableContactInfo contactDetails = new MutableContactInfo();
-//        // Poco rebote
-//        contactDetails.setBounce( 0.5f );
-//        // Poco rozamiento
-//        contactDetails.setMu( 0.5f );
-//        customMaterial.putContactHandlingDetails( pinballTableMaterial, contactDetails );
-//*/
-//        /* Nodo dinamico de la bola */
-//        final DynamicPhysicsNode mainBall = getPhysicsSpace().createDynamicNode();
-//        mainBall.setName( PHYSIC_NODE_NAME_FOR_BALLS );
-//        rootNode.attachChild( mainBall );
-//
-//        final Sphere visualMainBall = new Sphere( "Bola", 10, 10, 0.25f );
-//        visualMainBall.setLocalTranslation( new Vector3f( this.ballStartUp ) );
-//
-//        // Agregado de bounding volume 
-//        visualMainBall.setModelBound( new BoundingSphere() );
-//        visualMainBall.updateModelBound();
-//
-//        mainBall.attachChild( visualMainBall );
-//        mainBall.generatePhysicsGeometry();
-////		mainBall.setMaterial( customMaterial );
-//        mainBall.setMaterial(Material.IRON);
-//        // Se computa la masa luego de generar la geometria fisica
-//        mainBall.computeMass();
-//
-//        // La agrego a la lista de bolas
-//        balls.add( mainBall );
-//    }
-    
-
     public void addBall(Vector3f location)
 	{
         /* Nodo dinamico de la bola */
@@ -651,6 +612,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         return table;
     }
     
+    ///XXX debug
     // variables de debug
     private boolean pause = false;
     private boolean showDepth = false;

@@ -224,25 +224,11 @@ public class LoadingGameState extends BasicGameState
             threadMachine = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
             Thread loadMachine = new Thread(threadMachine, "machineLoadThread");
             
+//            tableResource = LoadingGameState.class.getClassLoader().getResource( "resources/models/TableAux.x3d" );
             threadTable = new LoaderThread( tableResource, pinballGS );
             Thread loadTable = new Thread(threadTable, "tableLoadThread");
             
-            /* Los inicio */
-            // Secuencial
-            /*try
-            {
-                loadRoom.start();
-                loadRoom.join();
-
-                loadMachine.start();
-                loadMachine.join();
-                
-                loadTable.start();
-                loadTable.join();
-            }
-            catch(Exception e){}*/
-
-            // Paralelo
+            // Paralelizo
             loadRoom.start();
             loadMachine.start();
             loadTable.start();
