@@ -133,7 +133,7 @@ public class CarsThemeGameLogic extends GameLogic
 			{
 				completeSeqCnt = 2;  //Se realizo el segundo paso de la secuencia
 				// Mensaje al usuario diciendo el proximo paso a seguir
-				showMessage("Opponent overtaked. Go through the ramp to get the checkpoint!!!");
+				showMessage("Opponent overtook. Get to checkpoint through the ramp!!!");
 			}
 			else
 			{
@@ -225,7 +225,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
-			showMessage("Pits stop, lost ball!!!");
+			showMessage("Pit stop, lost ball!!!");
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
 			newBallCntsReset();			
@@ -329,7 +329,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("Oil in the course, magnets active!!!");
+		showMessage("Oil in the course, magnets activated!!!");
 	}
 	
 	private void showDisabledMagnetsMessage()
@@ -375,7 +375,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.gameStart();
 		
 		// Mensaje y sonido de nuevo juego
-		showMessage("Start your engines!!!");		
+		showMessage("Gentlemen, start your engines!!!");		
 		gameStartSound.play();
 		
 		// Desactivar los magnets si es que alguno estaba activo 
