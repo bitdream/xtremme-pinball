@@ -7,7 +7,8 @@ import com.jme.input.action.InputActionEvent;
 import com.jme.input.util.SyntheticButton;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
-import com.jme.scene.*;
+import com.jme.scene.Geometry;
+import com.jme.scene.Node;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.TranslationalJointAxis;
@@ -22,8 +23,14 @@ public class Plunger extends Node
 {
 	private static final long serialVersionUID = 1L;
 	
-	/* Fuerza de charge */
-	public static final Vector3f plungerChargeForce = new Vector3f(0f, 0f, 30f);
+	// COMUNICADO: estos valores estan asi para que con 10 grados sea complicado
+	// dar la vueltita, pero no imposible, ajustarlos si no van.
+	/* Valores de movimiento del plunger al disparar */
+	private static final float SHOTACCELERATION = 100, SHOTSPEED = -100;
+	
+	/* Valores de movimiento del usuario sobre el plunger */
+	private static final float USERACELERATION = 5, USERSPEED = 1; 
+	// FIN DEL COMUNICADO
 	
 	/* Esta suelto o lo esta controlando el usuario */
 	private boolean loose;
@@ -116,7 +123,7 @@ public class Plunger extends Node
 
         }, collisionEventHandler, false);
         
-        //plungerNode.setAffectedByGravity( false );
+        plungerNode.setAffectedByGravity( false );
         
 		return plungerNode;
 	}
@@ -189,16 +196,25 @@ public class Plunger extends Node
 	
 	public void update(float time)
 	{
-		Quaternion rot = pinball.getPinballSettings().getInclinationQuaternion();
-		
-		DynamicPhysicsNode parentNode = (DynamicPhysicsNode)getParent();
-		
-		if (isLoose()) /* Esta suelto, aplico una fuerza proporcional al cuadrado de la distancia que obtuvo */
-			parentNode.addForce((new Vector3f(0, 0,
-					-4 * pinball.getPinballSettings().getInclinationLevel()
-					/*-250 */ -800* (float)Math.pow(getDistance(), 2))
-			).rotate(rot));
-		else /* Aplico la fuerza para alejarlo del origen */
-			parentNode.addForce(plungerChargeForce.rotate(rot));
+		if (isLoose())
+		{
+            /* Esta suelto, aplico una aceleracion para volverlo a su lugar */
+		    
+		    // esta fijo para todos los angulos. si no va
+		    // podria calcularse aceleracion += aceleracion * sin(angulo)
+		    // pero pinta que asi esta bien
+    		joint.getAxes().get(0).setAvailableAcceleration( SHOTACCELERATION );
+    		joint.getAxes().get( 0 ).setDesiredVelocity( SHOTSPEED );
+    		
+		}
+		else
+		{
+	        /* Aplico la fuerza para alejarlo del origen */
+		    // quiero que se aleje lentamente al ppio por si quiere un tiro suave o de rebote
+		    joint.getAxes().get(0).setAvailableAcceleration( USERACELERATION );
+            joint.getAxes().get( 0 ).setDesiredVelocity( USERSPEED );
+		        
+		}
+			
 	}
 }

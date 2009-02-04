@@ -19,7 +19,11 @@ import org.fenggui.util.Color;
 import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
 
+import com.jme.input.InputHandler;
+import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.game.state.BasicGameState;
@@ -80,9 +84,7 @@ public class LoadingGameState extends BasicGameState
  
 		/* Inicializo el input handler de FengGUI */
 		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
-		
-		// TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
- 
+	
 		/* Creo el contenedor general */
 		c = new Container();
 		c.getAppearance().add(new PlainBackground(Color.BLUE));
@@ -104,6 +106,16 @@ public class LoadingGameState extends BasicGameState
 		/* Thread de loading */
         loadingThread = new LoadWorker();
 
+        // TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
+        fengGUIInputHandler.addAction( new InputAction() {
+
+            @Override
+            public void performAction( InputActionEvent evt )
+            {
+                loadingThread.stopLoading();
+            }
+        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
+        
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
 		
@@ -195,12 +207,20 @@ public class LoadingGameState extends BasicGameState
 	
 	private class LoadWorker implements Runnable {
 	    private PinballGameState pinballGS;
-	    private LoaderThread threadRoom;
-	    private LoaderThread threadMachine;
-	    private LoaderThread threadTable;
-	    private Boolean complete = false;
-	    private Boolean started = false;
+	    private LoaderThread roomLoader, machineLoader, tableLoader;
+	    private Thread roomThread, machineThread, tableThread; 
+	    private Boolean complete = false, started = false;
 	    private float percentage = 0f;
+	    
+	    // no funca y no tengo ganas de pollear en el loader
+	    public void stopLoading()
+	    {
+	        // seniales no capturadas en ningun lado
+//	        this.roomThread.interrupt();
+//	        this.machineThread.interrupt();
+//            this.tableThread.interrupt();
+            System.out.println("Stopping load is not working yet");
+	    }
 	    
 	    public void setPinball(PinballGameState pinballGS)
 	    {
@@ -216,7 +236,7 @@ public class LoadingGameState extends BasicGameState
 	    {
 	        if (started) 
 	        {
-	            float percent = (threadMachine.getPercentComplete() + threadRoom.getPercentComplete() + threadTable.getPercentComplete());
+	            float percent = (machineLoader.getPercentComplete() + roomLoader.getPercentComplete() + tableLoader.getPercentComplete());
 	            if ( percentage == percent ) // float identity
 	                return old;
 	            percentage = percent;
@@ -235,37 +255,41 @@ public class LoadingGameState extends BasicGameState
         public void run() {
             
             /* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
-            threadRoom = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
-            Thread loadRoom = new Thread(threadRoom, "roomLoadThread");
+            roomLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
+            roomThread = new Thread(roomLoader, "roomLoadThread");
             
-            threadMachine = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
-            Thread loadMachine = new Thread(threadMachine, "machineLoadThread");
+            machineLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
+            machineThread = new Thread(machineLoader, "machineLoadThread");
             
-//            tableResource = LoadingGameState.class.getClassLoader().getResource( "resources/models/TableAux.x3d" );
-            threadTable = new LoaderThread( tableResource, pinballGS );
-            Thread loadTable = new Thread(threadTable, "tableLoadThread");
+            tableResource = LoadingGameState.class.getClassLoader().getResource( "resources/models/themes/Cars.x3d" );
+            tableLoader = new LoaderThread( tableResource, pinballGS );
+            tableThread = new Thread(tableLoader, "tableLoadThread");
             
             // Paralelizo
-            loadRoom.start();
-            loadMachine.start();
-            loadTable.start();
+            roomThread.start();
+            machineThread.start();
+            tableThread.start();
             synchronized ( started )
             {
                 started = true;
             }
             try
             {
-                loadRoom.join();
-                loadMachine.join();
-                loadTable.join();
+                roomThread.join();
+                machineThread.join();
+                tableThread.join();
             }
-            catch(InterruptedException e){}
+            catch(InterruptedException e)
+            {
+//                System.out.println("chau");
+//                System.exit( 1 );
+            }
             
             /* Atacheo los resultados */
-            pinballGS.getRootNode().attachChild(threadRoom.getScene());    
-            pinballGS.getRootNode().attachChild(threadMachine.getScene());
-            pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(threadTable.getScene()));
-            pinballGS.setGameLogic(threadTable.getTheme());
+            pinballGS.getRootNode().attachChild(roomLoader.getScene());    
+            pinballGS.getRootNode().attachChild(machineLoader.getScene());
+            pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(tableLoader.getScene()));
+            pinballGS.setGameLogic(tableLoader.getTheme());
             
             synchronized ( complete )
             {

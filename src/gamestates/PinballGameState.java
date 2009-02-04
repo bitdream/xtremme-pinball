@@ -48,7 +48,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!!!!xtremme pinball";
+	private static final String GAME_NAME = "!!!!!xtremme pinball";
 	private static final String GAME_VERSION = "0.5";
 	
 	/* Logger de la clase Pinball */
@@ -115,7 +115,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
     private float lastSampleTime = 0;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 4.88f, 1.2f, -3.0f ); 
+	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f ); 
 	/*new Vector3f( 15,15,-51 )*/ 
 	/*new Vector3f( 1, 16, -58)*/
 	/*new Vector3f(-3.22f,20,-15.37485f)*/
@@ -304,6 +304,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
 		/* Armo la habitacion, la mesa y la bola */
 //        addBall(this.ballStartUp); -> hecho desde la logica (metodo startGame())
+        ballStartUp.rotate( pinballSettings.getInclinationQuaternion() );
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
@@ -615,9 +616,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         if (plunger != null)
             ((Plunger)plunger.getChild(0)).recalculateJoints(this);
         
-        //TODO volar 
-        this.tabla = table;
-        
         return table;
     }
     
@@ -626,7 +624,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
     private boolean pause = false;
     private boolean showGraphs = false;
     private static final float g = -9.81f; 
-    private Spatial tabla;
     
     protected void initDebug()
     {
