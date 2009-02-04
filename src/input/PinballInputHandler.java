@@ -6,6 +6,7 @@ import main.Main;
 import com.jme.input.FirstPersonHandler;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
+import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.math.FastMath;
@@ -33,6 +34,14 @@ public class PinballInputHandler extends FirstPersonHandler
 	private static long tiltFreeTimeInterval = 5000; // Son 5 segundos
 	
 	private boolean tiltActive = true;
+	
+	@Override
+	public void setEnabled( boolean value )
+	{
+	    super.setEnabled( value );
+	    KeyInput.get().clear();
+	    MouseInput.get().clear();
+	}
 	
 	public boolean isTiltActive() 
 	{
@@ -86,6 +95,7 @@ public class PinballInputHandler extends FirstPersonHandler
         
         addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( 27, 19, 27 ), new Vector3f( 0f, 5f, 0f )), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_4, InputHandler.AXIS_NONE, false );
+        
     }
     
 
