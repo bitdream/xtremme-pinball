@@ -627,7 +627,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
     ///XXX debug
     // variables de debug
     private boolean pause = false;
-    private boolean showDepth = false;
     private boolean showGraphs = false;
     private static final float g = -9.81f; 
     private Spatial tabla;
@@ -938,23 +937,20 @@ public class PinballGameState extends PhysicsEnhancedGameState
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_PGDN, InputHandler.AXIS_NONE, false );
             
             
-            /* Assign key ADD to action "step". */
-            // esto debería forzar el update... no creo que valga la pena
+            /* libres para pruebas */
             pinballInputHandler.addAction( new InputAction() {
                 public void performAction( InputActionEvent evt ) {
                     if ( evt.getTriggerPressed() ) {
-                        float tpf =  timer.getTimePerFrame();
-                        update( tpf );
-                        rootNode.updateGeometricState(tpf, true);
+
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ADD, InputHandler.AXIS_NONE, false );
-            // esto debería cambiar la profundidad... tampoco creo que valga la pena
+
             pinballInputHandler.addAction( new InputAction() 
             {
                 public void performAction( InputActionEvent evt ) {
                     if ( evt.getTriggerPressed() ) {
-                        showDepth = !showDepth;
+                        
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F10, InputHandler.AXIS_NONE, false );
