@@ -270,8 +270,8 @@ public class Bumper extends Node implements ActivableComponent
                     
                     // Aplicarle fuerza para hacer saltar a aquellos bumpers que sean saltarines (honguitos). La misma debe ser paralela a la mesa, no exclusiva en Y
                 	bump.clearDynamics();
-                	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle()),
-                								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationAngle())));
+                	bump.addForce (new Vector3f(0, (bump.getMass() * 500f) * FastMath.cos(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationLevel()),
+                								   (bump.getMass() * 500f) * FastMath.sin(FastMath.DEG_TO_RAD * pinballInstance.getPinballSettings().getInclinationLevel())));
 
                 	// Le seteo la camtidad de frames que le quedan de movimiento a este bumper antes de hacerle clearDynamics()
                 	//bumper.setRemainigFramesInMovement(Timer.getTimer().getFrameRate());

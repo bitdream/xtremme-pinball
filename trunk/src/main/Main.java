@@ -26,7 +26,7 @@ public class Main
 	
 	private static AudioSystem audio;
 	
-	private static float musicVolume = 07.f;
+	private static float musicVolume = 0.55f;
 
 	/**
 	 * Punto de entrada al juego
@@ -62,7 +62,7 @@ public class Main
 		/* Inicializacion del juego principal */
 		stdGame = new StandardGame("xtremme-pinball");
 		
-		// TODO cablear que siempre use LWJGL, y ver porque solo aparece 1 vez (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
+		// TODO Ver porque solo aparece 1 vez (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro)
 		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
 		
 		gamestates.PhysicsEnhancedGameState.game = stdGame;
@@ -100,23 +100,15 @@ public class Main
 	
 	public static PinballGameState newPinballGame(PinballGameStateSettings settings)
 	{
-		/* Creo las configuraciones */
-		PinballGameStateSettings pinballSettings = new PinballGameStateSettings();
-		
-		// TODO ver que hacer con los settings, probablemente vuelen de aca (deberian ser directamente gameSettings y ser globales...)
-		
 		/* Les guardo los valores recogidos de la ventana de configuraciones */
-		pinballSettings.setWidth(stdGame.getSettings().getWidth());
-		pinballSettings.setHeight(stdGame.getSettings().getHeight());
-		pinballSettings.setDepth(stdGame.getSettings().getDepth());
-		pinballSettings.setFreq(stdGame.getSettings().getFrequency());
-		pinballSettings.setFullscreen(stdGame.getSettings().isFullscreen());
-		pinballSettings.setRenderer(stdGame.getSettings().getRenderer());
-		
-		pinballSettings.setInclinationAngle(settings.getInclinationAngle());
+		settings.setWidth(stdGame.getSettings().getWidth());
+		settings.setHeight(stdGame.getSettings().getHeight());
+		settings.setDepth(stdGame.getSettings().getDepth());
+		settings.setFreq(stdGame.getSettings().getFrequency());
+		settings.setFullscreen(stdGame.getSettings().isFullscreen());
 		
 		/* Creo un nuevo Pinball */
-		PinballGameState pinballGS = new PinballGameState("Game", pinballSettings);
+		PinballGameState pinballGS = new PinballGameState("Game", settings);
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(pinballGS);

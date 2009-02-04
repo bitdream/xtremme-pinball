@@ -6,7 +6,11 @@ import com.jme.math.*;
 
 public class PinballGameStateSettings
 {
-	private static float camMoveSpeedDefault = 15f, camTurnSpeedDefault = 0.5f, inclinationAngleDefault = 0.0f;
+	private static final float camMoveSpeedDefault = 15f, camTurnSpeedDefault = 0.5f;
+	
+	private static final int inclinationLevelDefault = 5;
+	
+	private static final String rendererDefault = "LWJGL";
 	
 	private static Vector3f camStartPosDefault = new Vector3f(/*0.0f, 15.0f, 9.0f*/ 0f, 18.64f, 7.41f), camStartLookAtDefault = new Vector3f(0.0f, /*8.5f*/ 10f, 0.0f); 
 	
@@ -16,11 +20,9 @@ public class PinballGameStateSettings
 	
 	private int width, height, depth, freq;
 	
-	private float inclinationAngle;
+	private int inclinationLevel;
 	
 	private boolean fullscreen;
-	
-	private String renderer;
 	
 	private Quaternion inclinationQuaternion;
 
@@ -28,12 +30,12 @@ public class PinballGameStateSettings
 	{
 		camMoveSpeed = camMoveSpeedDefault;
 		camTurnSpeed = camTurnSpeedDefault;
-		inclinationAngle = inclinationAngleDefault;
+		inclinationLevel = inclinationLevelDefault;
 		camStartLookAt = camStartLookAtDefault;
 		camStartPos = camStartPosDefault;
 		
 		inclinationQuaternion = new Quaternion();
-		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, 0f, 0f);
+		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationLevel, 0f, 0f);
 	}
 	
 	public void setCamMoveSpeed(float camMoveSpeed)
@@ -128,26 +130,21 @@ public class PinballGameStateSettings
 
 	public String getRenderer()
 	{
-		return renderer;
+		return rendererDefault;
 	}
 
-	public void setRenderer(String renderer)
+	public int getInclinationLevel()
 	{
-		this.renderer = renderer;
+		return inclinationLevel;
 	}
 
-	public float getInclinationAngle()
+	public void setInclinationLevel(int inclinationLevel)
 	{
-		return inclinationAngle;
-	}
-
-	public void setInclinationAngle(float inclinationAngle)
-	{
-		this.inclinationAngle = inclinationAngle;
+		this.inclinationLevel = inclinationLevel;
 		
 		/* Recalculo el quaternion */
 		inclinationQuaternion = new Quaternion();
-		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationAngle, 0f, 0f);
+		inclinationQuaternion.fromAngles(FastMath.DEG_TO_RAD * inclinationLevel, 0f, 0f);
 	}
 
 	public Quaternion getInclinationQuaternion()

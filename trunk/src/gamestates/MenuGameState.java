@@ -1,18 +1,31 @@
 package gamestates;
 
+import java.io.File;
+import java.net.URL;
+import java.util.regex.Pattern;
+
 import input.FengJMEInputHandler;
 
 import main.Main;
 
 import org.fenggui.Button;
+import org.fenggui.ComboBox;
+import org.fenggui.Container;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
+import org.fenggui.Label;
+import org.fenggui.ListItem;
+import org.fenggui.Slider;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
-import org.fenggui.composite.Window;
+import org.fenggui.decorator.background.PlainBackground;
 import org.fenggui.event.ButtonPressedEvent;
 import org.fenggui.event.IButtonPressedListener;
+import org.fenggui.event.ISliderMovedListener;
+import org.fenggui.event.SliderMovedEvent;
 import org.fenggui.layout.RowLayout;
 import org.fenggui.layout.StaticLayout;
+import org.fenggui.util.Color;
+import org.fenggui.util.Spacing;
 import org.lwjgl.opengl.GL13;
 
 import com.jme.input.MouseInput;
@@ -31,14 +44,30 @@ public class MenuGameState extends BasicGameState
 	private FengJMEInputHandler fengGUIInputHandler;
 
 	/* Botones del menu */
-	private Button continueButton, newGameButton, exitButton;
+	private Button continueButton, newGameButton, exitButton, cancelButton, startButton;
 	
 	/* Musica del menu */
 	private AudioTrack music;
 	
 	/* Settings del pinball */
 	private PinballGameStateSettings settings;
+	
+	/* El contenedor general de los menues */
+	private Container c;
 
+	/* Control de slider para la inclinacion */
+	private Slider slider;
+	
+	/* Control de dropdown para la mesa elegida */
+	private ComboBox<Theme> tableList;
+	
+	
+	/* Los botones de los menues */
+//	private GameMenuButton play, cont, quit;
+	
+	private static final String THEMES_DIRECTORY = "resources/models/themes/";
+
+	
 	public MenuGameState(String name)
 	{
 		super(name);
@@ -47,42 +76,110 @@ public class MenuGameState extends BasicGameState
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/menu/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
-		music.setVolume(Main.getMusicVolume());
+		music.setTargetVolume(Main.getMusicVolume());
 		
-		settings = new PinballGameStateSettings();
+		/* Obtengo un display en Feng con LWJGL */
+		fengGUIdisplay = new Display(new LWJGLBinding());
 		
-		/* Inicializo el menu */
-		initMenu();
+		/* Inicializo el input handler de FengGUI */
+		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
+ 
+		/* Creo el contenedor general del menu */
+		c = new Container();
+		c.getAppearance().add(new PlainBackground(Color.BLUE));
+		fengGUIdisplay.addWidget(c);
+		c.getAppearance().setPadding(new Spacing(10, 10));
+		c.setLayoutManager(new RowLayout(false));
+		
+		/* Inicializo los botones de los menues */
+		initButtons();
 	}
 
 	/**
 	 * Inicializa el menu.
 	 */
-	protected void initMenu()
+	private void buildMainMenu()
 	{
-		/* Obtengo un display en Feng con LWJGL */
-		fengGUIdisplay = new Display(new LWJGLBinding());
+		//TODO darle algo de estilo al menu y agregarle un fondo
+		
+		/* Remuevo todo lo que esta en el contenedor */
+		c.removeAllWidgets();
+		
+		/* Coloco los botones */
+		c.addWidget(continueButton);
+		c.addWidget(newGameButton);
+		c.addWidget(exitButton);
+	
+		c.pack();
+		
+		StaticLayout.center(c, fengGUIdisplay);
  
-		/* Inicializo el input handler de FengGUI */
-		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
+		/* Actualizo la pantalla con los nuevos componentes */
+		fengGUIdisplay.layout();
+	}
+	
+	/**
+	 * Inicializa el menu de opciones para un juego.
+	 */
+	private void buildGameOptionsMenu()
+	{
+		/* Remuevo todo lo que esta en el contenedor */
+		c.removeAllWidgets();
+		
+		/* Creo las configuraciones del pinball que generaria */
+		settings = new PinballGameStateSettings();
+		
+		/* Titulo de elegir mesa */
+	    Label labelTable = FengGUI.createLabel(c, "Select game table");
+		//labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+	    
+		/* Creo el dropdown con las mesas para seleccionar */
+		tableList = FengGUI.createComboBox(c);
+		populateTableList(tableList);
+		
+	    /* Titulo de elegir inclinacion */
+	    Label labelInclination = FengGUI.createLabel(c, "Select inclination level");
+		//labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+		
+		/* Creo el slider con los niveles de inclinacion posibles */
+	    slider = FengGUI.createSlider(c, true);
+		slider.updateMinSize();
+		slider.setValue(0.5);
+		slider.setClickJump(0.1);
+		
+		/* Estado del slider */
+	    final Label labelInclinationStatus = FengGUI.createLabel(c, getLevelMessage(getInclinationLevel(slider.getValue())));
+	    //labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+		
+		slider.addSliderMovedListener(new ISliderMovedListener()
+		{
+			public void sliderMoved(SliderMovedEvent sliderMovedEvent)
+			{
+				labelInclinationStatus.setText(getLevelMessage(getInclinationLevel(sliderMovedEvent.getPosition())));
+			}
+		});
+		
+		/* Coloco los botones */
+		c.addWidget(startButton);
+		c.addWidget(cancelButton);
+	
+		c.pack();
+		
+		StaticLayout.center(c, fengGUIdisplay);
  
-		/* Creo el menu */
-		final Window menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
-		menu.setTitle("Main menu");
-		menu.setSize(200, 200);
-		menu.getContentContainer().setLayoutManager(new RowLayout(false));
-		//menu.getContentContainer().getAppearance().setPadding(new Spacing(10, 10));
-
+		/* Actualizo la pantalla con los nuevos componentes */
+		fengGUIdisplay.layout();
+	}
+	
+	private void initButtons()
+	{
 		/* Boton de continuar */
-		continueButton = FengGUI.createButton(menu.getContentContainer(), "Continue");
+		continueButton = FengGUI.createButton(c, "Continue");
 		
 		continueButton.addButtonPressedListener(new IButtonPressedListener() {
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 
-				/* Cierro la ventana */
-				menu.close();
-				
 				/* Continuo el juego actual */
 				Main.continueCurrentPinballGame();
 				
@@ -93,50 +190,100 @@ public class MenuGameState extends BasicGameState
 		});
 
 		/* Boton de juego nuevo */
-		newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
+		newGameButton = FengGUI.createButton(c, "New game");
 		
 		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 				
-				/* Cierro la ventana */
-				menu.close();
-
+				/* Creo la pantalla de opciones de juego */
+				buildGameOptionsMenu();
+			}
+		});
+		
+		/* Boton de salir */
+		exitButton = FengGUI.createButton(c, "Exit");
+		
+		exitButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0)
+			{
+				/* Acabo con todo el juego */
+				Main.shutdownGame();
+			}
+		});
+		
+		/* Boton de cancelar */
+		cancelButton = FengGUI.createButton(c, "Cancel");
+		
+		cancelButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+				
+				/* Vuelvo a construir el menu principal */
+				buildMainMenu();
+			}
+		});
+		
+		/* Boton de comenzar juego */
+		startButton = FengGUI.createButton(c, "Start");
+		
+		startButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+				
 				/* Destruyo el gamestate de menu */
 				Main.endMenu();
 
 				/* Mato el juego actual si hay alguno */
 				Main.endCurrentPinballGame();
 				
-				/* TODO (aca hacer la ventanita modal de selecc de mapa e inclinacion) Creo un loading nuevo y lo inicio */
-				LoadingGameState lgs = Main.newLoading(settings, MenuGameState.class.getClassLoader().getResource( "resources/models/Table.x3d" ));
+				/* Creo un loading nuevo y lo inicio */
+				settings.setInclinationLevel(getInclinationLevel(slider.getValue()));
+				
+				/* Creo el gamestate de loading con la configuracion del pinball a crear y el recurso de su mesa */
+				LoadingGameState lgs = Main.newLoading(settings, tableList.getSelectedItem().getValue().getResource());
 				lgs.setActive(true);
 				lgs.startLoading();
 			}
 		});
 		
-		/* Boton de salir */
-		exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
+		/*
+		TODO 
+		play = new GameMenuButton("src/resources/images/menu/play0.png", "src/resources/images/menu/play1.png");
+		cont = new GameMenuButton("resources/images/menu/credits0.png", "resources/images/menu/credits1.png");
+		quit = new GameMenuButton("resources/images/menu/quit0.png", "resources/images/menu/quit1.png");
 		
-		exitButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0)
+		play.addButtonPressedListener(new IButtonPressedListener()
+		{
+			public void buttonPressed(ButtonPressedEvent e)
 			{
-				/* Cierro la ventana */
-				menu.close();
-				
-				/* Acabo con todo el juego */
-				Main.shutdownGame();
+				MessageWindow mw = new MessageWindow("Nothing to play. Just a demo.");
+				mw.pack();
+				fengGUIdisplay.addWidget(mw);
+				StaticLayout.center(mw, fengGUIdisplay);
 			}
 		});
- 
-		//TODO darle algo de estilo al menu y agregarle un fondo
- 
-		/* Actualizo la pantalla con los nuevos componentes */
-		fengGUIdisplay.layout();
 
-		/* Centro la ventana */
-		StaticLayout.center(menu, fengGUIdisplay);
+		cont.addButtonPressedListener(new IButtonPressedListener()
+		{
+			public void buttonPressed(ButtonPressedEvent e)
+			{
+				MessageWindow mw = new MessageWindow("We dont take credit for FengGUI :)");
+				mw.pack();
+				fengGUIdisplay.addWidget(mw);
+				StaticLayout.center(mw, fengGUIdisplay);
+			}
+		});
+
+		quit.addButtonPressedListener(new IButtonPressedListener()
+		{
+
+			public void buttonPressed(ButtonPressedEvent e)
+			{
+				Main.shutdownGame();
+			}
+		});*/
 	}
 	
 	@Override
@@ -149,6 +296,9 @@ public class MenuGameState extends BasicGameState
 			/* Hago visible al cursor */
 			MouseInput.get().setCursorVisible(true);
 			
+			/* Inicializo el menu */
+			buildMainMenu();
+			
 			/* Si hay juegos en transcurso, muestro el boton de continue */
 			continueButton.setVisible(Main.hasInCourseGame());
 
@@ -159,12 +309,14 @@ public class MenuGameState extends BasicGameState
 			/* Si era la primera instancia del menu todavia no estaba en ejecucion la musica */
 			if (!Main.getAudioSystem().getMusicQueue().isPlaying())
 				Main.getAudioSystem().getMusicQueue().play();
-
 		}
 		else
 		{
 			/* Oculto el cursor */
 			MouseInput.get().setCursorVisible(false);
+			
+			/* Remuevo todo lo que esta en el contenedor */
+			c.removeAllWidgets();
 		}
 	}
 	
@@ -190,5 +342,83 @@ public class MenuGameState extends BasicGameState
 		
 		/* Muestro la pantalla de FengGUI */
 		fengGUIdisplay.display();
+	}
+	
+	private static int getInclinationLevel(double position)
+	{
+		return (position == 0)? 1 : (int) Math.ceil(position * 10);
+	}
+	
+	private static String getLevelMessage(int level)
+	{
+		String message = "Level " + level + " - ";
+		String difficulty;
+		
+		if (level == 1)
+			difficulty = "Beginner";
+		else if (level < 5)
+			difficulty =  "Easy";
+		else if (level == 5)
+			difficulty = "Normal";
+		else if (level < 10)
+			difficulty = "Hard";
+		else
+			difficulty = "Nightmare";
+		
+		return message + difficulty;
+	}
+	
+	private void populateTableList(ComboBox<Theme> list)
+	{
+		URL themesDirURL = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY);
+		File themesDir = new File(themesDirURL.getPath());
+		
+		/* Obtengo todos los archivos en el directorio de themes */
+		File[] files = themesDir.listFiles();
+		
+		/* Voy a buscar aquellos archivos que sean x3d */
+		String themeFilename;
+		Theme theme;
+		Pattern x3dFiles = Pattern.compile(".*\\.x3d", Pattern.CASE_INSENSITIVE);
+		
+		for (int i = 0; i < files.length; i++)
+		{
+			/* Obtengo el nombre de archivo del theme */
+			themeFilename = files[i].getName();
+		
+			/* Si corresponde a un archivo x3d lo incorporo al menu */
+			if (x3dFiles.matcher(themeFilename).find())
+			{
+				/* Creo el theme obteniendo su nombre del nombre de archivo y formando su recurso */
+				theme = new Theme(themeFilename.substring(0, themeFilename.length() - 4),
+						MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY + themeFilename));
+				
+				/* Lo agrego a la lista */
+				list.addItem(new ListItem<Theme>(theme.getName(), theme));
+			}
+		}
+	}
+	
+	private class Theme
+	{
+		private String name;
+		
+		private URL resource;
+		
+		public Theme(String name, URL resource)
+		{
+			this.name = name;
+			this.resource = resource;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+
+		public URL getResource()
+		{
+			return resource;
+		}
 	}
 }

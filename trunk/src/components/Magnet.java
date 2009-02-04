@@ -49,7 +49,7 @@ public class Magnet extends Node implements ActivableComponent
 		
 		//TODO hacer testeos
 		// La fuerza dependera del angulo de inclinacion de la mesa
-		float angle = pinball.getPinballSettings().getInclinationAngle();
+		float angle = pinball.getPinballSettings().getInclinationLevel();
 		if ( angle < 3)
 		{
 			force = 200;
