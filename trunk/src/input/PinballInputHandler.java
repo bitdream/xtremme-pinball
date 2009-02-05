@@ -313,7 +313,7 @@ public class PinballInputHandler extends FirstPersonHandler
 			else if(event.getTriggerPressed() && tiltActive)
 			{
 				// Intensidad de la fuerza a aplicar
-				float forceIntensity = 150 /** game.getPinballSettings().getInclinationAngle() / 3*/; //90000f;
+				float forceIntensity = 150;
 				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
 				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)),
 						0.0f, /*FastMath.sign(FastMath.nextRandomInt(-1, 1)) , */
