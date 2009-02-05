@@ -29,6 +29,8 @@ private static final long serialVersionUID = 1L;
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
 	
+	private Geometry visualModel;
+	
 	// Tiempo de la ultima colision considerada (donde se llamo a la logica del juego) entre una bola y este door
 	private long lastConsideredCollisionTime = 0;
 	
@@ -118,30 +120,6 @@ private static final long serialVersionUID = 1L;
                     }
                     // Sino no hago nada pq es una colision repetida                    
                 }       		
-                
-                
-//                // Tiempo en el que se dio esta colision
-//                long now = System.currentTimeMillis();
-//                
-//                // Tiempo de la ultima colision considerada
-//                long lastColl = sensor.getLastConsideredCollisionTime();
-//                
-//                // Si la diferencia con la ultima colision considerada no es menor a windowTimeForCollisions ms, la tomo como otra colision
-//                if (!(lastColl != 0 && now -  lastColl < windowTimeForCollisions))
-//                {   
-//            		// Dependiendo del tipo de sensor, se llama a metodos diferentes de la logica del juego
-//            		if (sensor.getSensorType() == SensorType.LOST_BALL_SENSOR)
-//            		{    		
-//            			pinballInstance.getGameLogic().lostBall(ball);
-//            		}
-//            		else 
-//            		{
-//            			pinballInstance.getGameLogic().sensorRampCollision();
-//            		}
-//            		
-//                    sensor.setLastConsideredCollisionTime(now);
-//                }
-//                // Sino no hago nada pq es una colision repetida       		
         	}
         }, collisionEventHandler, false );
 		
@@ -157,6 +135,7 @@ private static final long serialVersionUID = 1L;
 		super(name);
 		
 		attachChild(visualModel);
+		this.visualModel = visualModel;
 	}
 
 	public SensorType getSensorType() 
@@ -177,5 +156,10 @@ private static final long serialVersionUID = 1L;
 	public void setLastConsideredCollisionTime(long lastConsideredCollisionTime) 
 	{
 		this.lastConsideredCollisionTime = lastConsideredCollisionTime;
+	}
+	
+	public Geometry getVisualModel()
+	{
+		return visualModel;
 	}
 }

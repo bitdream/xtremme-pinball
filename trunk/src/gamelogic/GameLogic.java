@@ -168,6 +168,7 @@ public abstract class GameLogic
 		{
 			((Bumper)bumper.getChild(0)).setActive(false);
 		}		
+		// TODO descomentar
 		// Desactivar los magnets
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
