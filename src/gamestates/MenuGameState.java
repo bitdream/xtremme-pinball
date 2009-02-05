@@ -14,9 +14,10 @@ import org.fenggui.Button;
 import org.fenggui.ComboBox;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
+import org.fenggui.Item;
 import org.fenggui.Label;
-import org.fenggui.ListItem;
 import org.fenggui.Slider;
+import org.fenggui.appearance.LabelAppearance;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.composite.Window;
 import org.fenggui.event.ButtonPressedEvent;
@@ -59,7 +60,7 @@ public class MenuGameState extends BasicGameState
 	private Slider slider;
 	
 	/* Control de dropdown para la mesa elegida */
-	private ComboBox<Theme> tableList;
+	private ComboBox tableList;
 
 	/* Directorio donde se guardan los temas */
 	private static final String THEMES_DIRECTORY = "resources/models/themes/";
@@ -225,7 +226,7 @@ public class MenuGameState extends BasicGameState
 				settings.setInclinationLevel(getInclinationLevel(slider.getValue()));
 				
 				/* Creo el gamestate de loading con la configuracion del pinball a crear y el recurso de su mesa */
-				LoadingGameState lgs = Main.newLoading(settings, tableList.getSelectedItem().getValue().getResource());
+				LoadingGameState lgs = Main.newLoading(settings, (((Theme)tableList.getList().getSelectedItem().getUserData()).getResource()));
 				lgs.setActive(true);
 				lgs.startLoading();
 			}
@@ -306,7 +307,7 @@ public class MenuGameState extends BasicGameState
 		
 		/* Para que la GUI se muestre bien */
 		//GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		
+
 		/* Muestro la pantalla de FengGUI */
 		fengGUIdisplay.display();
 	}
@@ -335,9 +336,10 @@ public class MenuGameState extends BasicGameState
 		return message + difficulty;
 	}
 	
-	private void populateTableList(ComboBox<Theme> list)
+	private void populateTableList(ComboBox list)
 	{
-	    URI themesDirURI;
+		URI themesDirURI;
+		
 	    try 
 	    {
 	        themesDirURI = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY).toURI();
@@ -347,7 +349,7 @@ public class MenuGameState extends BasicGameState
 	        themesDirURI = null;
 	    }
 		
-		File themesDir = new File(themesDirURI.getPath()); //TODO aca toque, agregue el replace
+		File themesDir = new File(themesDirURI.getPath());
 		
 		/* Obtengo todos los archivos en el directorio de themes */
 		File[] files = themesDir.listFiles();
@@ -370,7 +372,9 @@ public class MenuGameState extends BasicGameState
 						MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY + themeFilename));
 				
 				/* Lo agrego a la lista */
-				list.addItem(new ListItem<Theme>(theme.getName(), theme));
+				Item item = new Item(theme.getName(), new LabelAppearance(new Label(theme.getName())));// FIXME
+				item.setData(theme);
+				list.addItem(item);
 			}
 		}
 	}
