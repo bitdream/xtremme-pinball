@@ -62,7 +62,7 @@ public class Main
 		audio.getMusicQueue().setRepeatType(RepeatType.ONE);
 	
 		/* Inicializacion del juego principal */
-		stdGame = new StandardGame("!!!!!xtremme-pinball");
+		stdGame = new StandardGame("xtremme-pinball");
 		//You can make a new GameSettings object from the code in AbstractGame.getAttributes() and then initialize StandardGame like this
 		// StandardGame game = new StandardGame("Game", GameType.GRAPHICAL, settings);
 		
@@ -139,7 +139,10 @@ public class Main
 	
 	public static boolean hasInCourseGame()
 	{
-		return GameStateManager.getInstance().getChild("Game") != null;
+		/* Debe estar en el manager de gamestates y tener carga de mesa completa */
+		PinballGameState pinballGS = (PinballGameState) GameStateManager.getInstance().getChild("Game");
+		
+		return pinballGS != null && pinballGS.isLoadingComplete();
 	}
 	
 	public static void pauseCurrentPinballGame()
@@ -154,7 +157,6 @@ public class Main
 		
 		if (gs != null)
 		{
-			gs.setActive(false);
 			gs.cleanup();
 			GameStateManager.getInstance().detachChild(gs);
 		}
@@ -182,6 +184,7 @@ public class Main
 		if (loadingGS != null)
 		{
 			loadingGS.setActive(false);
+			loadingGS.cleanup();
 			GameStateManager.getInstance().detachChild(loadingGS);
 		}
 	}
