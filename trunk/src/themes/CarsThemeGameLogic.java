@@ -42,7 +42,7 @@ public class CarsThemeGameLogic extends GameLogic
 	private boolean magnetsActive = false;
 	
 	// Sonidos
-	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, music;
+	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, magnetOffSound, music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
@@ -55,6 +55,10 @@ public class CarsThemeGameLogic extends GameLogic
 		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/start.wav"), false);
 		gameOverSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/end.wav"), false);
 		extraBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/extra-ball.wav"), false);
+		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/life-up.wav"), false);
+		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/checkpoint.wav"), false);
+		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/magnet-on.wav"), false);
+		magnetOffSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/magnet-off.wav"), false);
 		
 		// Inicializo la musica
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
@@ -152,10 +156,7 @@ public class CarsThemeGameLogic extends GameLogic
 	{
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
-		{				
-			// Sonido de este theme para el pasaje por rampa
-			rampUpSound.play();
-			
+		{			
 			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
 			if (completeSeqCnt == 2)
 			{
@@ -163,11 +164,17 @@ public class CarsThemeGameLogic extends GameLogic
 				score += COMPLETE_SEQ_SCORE;
 				thisBallScore += COMPLETE_SEQ_SCORE;
 				
-				// Mensaje al usuario diciendo avisando del bonus obtenido
+				// Mensaje al usuario avisando del bonus obtenido
 				showMessage("Checkpoint!!!");
+				
+				// Sonido de checkpoint
+				sequenceCompletedSound.play();
 			}
 			else
 			{
+				// Sonido de este theme para el pasaje por rampa
+				rampUpSound.play();
+				
 				// Solo sumar los puntos de pasaje por rampa
 				score += RAMP_SCORE;
 				thisBallScore += RAMP_SCORE;
@@ -205,7 +212,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano, esto se logra desactivando bumpers y puntaje
 		// de todos los componentes. Ya esta hecho en cada componente (los no desactivables hacen uso de la variable tiltAbused)
 	
-		// Los desactiva super.abuseTilt();
+		// Los desactiva super.abuseTilt(), solo resta actualizar la variable
 		magnetsActive = false;
 	}
 
@@ -317,7 +324,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void playExtraLifeSound()
 	{
-		// TODO encontrar sonido
+		extraLifeSound.play();
 	}
 	
 	private void showExtraLifeMessage()
@@ -327,7 +334,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void playActiveMagnetsSound()
 	{
-		// TODO encontrar sonido
+		magnetOnSound.play();
 	}
 	
 	private void showActiveMagnetsMessage()
