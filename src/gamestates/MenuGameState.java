@@ -1,10 +1,12 @@
 package gamestates;
 
+import input.FengJMEInputHandler;
+
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Pattern;
-
-import input.FengJMEInputHandler;
 
 import main.Main;
 
@@ -335,8 +337,17 @@ public class MenuGameState extends BasicGameState
 	
 	private void populateTableList(ComboBox<Theme> list)
 	{
-		URL themesDirURL = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY);
-		File themesDir = new File(themesDirURL.getPath().replace("%20", " ")); //TODO aca toque, agregue el replace
+	    URI themesDirURI;
+	    try 
+	    {
+	        themesDirURI = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY).toURI();
+	    } catch ( URISyntaxException e )
+	    {
+	        System.out.println("Error que no deberia pasar");
+	        themesDirURI = null;
+	    }
+		
+		File themesDir = new File(themesDirURI.getPath()); //TODO aca toque, agregue el replace
 		
 		/* Obtengo todos los archivos en el directorio de themes */
 		File[] files = themesDir.listFiles();

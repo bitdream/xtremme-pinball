@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +51,16 @@ public class X3DLoader extends Observable implements Observer
     {
         try
         {
-            this.x3d = new FileInputStream( x3dFilename.getFile().replace("%20", " ") ); //TODO aca toque, agregue el replace
+            URI x3dURI;
+            try 
+            {
+                x3dURI = x3dFilename.toURI();
+            } catch ( URISyntaxException e )
+            {
+                System.out.println("Error que no deberia pasar");
+                x3dURI = null;
+            }
+            this.x3d = new FileInputStream( x3dURI.getPath() ); //TODO aca toque, agregue el replace
             this.x3dFileName = x3dFilename.getPath(); 
         }
         catch ( FileNotFoundException e )
