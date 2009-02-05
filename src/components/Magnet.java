@@ -22,11 +22,11 @@ public class Magnet extends Node implements ActivableComponent
 	private Geometry visualModel;
 	
 	// Intensidad de la fuerza. Seteada desde el codigo de abajo en funcion del angulo de inclinacion
-	private static int force = 1000; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
+	private static int force;// = 1000; //TODO antes 500 Quizas sea bueno hacerla directamente proporcional al angulo de inclinacion
 	
 	// TODO hacer forceFieldRadius y maxRadius acordes a los valores y dimensiones que tengan finalmente los objetos de la mesa
 	// Radio del campo de la fuerza magnetica
-	private static int forceFieldRadius = 5; // La bola tiene radio 0.25 
+	private static float forceFieldRadius = 4f; // La bola tiene radio 0.25 
 	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
 	private static float maxRadius = 3;
@@ -47,26 +47,8 @@ public class Magnet extends Node implements ActivableComponent
         // Genero su fisica 
 		magnetNode.generatePhysicsGeometry(true);
 		
-		//TODO hacer testeos
 		// La fuerza dependera del angulo de inclinacion de la mesa
-		float angle = pinball.getPinballSettings().getInclinationLevel();
-		if ( angle < 3)
-		{
-			force = 200;
-		}
-		else if (angle < 6)
-		{
-			force = 500;
-		}
-		else if (angle < 8)
-		{
-			force = 800;
-		}
-		else // Pensado para un angulo maximo de 10
-		{
-			force = 1000;
-		}
-		
+		force = mapAngleToForce(pinball.getPinballSettings().getInclinationLevel());			
 		
 		// Efecto de iman en cada paso fisico
 		pinball.getPhysicsSpace().addToUpdateCallbacks( new PhysicsUpdateCallback() {
@@ -78,9 +60,11 @@ public class Magnet extends Node implements ActivableComponent
 	        	{
 	        		 for (DynamicPhysicsNode ball: pinball.getBalls()) 
 	 	            {	          
+	        			 ball.updateWorldVectors(true);
+	        			 
 	 	                    // Calcular la distancia entre la bola y el iman
 	 	                    // IMPORTANTE: la distancia se calcula entre los centros de masa de los objetos
-	 	                    float distance = ball.getLocalTranslation().distance(magnet.getVisualModel().getLocalTranslation());
+	 	                    float distance = ball.getChild(0).getWorldTranslation().distance(magnet.getVisualModel().getLocalTranslation());
 
 	 	                    // Si la distancia es menor a cierto valor, se aplica la fuerza
 	 	                    if (distance < forceFieldRadius)
@@ -88,10 +72,13 @@ public class Magnet extends Node implements ActivableComponent
 	 	                    	/* Calcular la direccion en la que hay que aplicar la fuerza como resta de las posiciones
 	 		                     * de la bola y del iman. El sentido de la fuerza debe ser hacia el iman.
 	 		                     */	 
-	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getLocalTranslation()).normalize();	         
+	 		                    Vector3f direction = magnet.getVisualModel().getLocalTranslation().subtract(ball.getChild(0).getWorldTranslation()).normalize();	         
+	 		                    Vector3f appliedForce = direction.mult(force*ball.getMass()).divide(100/maxRadius*distance);
 	 		                    
+	 		                    // Bajar la intensidad de la fuerza en z para que la bola no suba, pero si se vaya para el costado
+	 		                    appliedForce.setZ(appliedForce.getZ()/2);
 	 		                    // Aplicar la fuerza atractora. Es inversamente proporcional a la distancia
-	 		                    ball.addForce(direction.mult(force*ball.getMass()).divide(100/maxRadius*distance));              
+	 		                    ball.addForce(appliedForce);                 
 	 	                    }
 	 	            }
 	        	}	           
@@ -140,5 +127,39 @@ public class Magnet extends Node implements ActivableComponent
 	public boolean isActive()
 	{
 		return this.active;
+	}
+	
+	// Si, asi de cabeza. Todo sale de prueba y error. Aplicar un polinomio de Taylor seria ineficiente
+	private static int mapAngleToForce(float angle)
+	{
+		float epsilon = 0.001f;
+		int force;
+		
+		if ( angle <= 1 + epsilon)
+		{
+			force = 20; //200 es muy fuerte para 1º
+		}
+		else if ( angle <= 2 + epsilon)
+		{
+			force = /*200*/40; //200 es muy fuerte para 1º
+		}
+		else if ( angle <= 3 + epsilon)
+		{
+			force = /*200*/70; //200 es muy fuerte para 1º
+		}
+		else if (angle < 6)
+		{
+			force = 500;
+		}
+		else if (angle < 8)
+		{
+			force = 800;
+		}
+		else // Pensado para un angulo maximo de 10
+		{
+			force = 1000;
+		}
+		
+		return force;
 	}
 }
