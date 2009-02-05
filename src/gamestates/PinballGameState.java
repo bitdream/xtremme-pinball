@@ -48,8 +48,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!!!!!xtremme pinball";
-	private static final String GAME_VERSION = "0.5";
+	private static final String GAME_NAME = "xtremme pinball";
+	private static final String GAME_VERSION = "0.6";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
@@ -113,6 +113,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Timer para los FPS */
 	protected Timer timer;
     private float lastSampleTime = 0;
+    
+    /* Carga de la mesa completa */
+    private boolean loadingComplete = false;
 
 	/* XXX Ubicacion inicial de la bola: cable */
 	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f ); 
@@ -131,6 +134,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public PinballGameState(String name, PinballGameStateSettings pinballSettings)
 	{
 		super(name);
+		
+		logger.info("Pinball Game State creado");
 		
 		this.pinballSettings = pinballSettings;
 	
@@ -902,5 +907,15 @@ public class PinballGameState extends PhysicsEnhancedGameState
         }
         
     }
+
+	public boolean isLoadingComplete()
+	{
+		return loadingComplete;
+	}
+
+	public void setLoadingComplete(boolean loadingComplete)
+	{
+		this.loadingComplete = loadingComplete;
+	}
     
 }

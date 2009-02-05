@@ -29,6 +29,9 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	
 	/* El cargador */
 	private LoadWorker loadWorker;
+	
+	/* Controlador */
+	private InputHandler input;
 
 	
 	public LoadingGameState(PinballGameStateSettings settings, URL tableResource)
@@ -51,19 +54,16 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	 */
 	protected void initProgressInfo()
 	{
-		// TODO hacer que si pone ESC se cancela la carga (o si toca el boton CANCEL) fengGUIInputHandler.addAction
 	    this.input = new InputHandler();
 	    input.addAction( new InputAction() {
 
-            @Override
             public void performAction( InputActionEvent evt )
             {
                 loadWorker.stopLoading();
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
-        
 	}
-	private InputHandler input;
+	
 	/**
 	 * Se pone a cargar la mesa seleccionada al construir el loadinggamestate.
 	 */
@@ -113,7 +113,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	{
 		super.update(tpf);
 
-		//setProgress(loadWorker.getPercentage(), "Loading");
 		input.update( tpf );
 		
 		if (loadWorker.isCompleted())
@@ -137,7 +136,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	    private PinballGameState pinballGS;
 	    private LoadingGameState loadingGS;
 	    private LoaderThread roomLoader, machineLoader, tableLoader;
-	    //private Thread roomThread, machineThread, tableThread; 
 	    private volatile boolean complete = false, started = false, aborted = false;
 		private float percentage = 0f;
 		
@@ -200,12 +198,12 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
                 }
             }
             
-            // TODO accion para abortar
+            /* Accion para abortar */
             if ( aborted )
             {
-//                Main.endLoading();
-//                Main.newMenu();
-                System.out.println("ABORTADO");
+                Main.endLoading();
+                Main.newMenu().setActive(true);
+
                 return;
             }
             
@@ -215,16 +213,19 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(tableLoader.getScene()));
             pinballGS.setGameLogic(tableLoader.getTheme());
             
-            this.complete = true;    
-			
+            this.complete = true;
+            
+			/* Marco al gamestate de juego como con carga completa */
+            pinballGS.setLoadingComplete(true);
 		}
 
-        @Override
         public Void call() throws Exception
         {
             this.loadingGS.setProgress( getPercentage(), "Loading" );
+            
             if (!complete && !aborted)
                 GameTaskQueueManager.getManager().update(this);
+            
             return null;
         }
         

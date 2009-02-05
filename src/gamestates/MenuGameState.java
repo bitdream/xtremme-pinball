@@ -10,23 +10,21 @@ import main.Main;
 
 import org.fenggui.Button;
 import org.fenggui.ComboBox;
-import org.fenggui.Container;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
 import org.fenggui.Label;
 import org.fenggui.ListItem;
 import org.fenggui.Slider;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
-import org.fenggui.decorator.background.PlainBackground;
+import org.fenggui.composite.Window;
 import org.fenggui.event.ButtonPressedEvent;
 import org.fenggui.event.IButtonPressedListener;
 import org.fenggui.event.ISliderMovedListener;
 import org.fenggui.event.SliderMovedEvent;
 import org.fenggui.layout.RowLayout;
 import org.fenggui.layout.StaticLayout;
-import org.fenggui.util.Color;
+import org.fenggui.util.Alignment;
 import org.fenggui.util.Spacing;
-import org.lwjgl.opengl.GL13;
 
 import com.jme.input.MouseInput;
 import com.jmex.audio.AudioTrack;
@@ -52,8 +50,8 @@ public class MenuGameState extends BasicGameState
 	/* Settings del pinball */
 	private PinballGameStateSettings settings;
 	
-	/* El contenedor general de los menues */
-	private Container c;
+	/* La ventana de los menues */
+	private Window menu;
 
 	/* Control de slider para la inclinacion */
 	private Slider slider;
@@ -80,36 +78,87 @@ public class MenuGameState extends BasicGameState
 		
 		/* Inicializo el input handler de FengGUI */
 		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
- 
-		/* Creo el contenedor general del menu */
-		c = new Container();
-		c.getAppearance().add(new PlainBackground(Color.BLUE));
-		fengGUIdisplay.addWidget(c);
-		c.getAppearance().setPadding(new Spacing(10, 10));
-		c.setLayoutManager(new RowLayout(false));
-		
-		/* Inicializo los botones de los menues */
-		initButtons();
-	}
+ 	}
 
+	/**
+	 * Creo la ventana.
+	 */
+	private void buildWindow()
+	{
+		//TODO darle algo de estilo al menu y agregarle un fondo
+		
+		/* Remuevo todos los componentes que puedan haber en la pantalla */
+		fengGUIdisplay.removeAllWidgets();
+		
+		/* Creo la ventana del menu */
+		menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
+		menu.setExpandable(false);
+		menu.setResizable(false);
+		menu.setShrinkable(false);
+		menu.setMovable(false);
+		menu.setTitle("Main menu");
+		menu.setSize(300, 300);
+		menu.getContentContainer().setLayoutManager(new RowLayout(false));
+		menu.getContentContainer().getAppearance().setPadding(new Spacing(20, 15));
+	}
+	
 	/**
 	 * Inicializa el menu.
 	 */
 	private void buildMainMenu()
 	{
-		//TODO darle algo de estilo al menu y agregarle un fondo
+		/* Construyo la ventana */
+		buildWindow();
 		
-		/* Remuevo todo lo que esta en el contenedor */
-		c.removeAllWidgets();
+		/* Boton de continuar */
+		continueButton = FengGUI.createButton(menu.getContentContainer(), "Continue");
 		
-		/* Coloco los botones */
-		c.addWidget(continueButton);
-		c.addWidget(newGameButton);
-		c.addWidget(exitButton);
-	
-		c.pack();
+		continueButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+
+				/* Cierro la ventana */
+				menu.close();
+				
+				/* Continuo el juego actual */
+				Main.continueCurrentPinballGame();
+				
+				/* Desactivo el gamestate de menu */
+				Main.endMenu();
+
+			}
+		});
+		continueButton.setVisible(false);
+
+		/* Boton de juego nuevo */
+		newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
 		
-		StaticLayout.center(c, fengGUIdisplay);
+		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+				
+				/* Cierro la ventana */
+				menu.close();
+				
+				/* Creo la pantalla de opciones de juego */
+				buildGameOptionsMenu();
+			}
+		});
+		
+		/* Boton de salir */
+		exitButton = FengGUI.createButton(menu.getContentContainer(), "Exit");
+		
+		exitButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0)
+			{
+				/* Acabo con todo el juego */
+				Main.shutdownGame();
+			}
+		});
+
+		/* Lo centro */
+		StaticLayout.center(menu, fengGUIdisplay);
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
@@ -120,33 +169,31 @@ public class MenuGameState extends BasicGameState
 	 */
 	private void buildGameOptionsMenu()
 	{
-		/* Remuevo todo lo que esta en el contenedor */
-		c.removeAllWidgets();
+		/* Construyo la ventana */
+		buildWindow();
 		
 		/* Creo las configuraciones del pinball que generaria */
 		settings = new PinballGameStateSettings();
 		
 		/* Titulo de elegir mesa */
-	    Label labelTable = FengGUI.createLabel(c, "Select game table");
-		//labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+		FengGUI.createLabel(menu.getContentContainer(), "Select game table");
 	    
 		/* Creo el dropdown con las mesas para seleccionar */
-		tableList = FengGUI.createComboBox(c);
+		tableList = FengGUI.createComboBox(menu.getContentContainer());
 		populateTableList(tableList);
 		
 	    /* Titulo de elegir inclinacion */
-	    Label labelInclination = FengGUI.createLabel(c, "Select inclination level");
-		//labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+	    FengGUI.createLabel(menu.getContentContainer(), "Select inclination level");
 		
 		/* Creo el slider con los niveles de inclinacion posibles */
-	    slider = FengGUI.createSlider(c, true);
+	    slider = FengGUI.createSlider(menu.getContentContainer(), true);
 		slider.updateMinSize();
 		slider.setValue(0.5);
 		slider.setClickJump(0.1);
 		
 		/* Estado del slider */
-	    final Label labelInclinationStatus = FengGUI.createLabel(c, getLevelMessage(getInclinationLevel(slider.getValue())));
-	    //labelInclination.getAppearance().setAlignment(Alignment.MIDDLE);
+	    final Label labelInclinationStatus = FengGUI.createLabel(menu.getContentContainer(), getLevelMessage(getInclinationLevel(slider.getValue())));
+	    labelInclinationStatus.getAppearance().setAlignment(Alignment.MIDDLE);
 		
 		slider.addSliderMovedListener(new ISliderMovedListener()
 		{
@@ -155,79 +202,16 @@ public class MenuGameState extends BasicGameState
 				labelInclinationStatus.setText(getLevelMessage(getInclinationLevel(sliderMovedEvent.getPosition())));
 			}
 		});
-		
-		/* Coloco los botones */
-		c.addWidget(startButton);
-		c.addWidget(cancelButton);
-	
-		c.pack();
-		
-		StaticLayout.center(c, fengGUIdisplay);
- 
-		/* Actualizo la pantalla con los nuevos componentes */
-		fengGUIdisplay.layout();
-	}
-	
-	private void initButtons()
-	{
-		/* Boton de continuar */
-		continueButton = FengGUI.createButton(c, "Continue");
-		
-		continueButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0) {
 
-				/* Continuo el juego actual */
-				Main.continueCurrentPinballGame();
-				
-				/* Desactivo el gamestate de menu */
-				Main.endMenu();
-
-			}
-		});
-
-		/* Boton de juego nuevo */
-		newGameButton = FengGUI.createButton(c, "New game");
-		
-		newGameButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0) {
-				
-				/* Creo la pantalla de opciones de juego */
-				buildGameOptionsMenu();
-			}
-		});
-		
-		/* Boton de salir */
-		exitButton = FengGUI.createButton(c, "Exit");
-		
-		exitButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0)
-			{
-				/* Acabo con todo el juego */
-				Main.shutdownGame();
-			}
-		});
-		
-		/* Boton de cancelar */
-		cancelButton = FengGUI.createButton(c, "Cancel");
-		
-		cancelButton.addButtonPressedListener(new IButtonPressedListener() {
-			
-			public void buttonPressed(ButtonPressedEvent arg0) {
-				
-				/* Vuelvo a construir el menu principal */
-				buildMainMenu();
-			}
-		});
-		
 		/* Boton de comenzar juego */
-		startButton = FengGUI.createButton(c, "Start");
+		startButton = FengGUI.createButton(menu.getContentContainer(), "Start");
 		
 		startButton.addButtonPressedListener(new IButtonPressedListener() {
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
+				
+				/* Cierro la ventana */
+				menu.close();
 				
 				/* Destruyo el gamestate de menu */
 				Main.endMenu();
@@ -245,44 +229,28 @@ public class MenuGameState extends BasicGameState
 			}
 		});
 		
-		/*
-		TODO 
-		play = new GameMenuButton("src/resources/images/menu/play0.png", "src/resources/images/menu/play1.png");
-		cont = new GameMenuButton("resources/images/menu/credits0.png", "resources/images/menu/credits1.png");
-		quit = new GameMenuButton("resources/images/menu/quit0.png", "resources/images/menu/quit1.png");
+		/* Boton de cancelar */
+		cancelButton = FengGUI.createButton(menu.getContentContainer(), "Cancel");
 		
-		play.addButtonPressedListener(new IButtonPressedListener()
-		{
-			public void buttonPressed(ButtonPressedEvent e)
-			{
-				MessageWindow mw = new MessageWindow("Nothing to play. Just a demo.");
-				mw.pack();
-				fengGUIdisplay.addWidget(mw);
-				StaticLayout.center(mw, fengGUIdisplay);
+		cancelButton.addButtonPressedListener(new IButtonPressedListener() {
+			
+			public void buttonPressed(ButtonPressedEvent arg0) {
+				
+				/* Cierro la ventana */
+				menu.close();
+				
+				/* Vuelvo a construir el menu principal */
+				buildMainMenu();
 			}
 		});
-
-		cont.addButtonPressedListener(new IButtonPressedListener()
-		{
-			public void buttonPressed(ButtonPressedEvent e)
-			{
-				MessageWindow mw = new MessageWindow("We dont take credit for FengGUI :)");
-				mw.pack();
-				fengGUIdisplay.addWidget(mw);
-				StaticLayout.center(mw, fengGUIdisplay);
-			}
-		});
-
-		quit.addButtonPressedListener(new IButtonPressedListener()
-		{
-
-			public void buttonPressed(ButtonPressedEvent e)
-			{
-				Main.shutdownGame();
-			}
-		});*/
+		
+		/* Lo centro */
+		StaticLayout.center(menu, fengGUIdisplay);
+ 
+		/* Actualizo la pantalla con los nuevos componentes */
+		fengGUIdisplay.layout();
 	}
-	
+		
 	@Override
 	public void setActive(boolean active)
 	{
@@ -313,7 +281,7 @@ public class MenuGameState extends BasicGameState
 			MouseInput.get().setCursorVisible(false);
 			
 			/* Remuevo todo lo que esta en el contenedor */
-			c.removeAllWidgets();
+			fengGUIdisplay.removeAllWidgets();
 		}
 	}
 	
