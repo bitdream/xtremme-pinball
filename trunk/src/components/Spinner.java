@@ -39,7 +39,7 @@ public class Spinner extends Node
 	// TODO ver si el tiempo elegido funciona al tener la version final de la mesa
 	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
 	// El tiempo debe ser grande pq la cantidad de colisiones detectadas depende de la velocidad de la bola
-	private static final long windowTimeForCollisions = 1000; 
+	private static long windowTimeForCollisions = 1000; 
 
 	/**
      * Crea un nodo dinamico de molinete.
@@ -58,6 +58,9 @@ public class Spinner extends Node
 		spinnerNode.setName("Spinner");
 		
 		pinballInstance = pinball;
+		
+		// Para evitar que con angulos muy chicos la bola tarde en caer por el spinner y haga contacto mucho tiempo sumando puntos.
+		windowTimeForCollisions =  pinball.getPinballSettings().getInclinationLevel() < 3 ? 1500: 1000;
 		
 		/* El material de los spinners es plastico como la mesa */
         spinnerNode.setMaterial(Material.PLASTIC);
