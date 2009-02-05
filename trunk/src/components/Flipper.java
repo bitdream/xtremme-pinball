@@ -26,6 +26,9 @@ public class Flipper extends Node implements ActivableComponent
 	/* Aceleracion y velocidad en los flippers */
 	private static final float AVAILABLE_ACCELERATION_BACK = 15, AVAILABLE_ACCELERATION_FORWARD = 55, DESIRED_VELOCITY_BACK = 60, DESIRED_VELOCITY_FORWARD = 110;
 	
+	/* Factor de crecimiento de la fuerza */
+	private static final float GROWING_LEVEL_COEF_A = 0.00833f, GROWING_LEVEL_COEF_B = 0.075f, GROWING_LEVEL_COEF_C = 0.41666f;
+	
 	/* Maximos angulos de rotacion de los flippers */
 	private static final float maxRightRotationalAngle = 0.3f, maxLeftRotationalAngle = 0.6f, minLeftRotationalAngle = -0.3f, minRightRotationalAngle = -0.6f;
 	
@@ -46,6 +49,10 @@ public class Flipper extends Node implements ActivableComponent
 	
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
+	private PinballGameState pinballGS;
+	
+	/* Aceleracion y velocidad forward para este flipper (para adelante, las que son para atras quedan fijas) */
+	private float acceleration, velocity;
 	
 	/* Lo estan usando? */
 	private boolean inUse;
@@ -74,7 +81,7 @@ public class Flipper extends Node implements ActivableComponent
         flipperNode.setMaterial(Material.PLASTIC);
 		
         /* Creo un nodo de Flipper, con todas sus caracteristicas y lo fijo al nodo fisico */
-        final Flipper flipper = new Flipper(name, visualModel, flipperType);
+        final Flipper flipper = new Flipper(pinball, name, visualModel, flipperType);
         flipper.setActive(true);
         flipperNode.attachChild(flipper);
         
@@ -174,15 +181,25 @@ public class Flipper extends Node implements ActivableComponent
 	/**
 	 * Toma un nombre, el tipo de flipper y su representacion grafica.
 	 */
-	public Flipper(String name, Geometry visualModel, FlipperType flipperType)
+	public Flipper(PinballGameState pinballGS, String name, Geometry visualModel, FlipperType flipperType)
 	{
 		super(name);
 		
 		attachChild(visualModel);
 
+		this.pinballGS = pinballGS;
 		this.flipperType = flipperType;
+		
+		/* Calculo la velocidad y aceleracion en base a la inclinacion de la mesa */
+		acceleration = AVAILABLE_ACCELERATION_FORWARD * getPowerForLevel(pinballGS.getPinballSettings().getInclinationLevel());
+		velocity = DESIRED_VELOCITY_FORWARD * getPowerForLevel(pinballGS.getPinballSettings().getInclinationLevel());
 	}
 	
+	private static float getPowerForLevel(int inclinationLevel)
+	{
+		return (float)(GROWING_LEVEL_COEF_A * Math.pow(inclinationLevel, 2) + GROWING_LEVEL_COEF_B * inclinationLevel + GROWING_LEVEL_COEF_C);
+	}
+
 	public void recalculateJoints(PinballGameState pinball)
 	{
 		
@@ -229,15 +246,15 @@ public class Flipper extends Node implements ActivableComponent
 		if (isInUse())
 		{
 			/* Fijo la aceleracion con la que cuenta */
-			joint.getAxes().get(0).setAvailableAcceleration(AVAILABLE_ACCELERATION_FORWARD);
+			joint.getAxes().get(0).setAvailableAcceleration(acceleration);
 			
 			if (isLeftFlipper())
 			{
-				joint.getAxes().get(0).setDesiredVelocity(DESIRED_VELOCITY_FORWARD);
+				joint.getAxes().get(0).setDesiredVelocity(velocity);
 			}
 			else
 			{
-				joint.getAxes().get(0).setDesiredVelocity(-DESIRED_VELOCITY_FORWARD);
+				joint.getAxes().get(0).setDesiredVelocity(-velocity);
 			}
 		}
 		else
@@ -274,5 +291,10 @@ public class Flipper extends Node implements ActivableComponent
 	public void setInUse(boolean inUse)
 	{
 		this.inUse = inUse;
+	}
+
+	public PinballGameState getPinballGS()
+	{
+		return pinballGS;
 	}
 }
