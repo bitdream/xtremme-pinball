@@ -382,7 +382,7 @@
 <Shape>
 <Appearance>
 <Material DEF="MA_Material" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="themes-cars-table.jpg"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 <Coordinate DEF="coord_Fondo" 
