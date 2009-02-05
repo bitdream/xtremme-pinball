@@ -25,8 +25,8 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int MAX_BALLS = 3;
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas
-	private static final int EXTRA_LIFE_STEP = /*1000*/ 500; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = /*500*/ 70; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -205,6 +205,8 @@ public class CarsThemeGameLogic extends GameLogic
 		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano, esto se logra desactivando bumpers y puntaje
 		// de todos los componentes. Ya esta hecho en cada componente (los no desactivables hacen uso de la variable tiltAbused)
 	
+		// Los desactiva super.abuseTilt();
+		magnetsActive = false;
 	}
 
 	@Override
@@ -235,6 +237,7 @@ public class CarsThemeGameLogic extends GameLogic
 			showMessage("Accident in front of you, slow down!!!");
 		}	
 		
+		//TODO descomentar luego de testear imanes
 		if (magnetsActive)
 		{
 			// Desactivar los magnets si es que alguno estaba activo 
@@ -381,7 +384,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// Desactivar los magnets si es que alguno estaba activo 
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
-			((Magnet)magnet.getChild(0)).setActive(false);
+			((Magnet)magnet.getChild(0)).setActive(false); //TODO para debug de imanes poner true
 		}
 		magnetsActive = false;
 	}
@@ -410,13 +413,12 @@ public class CarsThemeGameLogic extends GameLogic
 		extraLifesCnt = 1;
 		extraBallsCnt = 1;
 		
-//		// TODO para debug de imanes. Ponerle false despues. Quitarlo todo!!!
+//		// TODO para debug de imanes. Quitarlo todo!!!
 //		// Desactivar los magnets si es que alguno estaba activo 
 //		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 //		{
 //			((Magnet)magnet.getChild(0)).setActive(/*false*/true); 
 //		}
-//		magnetsActive = false;
 	}
 
 	@Override

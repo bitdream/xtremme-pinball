@@ -34,7 +34,9 @@ import components.Bumper;
 import components.Door;
 import components.Flipper;
 import components.Plunger;
+import components.Sensor;
 import components.Spinner;
+import components.Sensor.SensorType;
 
 /**
  * Clase principal del juego.
@@ -119,13 +121,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
 	/* XXX Ubicacion inicial de la bola: cable */
 	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f ); 
-	/*new Vector3f( 15,15,-51 )*/ 
-	/*new Vector3f( 1, 16, -58)*/
-	/*new Vector3f(-3.22f,20,-15.37485f)*/
 	
-	/* XXX Bola extra que sale rodando por la rampa */
-	private Vector3f extraBallStartUp = new Vector3f(-0.6277902f, 5f, -19.233984f);
-	    
 	/**
 	 * Crea un estado de juego nuevo.
 	 * @param name Nombre del estado de juego.
@@ -547,11 +543,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         return ballStartUp;
     }
 	
-	public Vector3f getExtraBallStartUp() 
-	{
-		return extraBallStartUp;
-	}
-    
     public LightState getLightState()
     {
         return lightState;
@@ -560,6 +551,27 @@ public class PinballGameState extends PhysicsEnhancedGameState
     public void setGameLogic(GameLogic gameLogic)
     {
         this.gameLogic = gameLogic;
+    }
+    
+    // Se basa en la posicion del sensor de rampa luego de rotada la mesa.
+    public Vector3f getExtraBallStartUp()
+    {
+		Vector3f sensorOriginalPos = new Vector3f();
+		Vector3f sensorRotatedPos = new Vector3f();
+		
+    	// Se que hay un solo sensor de rampa
+    	for (StaticPhysicsNode sensor : sensors) 
+    	{
+			Sensor s = (Sensor) sensor.getChild(0);
+			
+			if (s.getSensorType().equals(SensorType.RAMP_SENSOR))
+			{
+				sensorOriginalPos = s.getVisualModel().getLocalTranslation();
+				sensorRotatedPos = sensorOriginalPos.rotate(getPinballSettings().getInclinationQuaternion());
+			}			
+		}
+    	// Una vez que se las coordenadas, retorno un vector que sea un poco mas a la izquierda (-x) y arriba (+y). La bola es de diametro 0.5
+    	return sensorRotatedPos.add(new Vector3f(-0.5f, 0.5f, 0f));
     }
     
     public void addBall(Vector3f location)
@@ -687,6 +699,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
                         balls.get( 0 ).setLocalRotation( new Quaternion() );
                         balls.get( 0 ).updateGeometricState( 0, false );
+                    	
                     }
                 }
                 
