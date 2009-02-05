@@ -335,7 +335,7 @@ public class MenuGameState extends BasicGameState
 		super.render(tpf);
 		
 		/* Para que la GUI se muestre bien */
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		//GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		
 		/* Muestro la pantalla de FengGUI */
 		fengGUIdisplay.display();

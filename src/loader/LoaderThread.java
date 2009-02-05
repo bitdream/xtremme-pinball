@@ -13,7 +13,10 @@ import com.jme.scene.Spatial;
 
 public class LoaderThread implements Runnable, Observer
 {
-
+    private volatile boolean shouldStop = false;
+    
+    private volatile float percentageComplete = 0f;
+    
     private URL resource;
     
     private PinballGameState pinballGS;
@@ -51,15 +54,14 @@ public class LoaderThread implements Runnable, Observer
         {
             e.printStackTrace();
         }
+        catch (LoadingStopException e) {
+        }
+
     }
     
-    private Float percentageComplete = 0f;
     public float getPercentComplete()
     {
-        synchronized ( percentageComplete )
-        {
-            return this.percentageComplete;    
-        }
+        return this.percentageComplete;    
     }
     
     public GameLogic getTheme()
@@ -77,11 +79,16 @@ public class LoaderThread implements Runnable, Observer
         if ( arg instanceof Float )
         {
             Float percentage = (Float) arg;
-            synchronized ( percentageComplete )
-            {
-                this.percentageComplete = percentage;                
-            }
-
+            this.percentageComplete = percentage;                
         }
+        
+        if (shouldStop) {
+            throw new LoadingStopException();
+        }
+    }
+    
+    public void stop()
+    {
+        this.shouldStop = true;
     }
 }

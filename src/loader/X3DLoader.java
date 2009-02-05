@@ -16,6 +16,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Logger;
 
+import org.xml.sax.SAXException;
+
 import com.jme.scene.Node;
 import com.jme.scene.state.LightState;
 import com.jmex.model.converters.DTDResolver;
@@ -119,10 +121,14 @@ public class X3DLoader extends Observable implements Observer
             node = (Node) converter.loadScene( this.x3d, null, this.lightState );
             theme = converter.getPinballTheme();
         }
-        catch ( Exception e )
+        catch ( SAXException saxe )
         {
-            e.printStackTrace();
             logger.severe( "Converting " + this.x3dFileName + ": could not parse file." );
+            return new Node();
+        }
+        catch ( IOException ioe )
+        {
+            logger.severe( "Converting " + this.x3dFileName + ": could not read file." );
             return new Node();
         }
         //logger.info( "Done converting" );

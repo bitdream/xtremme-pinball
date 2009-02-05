@@ -73,6 +73,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
+import org.xml.sax.SAXException;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Image;
@@ -401,12 +402,14 @@ public class X3dToJme extends FormatConverter {
      *            only the X3D scene itself
      * @return The model, if it was successfully loaded, otherwise
      *         <code>null</code>
+     * @throws IOException 
+     * @throws SAXException 
      * @throws An
      *             Exception, in case any error occurs
      */
     public Spatial loadScene(InputStream x3dIn,
-            Map<String, InputStream> texData, LightState lightState)
-            throws Exception {
+            Map<String, InputStream> texData, LightState lightState) 
+            throws SAXException, IOException {
 
         this.texData = texData;
 
@@ -560,7 +563,7 @@ public class X3dToJme extends FormatConverter {
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private Spatial parseNode(Node node) throws Exception {
+    private Spatial parseNode(Node node)  {
         // Check for the USE attribute
         
         Node use = node.getAttributes().getNamedItem("USE");
@@ -630,7 +633,7 @@ public class X3dToJme extends FormatConverter {
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private com.jme.scene.Spatial parseGroup(Node node) throws Exception {
+    private com.jme.scene.Spatial parseGroup(Node node)  {
         // Init node
         boolean isSwitch;
         com.jme.scene.Spatial group;
@@ -881,7 +884,7 @@ private Node transformNode;
      * @throws Exception
      *             In case an error occurs during loading
      */
-    private Spatial parseShape(Node node) throws Exception {
+    private Spatial parseShape(Node node)  {
         com.jme.scene.Node shape = new com.jme.scene.Node();
         // Check for a bounding box definition
         BoundingBox bbox = parseBoundingBox(node);
@@ -1116,7 +1119,7 @@ private Node transformNode;
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private Hashtable<String, Object> parseMetadata(Node node) throws Exception {
+    private Hashtable<String, Object> parseMetadata(Node node) {
         logger.info(" entrering parseMetadata");
         
         String type = node.getNodeName();
@@ -1156,7 +1159,7 @@ private Node transformNode;
      * @throws Exception
      *             In case an error occurs during parsing
      */
-    private synchronized Geometry parseGeometry(Node node) throws Exception {
+    private synchronized Geometry parseGeometry(Node node) {
         // Check for the USE attribute
         Node use = node.getAttributes().getNamedItem("USE");
         if (use != null) {
