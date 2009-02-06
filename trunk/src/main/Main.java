@@ -274,4 +274,12 @@ public class Main
 	{
 		return musicVolume;
 	}
+	
+	public static void toggleMuteAudio()
+	{
+		if (!audio.isMuted())
+			audio.mute();
+		else
+			audio.unmute();
+	}
 }

@@ -112,6 +112,18 @@ public class MenuGameState extends BasicGameState
             		
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
+		
+		/* Pongo la accion de mute/unmute durante todo el menu */
+		fengGUIInputHandler.addAction( new InputAction() {
+
+            public void performAction( InputActionEvent evt )
+            {
+            	if ( evt.getTriggerPressed() )
+            	{
+	            	Main.toggleMuteAudio();
+            	}
+            }
+        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_O, InputHandler.AXIS_NONE, false );
  	}
 
 	/**

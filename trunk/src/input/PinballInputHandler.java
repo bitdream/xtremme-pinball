@@ -123,6 +123,18 @@ public class PinballInputHandler extends FirstPersonHandler
         /* Activar/desactivar show FPS */
         addAction(new ShowFPSAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F, InputHandler.AXIS_NONE, false);
         
+        /* Toggle mute */
+	    addAction(new ToggleMuteAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_O, InputHandler.AXIS_NONE, false );
+    }
+	
+	/* Accion para toggle mute */
+	private class ToggleMuteAction extends InputAction
+    {
+        public void performAction( InputActionEvent evt )
+        {
+        	if (evt.getTriggerPressed())
+        		Main.toggleMuteAudio();
+        }
     }
 	
 	/* Accion de sacar una screenshot */
