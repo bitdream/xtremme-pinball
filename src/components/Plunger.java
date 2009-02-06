@@ -1,7 +1,6 @@
 package components;
 
 import gamestates.PinballGameState;
-
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
 import com.jme.input.util.SyntheticButton;
