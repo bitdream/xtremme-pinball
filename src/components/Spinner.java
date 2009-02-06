@@ -36,7 +36,6 @@ public class Spinner extends Node
 	// Tiempo de la ultima colision considerada (donde se llamo a la logica del juego) entre una bola y este spinner
 	private long lastConsideredCollisionTime = 0;
 	
-	// TODO ver si el tiempo elegido funciona al tener la version final de la mesa
 	// Ventana de tiempo dentro de la cual dos colisiones seran consideradas la misma. Medido en mseg
 	// El tiempo debe ser grande pq la cantidad de colisiones detectadas depende de la velocidad de la bola
 	private static long windowTimeForCollisions = 1000; 
@@ -62,18 +61,21 @@ public class Spinner extends Node
 		// Para evitar que con angulos muy chicos la bola tarde en caer por el spinner y haga contacto mucho tiempo sumando puntos.
 		windowTimeForCollisions =  pinball.getPinballSettings().getInclinationLevel() < 3 ? 1500: 1000;
 		
-		/* El material de los spinners es plastico como la mesa */
-        spinnerNode.setMaterial(Material.PLASTIC);
-		
         /* Creo un nodo de spinner, con todas sus caracteristicas y lo fijo al nodo fisico */
         final Spinner spinner = new Spinner(name, visualModel);
         spinnerNode.attachChild(spinner);
         
         /* Genero su fisica */
         spinnerNode.generatePhysicsGeometry(true);
+        
+		/* El material de los spinners */
+ //       spinnerNode.setMaterial(Material.PLASTIC); Les dejo el default para que sea mas facil pasarlos
 
         /* Computo su masa */
 		spinnerNode.computeMass();
+		
+        System.out.println("Densidad del plastico: " + Material.DEFAULT.getDensity());
+        System.out.println("Masa de spinners: " + spinnerNode.getMass());
         
         /* Voy a fijar el spinner con un eje rotacional */
         final Joint jointForSpinner = pinball.getPhysicsSpace().createJoint();
