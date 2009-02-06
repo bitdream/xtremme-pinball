@@ -81,14 +81,14 @@ private static final long serialVersionUID = 1L;
                 DynamicPhysicsNode ball;
 
                 // El contacto pudo haber sido bola -> sensor o sensor -> bola
-                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) &&
-                		contactInfo.getNode1() instanceof StaticPhysicsNode && contactInfo.getNode1().getName() != null && (contactInfo.getNode1().getName().equals("SensorPerder") || contactInfo.getNode1().getName().equals("SensorRampa"))) 
+                if ( contactInfo.getNode2() instanceof DynamicPhysicsNode && contactInfo.getNode2().getName() != null && contactInfo.getNode2().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) /*&&
+                		contactInfo.getNode1() instanceof StaticPhysicsNode && contactInfo.getNode1().getName() != null && (contactInfo.getNode1().getName().equals("SensorPerder") || contactInfo.getNode1().getName().equals("SensorRampa"))*/) 
                 { 
                     // fue sensor -> bola
                     ball = (DynamicPhysicsNode) contactInfo.getNode2();  
                 }
-                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) &&
-                		     contactInfo.getNode2() instanceof StaticPhysicsNode && contactInfo.getNode2().getName() != null && (contactInfo.getNode2().getName().equals("SensorPerder") || contactInfo.getNode2().getName().equals("SensorRampa"))) 
+                else if ( contactInfo.getNode1() instanceof DynamicPhysicsNode && contactInfo.getNode1().getName() != null && contactInfo.getNode1().getName().equals(PinballGameState.PHYSIC_NODE_NAME_FOR_BALLS) /*&&
+                		     contactInfo.getNode2() instanceof StaticPhysicsNode && contactInfo.getNode2().getName() != null && (contactInfo.getNode2().getName().equals("SensorPerder") || contactInfo.getNode2().getName().equals("SensorRampa"))*/) 
                 {
                 	// fue bola -> sensor
                     ball = (DynamicPhysicsNode) contactInfo.getNode1();  

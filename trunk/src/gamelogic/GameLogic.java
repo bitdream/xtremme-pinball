@@ -168,7 +168,7 @@ public abstract class GameLogic
 		{
 			((Bumper)bumper.getChild(0)).setActive(false);
 		}		
-		// TODO descomentar al dejar de debuggear los magnets
+
 		// Desactivar los magnets
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
@@ -197,7 +197,7 @@ public abstract class GameLogic
 */		
 		// Desattachearla del rootNode para que no se siga renderizando. Tambien borrarla de la fisica.
 		pinball.getRootNode().detachChild(ball);
-		ball.delete(); //TODO, ver esto!
+		ball.delete();
 		
 		if (getInTableBallQty() == 0) // Era la ultima bola, debe perder una vida
 		{		
