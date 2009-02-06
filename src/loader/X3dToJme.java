@@ -2204,14 +2204,14 @@ private static int  ifscount = 0;
             try {
                 float angle = Float.parseFloat(rotation);
                 
-                Matrix3f rotationMatrix = new Matrix3f();
-                rotationMatrix.set(new float[][]
-                  {{FastMath.cos(angle), -FastMath.sin(angle), 0},
-                   {FastMath.sin(angle), FastMath.cos(angle), 0},
-                   {0, 0, 0}} );
+//                Matrix3f rotationMatrix = new Matrix3f();
+//                rotationMatrix.set(new float[][]
+//                  {{FastMath.cos(angle), -FastMath.sin(angle), 0},
+//                   {FastMath.sin(angle), FastMath.cos(angle), 0},
+//                   {0, 0, 0}} );
                 
-                Quaternion rotationQuaternion = new Quaternion().fromRotationMatrix(rotationMatrix);
-                 //logger.info("Setting rotation: ("+rotationQuaternion+")");
+                Quaternion rotationQuaternion = new Quaternion().fromAngleAxis( angle, new Vector3f(1,0,1) );//.fromRotationMatrix(rotationMatrix);
+//                System.out.println("Setting rotation: ("+rotationQuaternion+")");
                 texture.setRotation(rotationQuaternion); 
 
             } catch (NumberFormatException e) {

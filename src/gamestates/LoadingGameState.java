@@ -84,6 +84,11 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	private void endLoad()
 	{
         /* Termino de cargar, destruyo el loadinggamestate */
+        
+        if (loadWorker.aborted)
+            Main.newMenu().setActive(true);
+        else
+            loadWorker.endWork();
         Main.endLoading();
 	}
 	
@@ -118,7 +123,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		if (loadWorker.isCompleted())
 		{
 		    endLoad();
-		    loadWorker.endWork();
 		}
 
 		/* Actualizo el sistema de sonido */
@@ -129,6 +133,11 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	public void render(float tpf)
 	{
 		super.render(tpf);
+	}
+	
+	public void cleanup()
+	{
+//	    System.out.println("clean");
 	}
 	
 	private class LoadWorker implements Runnable, Callable<Void>
@@ -199,32 +208,29 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             }
             
             /* Accion para abortar */
-            if ( aborted )
+            if ( !aborted )
             {
-                Main.endLoading();
-                Main.newMenu().setActive(true);
 
-                return;
+                /* Atacheo los resultados */
+                pinballGS.getRootNode().attachChild(roomLoader.getScene());    
+                pinballGS.getRootNode().attachChild(machineLoader.getScene());
+                pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(tableLoader.getScene()));
+                pinballGS.setGameLogic(tableLoader.getTheme());
+                
+    			/* Marco al gamestate de juego como con carga completa */
+                pinballGS.setLoadingComplete(true);
             }
             
-            /* Atacheo los resultados */
-            pinballGS.getRootNode().attachChild(roomLoader.getScene());    
-            pinballGS.getRootNode().attachChild(machineLoader.getScene());
-            pinballGS.getRootNode().attachChild(pinballGS.inclinePinball(tableLoader.getScene()));
-            pinballGS.setGameLogic(tableLoader.getTheme());
-            
             this.complete = true;
-            
-			/* Marco al gamestate de juego como con carga completa */
-            pinballGS.setLoadingComplete(true);
 		}
 
         public Void call() throws Exception
         {
             this.loadingGS.setProgress( getPercentage(), "Loading..." );
-            
             if (!complete && !aborted)
                 GameTaskQueueManager.getManager().update(this);
+            else
+                this.loadingGS.setProgress( 1, "Aborting" );
             
             return null;
         }
