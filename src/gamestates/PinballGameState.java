@@ -516,9 +516,15 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Notifico a la logica de juego cada vez que
          * ingreso, reingreso o salgo del juego (para ir al menu) */
         if (active)
+        {
+        	pinballInputHandler.setEnabled(true);
         	gameLogic.enterGame();
+        }
         else
-            gameLogic.leaveGame();
+        {
+        	pinballInputHandler.setEnabled(false);
+        	gameLogic.leaveGame();
+        }
     }
 	
 	public DynamicPhysicsNode getPlunger()

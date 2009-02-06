@@ -29,7 +29,11 @@ import org.fenggui.layout.StaticLayout;
 import org.fenggui.util.Alignment;
 import org.fenggui.util.Spacing;
 
+import com.jme.input.InputHandler;
+import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
+import com.jme.input.action.InputAction;
+import com.jme.input.action.InputActionEvent;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.game.state.BasicGameState;
@@ -64,6 +68,9 @@ public class MenuGameState extends BasicGameState
 
 	/* Directorio donde se guardan los temas */
 	private static final String THEMES_DIRECTORY = "resources/models/themes/";
+	
+	/* Indica si esta en el menu principal o no */
+	private boolean inMainMenu;
 
 	
 	public MenuGameState(String name)
@@ -81,6 +88,30 @@ public class MenuGameState extends BasicGameState
 		
 		/* Inicializo el input handler de FengGUI */
 		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
+		
+		/* Pongo la accion de ESC durante todo el menu */
+		fengGUIInputHandler.addAction( new InputAction() {
+
+            public void performAction( InputActionEvent evt )
+            {
+            	if ( evt.getTriggerPressed() )
+            	{
+	            	if (inMainMenu)
+	            	{
+	            		if (continueButton.isVisible())
+	            			/* Si estoy en menu principal y esta visible el boton de continue, continuo el juego */
+	            			continueGame();
+	            		else
+	            			/* Salgo del juego si estoy en el principal y no hay juego para continuar */
+	            			exitGame();
+	            	}
+	            	else
+	            		/* Estoy en el menu de juego nuevo, lo cancelo */
+	            		cancelNewGame();
+            	}
+            		
+            }
+        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
  	}
 
 	/**
@@ -120,18 +151,11 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 
-				/* Cierro la ventana */
-				menu.close();
-				
-				/* Continuo el juego actual */
-				Main.continueCurrentPinballGame();
-				
-				/* Desactivo el gamestate de menu */
-				Main.endMenu();
-
+				/* Continuo con el juego */
+				continueGame();
 			}
 		});
-		continueButton.setVisible(false);
+		continueButton.setVisible(Main.hasInCourseGame());
 
 		/* Boton de juego nuevo */
 		newGameButton = FengGUI.createButton(menu.getContentContainer(), "New game");
@@ -155,16 +179,19 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0)
 			{
-				/* Acabo con todo el juego */
-				Main.shutdownGame();
+				/* Salgo del juego */
+				exitGame();
 			}
 		});
-
+		
 		/* Lo centro */
 		StaticLayout.center(menu, fengGUIdisplay);
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
+		
+		/* Indico que estoy en main menu */
+		inMainMenu = true;
 	}
 	
 	/**
@@ -239,11 +266,8 @@ public class MenuGameState extends BasicGameState
 			
 			public void buttonPressed(ButtonPressedEvent arg0) {
 				
-				/* Cierro la ventana */
-				menu.close();
-				
-				/* Vuelvo a construir el menu principal */
-				buildMainMenu();
+				/* Cancelo el juego nuevo */
+				cancelNewGame();
 			}
 		});
 		
@@ -252,13 +276,43 @@ public class MenuGameState extends BasicGameState
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
-	}
 		
+		/* Indico que ya no estoy en main menu */
+		inMainMenu = false;
+	}
+	
+	private void continueGame()
+	{
+		/* Cierro la ventana */
+		menu.close();
+		
+		/* Desactivo el gamestate de menu */
+		Main.endMenu();
+		
+		/* Continuo el juego actual */
+		Main.continueCurrentPinballGame();
+	}
+	
+	private void exitGame()
+	{
+		/* Acabo con todo el juego */
+		Main.shutdownGame();
+	}
+	
+	private void cancelNewGame()
+	{
+		/* Cierro la ventana */
+		menu.close();
+		
+		/* Vuelvo a construir el menu principal */
+		buildMainMenu();
+	}
+
 	@Override
 	public void setActive(boolean active)
 	{
 		super.setActive(active);
-		// TODO si hay juego en transcurso, el action (que falta agregar) en ESC me deberia hacer continue, sino salir
+
 		if (active)
 		{
 			/* Hago visible al cursor */
@@ -372,7 +426,7 @@ public class MenuGameState extends BasicGameState
 						MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY + themeFilename));
 				
 				/* Lo agrego a la lista */
-				Item item = new Item(theme.getName(), new LabelAppearance(new Label(theme.getName())));// FIXME
+				Item item = new Item(theme.getName(), new LabelAppearance(new Label(theme.getName())));
 				item.setData(theme);
 				list.addItem(item);
 			}

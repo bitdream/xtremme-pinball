@@ -192,14 +192,14 @@ public class Main
 	
 	public static void shutdownGame()
 	{
-		/* Termino con el juego */
-		stdGame.shutdown();
-		
 		/* Termino con el sistema de sonido TODO no anda? */
 		getAudioSystem().fadeOutAndClear(2);
 		
 //		if (AudioSystem.isCreated())
 //            AudioSystem.getSystem().cleanup();
+		
+		/* Termino con el juego */
+		stdGame.shutdown();
 	}
 
 	public static AudioSystem getAudioSystem()
