@@ -51,7 +51,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "xtremme pinball";
+	private static final String GAME_NAME = "!xtremme pinball";
 	private static final String GAME_VERSION = "0.6";
 	
 	/* Logger de la clase Pinball */
