@@ -68,14 +68,8 @@ public class Spinner extends Node
         /* Genero su fisica */
         spinnerNode.generatePhysicsGeometry(true);
         
-		/* El material de los spinners */
- //       spinnerNode.setMaterial(Material.PLASTIC); Les dejo el default para que sea mas facil pasarlos
-
         /* Computo su masa */
 		spinnerNode.computeMass();
-		
-        System.out.println("Densidad del plastico: " + Material.DEFAULT.getDensity());
-        System.out.println("Masa de spinners: " + spinnerNode.getMass());
         
         /* Voy a fijar el spinner con un eje rotacional */
         final Joint jointForSpinner = pinball.getPhysicsSpace().createJoint();
