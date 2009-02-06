@@ -84,4 +84,9 @@ public class PhysicsEnhancedGameState extends com.jmex.physics.util.states.Physi
     {
         //super.delete();
     }
+    
+    public DisplaySystem getDisplay()
+    {
+        return this.display;
+    }
 }

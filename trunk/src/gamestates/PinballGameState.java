@@ -2,18 +2,19 @@ package gamestates;
 
 import gamelogic.GameLogic;
 import input.PinballInputHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import main.Main;
+
 import com.jme.bounding.BoundingSphere;
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
-import com.jme.math.FastMath;
-import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.renderer.ColorRGBA;
@@ -775,12 +776,23 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
         return table;
     }
+
+    public boolean isLoadingComplete()
+    {
+        return loadingComplete;
+    }
+
+    public void setLoadingComplete(boolean loadingComplete)
+    {
+        this.loadingComplete = loadingComplete;
+    }
+
+    
     
     ///XXX debug
     // variables de debug
     private boolean pause = false;
     private boolean showGraphs = false;
-    private static final float g = -9.81f; 
     
     protected void initDebug()
     {
@@ -798,6 +810,27 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 lightState.attach( light );
             }
 
+//            // Y reset de pelota 
+//            pinballInputHandler.addAction( new InputAction()
+//            {
+//                public void performAction( InputActionEvent evt )
+//                {
+//                    if ( evt.getTriggerPressed() )
+//                    {
+//                        
+//                        if (balls.size() == 0)
+//                            addBall(ballStartUp);
+//                        
+//                        balls.get( 0 ).clearDynamics();
+//                        balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
+//                        balls.get( 0 ).setLocalRotation( new Quaternion() );
+//                        balls.get( 0 ).updateGeometricState( 0, false );
+//                        
+//                    }
+//                }
+//                
+//            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_Y, InputHandler.AXIS_NONE, false );
+            
             // P pausa fisica
             pinballInputHandler.addAction( new InputAction()
             {
@@ -809,53 +842,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     }
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_P, InputHandler.AXIS_NONE, false );
-
-            // Home reset de camara
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        cam.setLocation( pinballSettings.getCamStartPos() );
-
-                        cam.lookAt( pinballSettings.getCamStartLookAt(), new Vector3f( 0.0f, 1.0f, 0.0f ) );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_HOME, InputHandler.AXIS_NONE, false );
-
-
-            // Y reset de pelota 
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        if (balls.size() == 0)
-                        	addBall(ballStartUp);
-                        
-                        balls.get( 0 ).clearDynamics();
-                        balls.get( 0 ).setLocalTranslation( new Vector3f(Vector3f.ZERO) );
-                        balls.get( 0 ).setLocalRotation( new Quaternion() );
-                        balls.get( 0 ).updateGeometricState( 0, false );
-                    	
-                    }
-                }
-                
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_Y, InputHandler.AXIS_NONE, false );
-            
-            // F1 screenshot
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        display.getRenderer().takeScreenShot( "SimpleGameScreenShot" );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F1, InputHandler.AXIS_NONE, false );
 
             // F2 mostrar reporte de memoria
             pinballInputHandler.addAction( new InputAction()
@@ -979,7 +965,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                 }
             }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F9, InputHandler.AXIS_NONE, false );
 
-            // F11 mostrar el mouse 
+            // F10 mostrar el mouse 
             pinballInputHandler.addAction( new InputAction()
             {
                 public void performAction( InputActionEvent evt )
@@ -989,64 +975,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         MouseInput.get().setCursorVisible( !MouseInput.get().isCursorVisible() );
                     }
                 }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F11, InputHandler.AXIS_NONE, false );
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F10, InputHandler.AXIS_NONE, false );
             
-            // INS subir angulo fisico
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-
-                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( -getPhysicsSpace().getDirectionalGravity( null ).z / getPhysicsSpace().getDirectionalGravity( null ).y);
-                        
-                        if (angle > 89)
-                        {
-                            angle = 1;
-                        }
-                        else
-                        {
-                            angle += 1;
-                        }
-                        getPhysicsSpace().setDirectionalGravity( new Vector3f(0, FastMath.cos( FastMath.DEG_TO_RAD * angle ) * g, -FastMath.sin( FastMath.DEG_TO_RAD * angle ) * g) );                        
-                        System.out.println( "angulo = " + angle );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_INSERT, InputHandler.AXIS_NONE, false );
             
-            // DEL bajar angulo fisico
-            pinballInputHandler.addAction( new InputAction()
-            {
-                public void performAction( InputActionEvent evt )
-                {
-                    if ( evt.getTriggerPressed() )
-                    {
-                        float angle = FastMath.RAD_TO_DEG * FastMath.atan( -getPhysicsSpace().getDirectionalGravity( null ).z / getPhysicsSpace().getDirectionalGravity( null ).y);
-                        
-                        if (angle < 2)
-                        {
-                            angle = 89;
-                        }
-                        else
-                        {
-                            angle -= 1;
-                        }
-                        getPhysicsSpace().setDirectionalGravity( new Vector3f(0, FastMath.cos( FastMath.DEG_TO_RAD * angle ) * g, -FastMath.sin( FastMath.DEG_TO_RAD * angle ) * g) );                        
-                        System.out.println( "angulo = " + angle );
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_DELETE, InputHandler.AXIS_NONE, false );
-            
-            /* libres para pruebas */
-            pinballInputHandler.addAction( new InputAction() {
-                public void performAction( InputActionEvent evt ) {
-                    if ( evt.getTriggerPressed() ) {
-
-                    }
-                }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ADD, InputHandler.AXIS_NONE, false );
-
+            /* libre para pruebas */
             pinballInputHandler.addAction( new InputAction() 
             {
                 public void performAction( InputActionEvent evt ) {
@@ -1054,20 +986,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
                         
                     }
                 }
-            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F10, InputHandler.AXIS_NONE, false );
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F11, InputHandler.AXIS_NONE, false );
             
         }
         
     }
 
-	public boolean isLoadingComplete()
-	{
-		return loadingComplete;
-	}
-
-	public void setLoadingComplete(boolean loadingComplete)
-	{
-		this.loadingComplete = loadingComplete;
-	}
-    
 }

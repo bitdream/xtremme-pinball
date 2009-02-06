@@ -113,10 +113,33 @@ public class PinballInputHandler extends FirstPersonHandler
         addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( 27, 19, 27 ), new Vector3f( 0f, 5f, 0f )), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_4, InputHandler.AXIS_NONE, false );
         
+        // reset de camara
+        addAction(new ChangeCameraAction(game.getCamera(), game.getPinballSettings().getCamStartPos(), game.getPinballSettings().getCamStartLookAt()), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_HOME, InputHandler.AXIS_NONE, false );
+
+        // F1 screenshot
+        addAction( new ScreenShotAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F1, InputHandler.AXIS_NONE, false );
+        
         /* Activar/desactivar show FPS */
         addAction(new ShowFPSAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F, InputHandler.AXIS_NONE, false);
+        
+        
     }
     
+	/* Accion de sacar una screenshot */
+	private class ScreenShotAction extends InputAction
+    {
+	    private int counter = 0;
+	    
+        public void performAction( InputActionEvent evt )
+        {
+            if ( evt.getTriggerPressed() )
+            {
+                game.getDisplay().getRenderer().takeScreenShot( "ScreenShot" + counter++ );
+            }
+        }
+    }
+	
 	/* Accion de activar o desactivar la muestra de FPS */
     private class ShowFPSAction extends InputAction
     {
