@@ -45,21 +45,14 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		music.setLooping(true);
 		music.setTargetVolume(Main.getMusicVolume());
 		
-		/* Inicializo la informacion del progreso */
-		initProgressInfo();
-	}
-
-	/**
-	 * Inicializa la informacion de progreso.
-	 */
-	protected void initProgressInfo()
-	{
+		/* Accion para abortar */
 	    this.input = new InputHandler();
 	    input.addAction( new InputAction() {
 
             public void performAction( InputActionEvent evt )
             {
-                loadWorker.stopLoading();
+            	if ( evt.getTriggerPressed() )
+            		loadWorker.stopLoading();
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
 	}
@@ -84,12 +77,12 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	private void endLoad()
 	{
         /* Termino de cargar, destruyo el loadinggamestate */
-        
+		Main.endLoading();
+		
         if (loadWorker.aborted)
             Main.newMenu().setActive(true);
         else
             loadWorker.endWork();
-        Main.endLoading();
 	}
 	
 	@Override
