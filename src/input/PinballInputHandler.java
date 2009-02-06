@@ -123,9 +123,23 @@ public class PinballInputHandler extends FirstPersonHandler
         /* Activar/desactivar show FPS */
         addAction(new ShowFPSAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F, InputHandler.AXIS_NONE, false);
         
-        
+        /* Pausar/Despausar fisica */
+        // P pausa fisica
+        addAction( new PauseAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_P, InputHandler.AXIS_NONE, false );
     }
     
+	/* Accion de pausar la fisica */
+	private class PauseAction extends InputAction
+    {
+        public void performAction( InputActionEvent evt )
+        {
+            if ( evt.getTriggerPressed() )
+            {
+                game.togglePause();
+            }
+        }
+    }
+	
 	/* Accion de sacar una screenshot */
 	private class ScreenShotAction extends InputAction
     {
