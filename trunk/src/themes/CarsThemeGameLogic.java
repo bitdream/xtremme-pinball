@@ -24,6 +24,12 @@ public class CarsThemeGameLogic extends GameLogic
 	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	private static final int MAX_BALLS = 3;
 	
+	// Cantidad de pasajes por rampa para activar imanes
+	private static final int ACTIVE_MAGNETS_RAMP = 3;
+	
+	// Cantidad de rebotes contra bumpers para activar imanes
+	private static final int ACTIVE_MAGNETS_BUMPERS = 40;
+	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
 	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
@@ -31,12 +37,12 @@ public class CarsThemeGameLogic extends GameLogic
 	// Contadores
 	private int bumperCollisionCnt = 0;	
 	private int rampCnt = 0;	
-	private int spinnerCollisionCnt = 0;
+	private int spinnerCollisionCnt = 0; // No usado
 	private int thisBallScore = 0;
 	private int extraLifesCnt = 1;
 	private int extraBallsCnt = 1;
 	
-	// Contador de pasos para la secuencia bumper saltarin -> spinner -> rampa sin perder vidas
+	// Contador de pasos para la secuencia bumper saltarin+ -> spinner+ -> rampa sin perder vidas
 	private int completeSeqCnt = 0;
 	
 	private boolean magnetsActive = false;
@@ -90,13 +96,31 @@ public class CarsThemeGameLogic extends GameLogic
 			
 			if (bumper.getBumperType().equals(BumperType.JUMPER))
 			{
-				// Inicio de secuencia bumper saltarin -> spinner -> rampa
+				// Inicio de secuencia bumper saltarin+ -> spinner+ -> rampa
 				completeSeqCnt = 1;
 				
 				// Mensaje al usuario diciendo el proximo paso a seguir
 				showMessage("To overtake next car go to the spinners!!!"); 
 				// FIXME estos mensajes seran tapados por los de vida extra y bola extra llamados por showScore, 
 				// ver si poner ambos al mismo tiempo o como solucionarlo con el HUD
+			}
+			
+			// Cada ACTIVE_MAGNETS_BUMPERS rebotes sin perder vidas, contra bumpers de cualquier tipo, activar los imanes hasta que una bola se pierda
+			if ( bumperCollisionCnt == ACTIVE_MAGNETS_BUMPERS)
+			{
+				// Activar los magnets 
+				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+				{
+					((Magnet)magnet.getChild(0)).setActive(true);
+				}
+				magnetsActive = true;
+				
+				// Mensaje y sonido al usuario
+				showActiveMagnetsMessage();
+				playActiveMagnetsSound();
+				
+				// Reinicio el contador
+				bumperCollisionCnt = 0;
 			}
 		}
 	}
@@ -132,23 +156,26 @@ public class CarsThemeGameLogic extends GameLogic
 			showScore();
 			spinnerCollisionCnt++;
 			
-			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
-			if (completeSeqCnt == 1)
+			// Ver si forma parte de la secuencia bumper saltarin+ -> spinner+ -> rampa
+			if (completeSeqCnt == 1 || completeSeqCnt == 2)
 			{
 				completeSeqCnt = 2;  //Se realizo el segundo paso de la secuencia
+				
 				// Mensaje al usuario diciendo el proximo paso a seguir
 				showMessage("Opponent overtook. Get to checkpoint through the ramp!!!");
 			}
-			else
-			{
-				if(completeSeqCnt == 2)
-				{
-					// No obedecio la secuencia (hizo spinner -> spinner), cartel indicador
-					showMessage("Next time obey team orders. Sequence aborted!!!");
-				}
-				
-				completeSeqCnt = 0; //Reseteo la secuencia
-			}
+			// Sino completeSeqCnt valia cero y debe seguir en cero
+			
+//			else
+//			{
+//				if(completeSeqCnt == 2)
+//				{
+//					// No obedecio la secuencia (hizo spinner -> spinner), cartel indicador
+//					showMessage("Next time obey team orders. Sequence aborted!!!");
+//				}
+//				
+//				completeSeqCnt = 0; //Reseteo la secuencia
+//			}
 		}		
 	}
 	
@@ -157,7 +184,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// No sumar si hay abuso de tilt
 		if (!tiltAbused)
 		{			
-			// Ver si forma parte de la secuencia bumper saltarin -> spinner -> rampa
+			// Ver si forma parte de la secuencia bumper saltarin+ -> spinner+ -> rampa
 			if (completeSeqCnt == 2)
 			{
 				// Otorgar el bonus por secuencia completa
@@ -179,6 +206,9 @@ public class CarsThemeGameLogic extends GameLogic
 				score += RAMP_SCORE;
 				thisBallScore += RAMP_SCORE;
 				
+				// Solo incrementado si no termina la secuencia con este pasaje por rampa
+				rampCnt++;
+				
 				if(completeSeqCnt == 1)
 				{
 					// No obedecio la secuencia, cartel indicador
@@ -188,9 +218,26 @@ public class CarsThemeGameLogic extends GameLogic
 			// Reinicio la secuencia siempre
 			completeSeqCnt = 0;  
 			
+			// Cada ACTIVE_MAGNETS_RAMP pasajes por rampa que no pertenezcan a la finalizacion de una secuencia, activar los imanes hasta que una bola se pierda
+			if ( rampCnt == ACTIVE_MAGNETS_RAMP)
+			{
+				// Activar los magnets 
+				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+				{
+					((Magnet)magnet.getChild(0)).setActive(true);
+				}
+				magnetsActive = true;
+				
+				// Mensaje y sonido al usuario
+				showActiveMagnetsMessage();
+				playActiveMagnetsSound();
+				
+				// Reinicio el contador
+				rampCnt = 0;
+			}
+			
 			// Se actualizan los datos de pantalla de usuario
 			showScore();
-			rampCnt++;
 		}
 	}
 
@@ -272,29 +319,23 @@ public class CarsThemeGameLogic extends GameLogic
 	private void analyzeScore()
 	{
 		// Bola extra?
-		if ((score >= EXTRA_BALL_STEP * extraBallsCnt) && getInTableBallQty() < MAX_BALLS)
+		if (score >= EXTRA_BALL_STEP * extraBallsCnt)
 		{
-			// Agrego una bola extra
-			pinball.addBall(pinball.getExtraBallStartUp());
+			/* Primero actualizo el contador de bolas extra y luego me fijo si hay que colocar una en la mesa (si hay menos de MAX_BALLS sobre ella).
+			 * Esto lo hago para evitar que se postergue el otorgamiento de la bola extra, se siga sumando puntaje, y cuando el jugador pierda bolas y las
+			 * mismas sean menos que MAX_BALLS en la mesa, se le otorguen dos bolas extra casi seguidas (pudiendo colisionar en la rampa que es desde donde
+			 * salen).
+			 */
 			extraBallsCnt++;
 			
-			// Mensaje y sonido al usuario
-			showExtraBallMessage();
-			playExtraBallSound();	
-			
-			// Cada 3 bolas extra, activar los imanes hasta que una bola se pierda
-			if ( (extraBallsCnt - 1) != 0 && (extraBallsCnt - 1) % 3 == 0)
+			if (getInTableBallQty() < MAX_BALLS)
 			{
-				// Activar los magnets 
-				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-				{
-					((Magnet)magnet.getChild(0)).setActive(true);
-				}
-				magnetsActive = true;
-				
+				// Agrego una bola extra a la mesa.
+				pinball.addBall(pinball.getExtraBallStartUp());
+
 				// Mensaje y sonido al usuario
-				showActiveMagnetsMessage();
-				playActiveMagnetsSound();
+				showExtraBallMessage();
+				playExtraBallSound();
 			}
 		}
 		
@@ -347,14 +388,13 @@ public class CarsThemeGameLogic extends GameLogic
 	}
 	
 	// Llamado al perder una vida
-	// TODO Varios contadores no se usan!
 	private void newBallCntsReset()
 	{
 		thisBallScore = 0;
 		completeSeqCnt = 0;
-		rampCnt = 0;
+		// rampCnt = 0;
 		bumperCollisionCnt = 0;
-		spinnerCollisionCnt = 0;
+		spinnerCollisionCnt = 0; // no usado
 	}
 	
 	@Override	

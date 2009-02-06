@@ -12,8 +12,6 @@ import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.Joint;
 import com.jmex.physics.RotationalJointAxis;
 import com.jmex.physics.contact.ContactInfo;
-import com.jmex.physics.material.Material;
-
 
 /**
  * Componente de molinete que permite pasar la pelota y se pone a girar.
