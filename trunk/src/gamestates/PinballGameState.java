@@ -20,6 +20,7 @@ import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Spatial;
 import com.jme.scene.Text;
+import com.jme.scene.shape.Quad;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
@@ -95,19 +96,57 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	/* Vidas que quedan */
 	private int lifes;
 	
-	/* Texto con el score para mostrar al usuario */
+	/* HUD -------------------------------------------------- */
+	
+	/* Barra superior del HUD */
+	private Quad hudTopBar;
+	
+	/* Texto con el score, para mostrar al usuario */
 	private Text scoreText;
 	
-	/* Texto con la cantidad de bolas restantes, para mostrar al usuario */
-	private Text ballsRemainingText;
+	/* Texto con la cantidad de vidas restantes, para mostrar al usuario */
+	private Text lifesRemainingText;
 	
-	/* Mensaje al usuario */
-	private String message = "";
-	
+	/* Texto para mostrar los fps */
 	private Text fpsText;
 	
+	/* Textos para titulos */
+	private Text scoreTitleText, lifesRemainingTitleText;
+	
 	/* Mensaje para mostrar al usuario */
-	private Text messageText;
+	private Text messageTextBottom, messageTextMiddle, messageTextTop;
+	
+	/* Longitud maxima de un mensaje */
+	private static final int MAX_GAME_MESSAGE_LEN = 40;
+	
+	/* Colores de las barras */
+	private ColorRGBA hudBackgroundColor = new ColorRGBA(0.2f, 0.2f, 0.4f, 1f);
+	private ColorRGBA hudBackgroundBorderColor = new ColorRGBA(0f, 0f, 0f, 1f);
+	
+	/* Color del texto */
+	private ColorRGBA hudTextColor = new ColorRGBA(0f, 0.7f, 0.7f, 1f);
+	
+	/* Ancho en % del ancho total para los paneles de puntaje y vidas */
+	private final float scoreLifesPanelWidth = 0.09f;
+	
+	/* Posiciones en % de la altura del panel de mensajes */
+	private float topTextPosition = 0.23f;
+	private float middleTextPosition = 0.55f;
+	private float bottomTextPosition = 1f;
+	
+	/* Escalas de los textos */
+	private float topTextScale, middleTextScale, bottomTextScale, scoreAndLifesTextScale;
+	
+	/* Coeficientes de las rectas que estiman los porcentajes de escalado para las distintas resoluciones */
+	private static final float SL_SCALE_COEF_A = 0.0010119f, SL_SCALE_COEF_B = 0.222857f;
+	private static final float TT_SCALE_COEF_A = 0.0002976f, TT_SCALE_COEF_B = 0.5714f;
+	private static final float MT_SCALE_COEF_A = 0.000595238f, MT_SCALE_COEF_B = 0.542857f;
+	private static final float BT_SCALE_COEF_A = 0.00238095f, BT_SCALE_COEF_B = 0.17143f;
+	
+	/* ------------------------------------------------------ */
+	
+	/* Mostrar o no los FPS */
+	private boolean showFPS = false;
 	
 	/* Logica de juego */
 	private GameLogic gameLogic;
@@ -120,8 +159,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
     private boolean loadingComplete = false;
 
 	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f ); 
-	
+	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f );
+
+
 	/**
 	 * Crea un estado de juego nuevo.
 	 * @param name Nombre del estado de juego.
@@ -136,7 +176,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		this.pinballSettings = pinballSettings;
 	
 		/* Adquiero el timer para calcular los FPS */
-		timer = new NanoTimer();//Timer.getTimer();
+		timer = new NanoTimer();
 		
 		/* Borro todas las luces default */
         lightState.detachAll();
@@ -151,10 +191,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	@Override
 	public void update(float tpf)
 	{
-		/* FIXME No deberiamos estar acelerando la fisica, pero bueno, aca esta 
-		 * la llamada, la tenemos 3 veces mas rapida.
-		 */
-
 		/* Actualizo el timer */
 		timer.update();
 		
@@ -166,6 +202,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Actualizo el controlador de input */
         pinballInputHandler.update(interpolation);
+        
         if (!pause)
         {
             /* Se modifico la escena, entonces actualizo el grafo */
@@ -174,18 +211,16 @@ public class PinballGameState extends PhysicsEnhancedGameState
             /* Actualizo los componentes que asi lo requieren */
             updateComponents(interpolation);
         }
-        
-        /* Se actualiza la info que se presenta en pantalla (score y mensajes) */
-        scoreText.getText().replace(0, scoreText.getText().length(), gameLogic.getScoreText() + score);
-        ballsRemainingText.getText().replace(0, ballsRemainingText.getText().length(), gameLogic.getBallsText() + lifes);
-        messageText.getText().replace(0, messageText.getText().length(), "" + message);
-                
-        float timeMS = timer.getTime() * 1f/1000000;
 
-        // Only continue if we've gone past our sample time threshold
-        if (timeMS - lastSampleTime > 1000) {
-            fpsText.getText().replace( 4, fpsText.getText().length(), Integer.toString( (int)timer.getFrameRate() ) );
-            lastSampleTime = timeMS;
+        if (showFPS)
+        {
+	        float timeMS = timer.getTime() * 1f/1000000;
+	
+	        if (timeMS - lastSampleTime > 1000)
+	        {
+	            fpsText.getText().replace(0, fpsText.getText().length(), Integer.toString((int)timer.getFrameRate()) + " fps");
+	            lastSampleTime = timeMS;
+	        }
         }
 
         /* Actualizo el sistema de sonido */
@@ -310,35 +345,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
         
-        // cartel de fps: no mover que se percha!!!!
-        fpsText = Text.createDefaultTextLabel( "fpsText", "fps " + timer.getFrameRate() );
-        fpsText.setLocalScale( 0.80f );
-        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        fpsText.setLocalTranslation(new Vector3f(1, display.getHeight()*.95f, 1));
-        rootNode.attachChild(fpsText);
-        
-		// Cateles con el puntaje y los mensajes al usuario
-        scoreText = Text.createDefaultTextLabel("scoreText", gameLogic.getScoreText() + String.valueOf(score));
-        scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        scoreText.setLocalTranslation(new Vector3f(display.getWidth() * 3f/4f, 20, 1));
-        scoreText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
-        rootNode.attachChild(scoreText);
-        
-        ballsRemainingText = Text.createDefaultTextLabel("ballsRemainingText", gameLogic.getBallsText() + String.valueOf(lifes));
-        ballsRemainingText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        ballsRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        ballsRemainingText.setLocalTranslation(new Vector3f(display.getWidth() * 3f/4f, 35, 1));
-        ballsRemainingText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
-        rootNode.attachChild(ballsRemainingText);
-        
-        messageText = Text.createDefaultTextLabel("messageText", message);
-        messageText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        messageText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        messageText.setLocalTranslation(new Vector3f(display.getWidth()/ /*4*/ 6, 5, 1));
-        messageText.setTextColor(new ColorRGBA(1f, 0f, 0f, 0.7f));
-        rootNode.attachChild(messageText);
+        /* Construyo el HUD */
+        buildHUD();
         
 		/* Actualizo el nodo raiz */
 		rootNode.updateGeometricState(0.0f, true);
@@ -349,6 +357,123 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
         /* Una vez que esta todo seteado, dejamos tocar las teclas */
         pinballInputHandler.setEnabled( true );  
+	}
+	
+	private void buildHUD()
+	{
+		/* Estimo los porcentajes de escalado segun resolucion */
+		estimateScalingPercentages();
+		
+		/* Barra superior del HUD */
+		hudTopBar = new Quad("HUD Top Bar", display.getWidth(), 0.08f * display.getHeight());
+		hudTopBar.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+		hudTopBar.setLightCombineMode(Spatial.LightCombineMode.Off);
+		hudTopBar.setSolidColor(hudBackgroundColor);
+		hudTopBar.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f, display.getHeight() - hudTopBar.getHeight() * 0.5f, 0));
+        rootNode.attachChild(hudTopBar);
+        
+        /* Borde inferior de la barra superior del HUD */
+        Quad hudTopBarBorder = new Quad("HUD Top Bar Border", display.getWidth(), 2);
+        hudTopBarBorder.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        hudTopBarBorder.setLightCombineMode(Spatial.LightCombineMode.Off);
+        hudTopBarBorder.setSolidColor(hudBackgroundBorderColor);
+        hudTopBarBorder.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f, display.getHeight() - hudTopBar.getHeight() - hudTopBarBorder.getHeight() * 0.5f, 0));
+        rootNode.attachChild(hudTopBarBorder);
+        
+        /* Borde divisor de las vidas */
+        Quad hudTopBarLeftBorder = new Quad("HUD Top Bar Left Border", 1, hudTopBar.getHeight());
+        hudTopBarLeftBorder.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        hudTopBarLeftBorder.setLightCombineMode(Spatial.LightCombineMode.Off);
+        hudTopBarLeftBorder.setSolidColor(hudBackgroundBorderColor);
+        hudTopBarLeftBorder.setLocalTranslation(new Vector3f(display.getWidth() * scoreLifesPanelWidth, hudTopBar.getLocalTranslation().y, 0));
+        rootNode.attachChild(hudTopBarLeftBorder);
+        
+        /* Borde divisor del puntaje */
+        Quad hudTopBarRightBorder = new Quad("HUD Top Bar Right Border", 1, hudTopBar.getHeight());
+        hudTopBarRightBorder.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        hudTopBarRightBorder.setLightCombineMode(Spatial.LightCombineMode.Off);
+        hudTopBarRightBorder.setSolidColor(hudBackgroundBorderColor);
+        hudTopBarRightBorder.setLocalTranslation(new Vector3f(display.getWidth() * (1 - scoreLifesPanelWidth), hudTopBar.getLocalTranslation().y, 0));
+        rootNode.attachChild(hudTopBarRightBorder);
+        
+        /* Creo los textos del HUD para mensajes */
+        
+        /* Mensaje superior */
+        messageTextTop = Text.createDefaultTextLabel("messageText", "");
+        messageTextTop.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        messageTextTop.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextTop.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextTop.getWidth() * 0.5f, display.getHeight() - topTextPosition * hudTopBar.getHeight(), 1));
+        messageTextTop.setTextColor(hudTextColor);
+        messageTextTop.setLocalScale(topTextScale);
+        rootNode.attachChild(messageTextTop);
+        
+        /* Mensaje central */
+        messageTextMiddle = Text.createDefaultTextLabel("messageText", "");
+        messageTextMiddle.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        messageTextMiddle.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextMiddle.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextMiddle.getWidth() * 0.5f, display.getHeight() - middleTextPosition * hudTopBar.getHeight(), 1));
+        messageTextMiddle.setTextColor(hudTextColor);
+        messageTextMiddle.setLocalScale(middleTextScale);
+        rootNode.attachChild(messageTextMiddle);
+        
+        /* Mensaje inferior */
+        messageTextBottom = Text.createDefaultTextLabel("messageText", "");
+        messageTextBottom.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        messageTextBottom.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextBottom.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextBottom.getWidth() * 0.5f, display.getHeight() - bottomTextPosition * hudTopBar.getHeight(), 1));
+        messageTextBottom.setTextColor(hudTextColor);
+        messageTextBottom.setLocalScale(bottomTextScale);
+        rootNode.attachChild(messageTextBottom);
+        
+        /* Texto de fps */
+        fpsText = Text.createDefaultTextLabel("fpsText", "");
+        fpsText.setLocalScale(0.8f);
+        fpsText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        fpsText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        fpsText.setLocalTranslation(new Vector3f(2, 2, 1));
+        rootNode.attachChild(fpsText);
+        
+		/* Puntaje */
+        scoreTitleText = Text.createDefaultTextLabel("scoreTitleText", gameLogic.getScoreText());
+        scoreTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        scoreTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        scoreTitleText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreTitleText.getWidth(), display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
+        scoreTitleText.setTextColor(hudTextColor);
+        scoreTitleText.setLocalScale(scoreAndLifesTextScale);
+        rootNode.attachChild(scoreTitleText);
+        
+        scoreText = Text.createDefaultTextLabel("scoreText", String.valueOf(score));
+        scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreText.getWidth(), display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
+        scoreText.setTextColor(hudTextColor);
+        scoreText.setLocalScale(scoreAndLifesTextScale);
+        rootNode.attachChild(scoreText);
+        
+        /* Vidas restantes */
+        lifesRemainingTitleText = Text.createDefaultTextLabel("lifesRemainingTitleText", gameLogic.getLifesText());
+        lifesRemainingTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        lifesRemainingTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        lifesRemainingTitleText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingTitleText.getWidth()) * 0.5f, display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
+        lifesRemainingTitleText.setTextColor(hudTextColor);
+        lifesRemainingTitleText.setLocalScale(scoreAndLifesTextScale);
+        rootNode.attachChild(lifesRemainingTitleText);
+        
+        lifesRemainingText = Text.createDefaultTextLabel("lifesRemainingText", String.valueOf(lifes));
+        lifesRemainingText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
+        lifesRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        lifesRemainingText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingText.getWidth()) * 0.5f, display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
+        lifesRemainingText.setTextColor(hudTextColor);
+        lifesRemainingText.setLocalScale(scoreAndLifesTextScale);
+        rootNode.attachChild(lifesRemainingText);
+	}
+	
+	private void estimateScalingPercentages()
+	{
+		topTextScale = TT_SCALE_COEF_A * display.getHeight() + TT_SCALE_COEF_B;
+		middleTextScale = MT_SCALE_COEF_A * display.getHeight() + MT_SCALE_COEF_B;
+		bottomTextScale = BT_SCALE_COEF_A * display.getHeight() + BT_SCALE_COEF_B;
+		scoreAndLifesTextScale = SL_SCALE_COEF_A * display.getHeight() + SL_SCALE_COEF_B;
 	}
 	
 	// Para poder reiniciar el juego. Es invocado por el inputHandler (tecla N)
@@ -382,26 +507,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		}
 	}
 
-	/**
-	 * Se la llama para limpiar el juego una vez finalizado
-	 */
-    @Override
-	public void cleanup()
-	{
-		super.cleanup();
-		
-		/* Limpieza de texturas */
-		//TODO ts.deleteAll();
-
-		//FIXME esto no tiene sentido aca porque le sacas el input al feng
-//		/* Limpieza del mouse */
-//		MouseInput.get().removeListeners();
-//		MouseInput.destroyIfInitalized();
-//		
-//		/* Limpieza del teclado */
-//		KeyInput.destroyIfInitalized();
-	}
-    
     @Override
     public void setActive(boolean active)
     {
@@ -410,9 +515,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         /* Notifico a la logica de juego cada vez que
          * ingreso, reingreso o salgo del juego (para ir al menu) */
         if (active)
-//            {gameLogic.enterGame();Main.getAudioSystem().getMusicQueue().clearTracks();
-//			Main.getAudioSystem().getMusicQueue().addTrack(Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false));
-//			Main.getAudioSystem().getMusicQueue().play();}
         	gameLogic.enterGame();
         else
             gameLogic.leaveGame();
@@ -512,20 +614,57 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	{
 		sensors.add(sensor);
 	}
+	
+	public void toggleShowFPS()
+	{
+		showFPS = !showFPS;
+		
+		/* Si no debo mostrar mas los fps borro el contenido del
+		 * texto (y no se va a actualizar mas hasta que no se prenda de nuevo) */
+		if (!showFPS)
+		{
+			fpsText.getText().delete(0, fpsText.getText().length());
+		}
+	}
 
 	public void setScore(int score)
 	{
 		this.score = score;
+		
+		/* Actualizo el texto de score en pantalla */
+		scoreText.getText().replace(0, scoreText.getText().length(), String.valueOf(score));
 	}
 	
 	public void setLifes(int lifes)
 	{
 		this.lifes = lifes;
+		
+		/* Actualizo el texto de vidas en pantalla */
+		lifesRemainingText.getText().replace(0, lifesRemainingText.getText().length(), String.valueOf(lifes));
 	}
 
-	public void setMessage(String message)
+	public void showGameMessage(String message)
 	{
-		this.message = message;
+		int len = message.length();
+		String newMessage = message;
+		
+		/* Si supera el tamanio maximo, lo trunco */
+		if (len > MAX_GAME_MESSAGE_LEN)
+			newMessage = message.substring(0, MAX_GAME_MESSAGE_LEN);
+		
+		/* Coloco el texto del medio en el superior */
+		messageTextTop.getText().replace(0, messageTextTop.getText().length(), "" + messageTextMiddle.getText());
+		
+		/* Coloco el texto de abajo en el del medio */
+		messageTextMiddle.getText().replace(0, messageTextMiddle.getText().length(), "" + messageTextBottom.getText());
+		
+		/* Coloco el nuevo mensaje en el de abajo */
+        messageTextBottom.getText().replace(0, messageTextBottom.getText().length(), "" + newMessage);
+        
+        /* Reposiciono los mensajes */
+        messageTextTop.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextTop.getWidth() * 0.5f, display.getHeight() - topTextPosition * hudTopBar.getHeight(), 1));
+        messageTextMiddle.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextMiddle.getWidth() * 0.5f, display.getHeight() - middleTextPosition * hudTopBar.getHeight(), 1));
+        messageTextBottom.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextBottom.getWidth() * 0.5f, display.getHeight() - bottomTextPosition * hudTopBar.getHeight(), 1));
 	}
 
 	public GameLogic getGameLogic()
@@ -591,6 +730,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         ball.attachChild( visualMainBall );
         ball.generatePhysicsGeometry();
         ball.setMaterial(Material.IRON);
+        
         // Se computa la masa luego de generar la geometria fisica
         ball.computeMass();
 
@@ -832,8 +972,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
                     {
                         
                         Vector3f pos = display.getRenderer().getCamera().getLocation();
-                        message = "cam[" + String.format( "%.2f", pos.x ) + ";" + String.format( "%.2f", pos.y ) + ";" + String.format( "%.2f", pos.z ) + "]";
-                        messageText.getText().replace(0, messageText.getText().length(), "" + message);
+                        showGameMessage("cam[" + String.format( "%.2f", pos.x ) + ";" + String.format( "%.2f", pos.y ) + ";" + String.format( "%.2f", pos.z ) + "]");
                         System.out.println( "Camera at: " + display.getRenderer().getCamera().getLocation() );
                         System.out.println( "Camera facing to " + display.getRenderer().getCamera().getDirection());
                     }

@@ -74,7 +74,7 @@ public abstract class GameLogic
 
 	public void showMessage(String message)
 	{
-		pinball.setMessage(message);
+		pinball.showGameMessage(message);
 	}
 	
 	public int getInTableBallQty()
@@ -339,7 +339,7 @@ public abstract class GameLogic
 		return scoreText;
 	}
 	
-	public String getBallsText()
+	public String getLifesText()
 	{
 		return ballsText;
 	}

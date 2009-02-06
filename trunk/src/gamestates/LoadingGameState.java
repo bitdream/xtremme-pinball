@@ -221,7 +221,7 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 
         public Void call() throws Exception
         {
-            this.loadingGS.setProgress( getPercentage(), "Loading" );
+            this.loadingGS.setProgress( getPercentage(), "Loading..." );
             
             if (!complete && !aborted)
                 GameTaskQueueManager.getManager().update(this);
