@@ -72,9 +72,9 @@ public class CarsThemeGameLogic extends GameLogic
 		music.setLooping(true);
 		music.setTargetVolume(Main.getMusicVolume());
 		
-		scoreText = "Distance: ";
-		ballsText = "Fuel: ";		
-		gameOverMessage = "Broke engine, race over... Press N to start a new game.";
+		scoreText = "Distance";
+		ballsText = "Fuel";		
+		gameOverMessage = "Blown engine! Press N to race again.";
 	}
 
 	@Override
@@ -100,9 +100,7 @@ public class CarsThemeGameLogic extends GameLogic
 				completeSeqCnt = 1;
 				
 				// Mensaje al usuario diciendo el proximo paso a seguir
-				showMessage("To overtake next car go to the spinners!!!"); 
-				// FIXME estos mensajes seran tapados por los de vida extra y bola extra llamados por showScore, 
-				// ver si poner ambos al mismo tiempo o como solucionarlo con el HUD
+				showMessage("To overtake next car go to the spinners!");
 			}
 			
 			// Cada ACTIVE_MAGNETS_BUMPERS rebotes sin perder vidas, contra bumpers de cualquier tipo, activar los imanes hasta que una bola se pierda
@@ -162,7 +160,7 @@ public class CarsThemeGameLogic extends GameLogic
 				completeSeqCnt = 2;  //Se realizo el segundo paso de la secuencia
 				
 				// Mensaje al usuario diciendo el proximo paso a seguir
-				showMessage("Opponent overtook. Get to checkpoint through the ramp!!!");
+				showMessage("Opponent overtook. Ramp for checkpoint!");
 			}
 			// Sino completeSeqCnt valia cero y debe seguir en cero
 			
@@ -171,7 +169,7 @@ public class CarsThemeGameLogic extends GameLogic
 //				if(completeSeqCnt == 2)
 //				{
 //					// No obedecio la secuencia (hizo spinner -> spinner), cartel indicador
-//					showMessage("Next time obey team orders. Sequence aborted!!!");
+//					showMessage("Next time obey your team. Seqn. aborted!");
 //				}
 //				
 //				completeSeqCnt = 0; //Reseteo la secuencia
@@ -212,7 +210,7 @@ public class CarsThemeGameLogic extends GameLogic
 				if(completeSeqCnt == 1)
 				{
 					// No obedecio la secuencia, cartel indicador
-					showMessage("Next time obey team orders. Sequence aborted!!!");
+					showMessage("Next time obey your team. Seqn. aborted!");
 				}
 			}
 			// Reinicio la secuencia siempre
@@ -245,7 +243,7 @@ public class CarsThemeGameLogic extends GameLogic
 	public void tilt()
 	{
 		super.tilt();
-		showMessage("Tilt, don't abuse!!!");
+		showMessage("Tilt, don't abuse!");
 	}
 	
 	@Override
@@ -254,7 +252,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.abuseTilt();
 		
 		// Imprimir en pantalla un cartel que avise el abuso de tilts de este theme
-		showMessage("Too much tilt, flippers disabled!!!");
+		showMessage("Too much tilt, flippers disabled!");
 		
 		// No contabilizar mas puntos hasta que no se hayan perdido todas las bolas de esta mano, esto se logra desactivando bumpers y puntaje
 		// de todos los componentes. Ya esta hecho en cada componente (los no desactivables hacen uso de la variable tiltAbused)
@@ -281,14 +279,14 @@ public class CarsThemeGameLogic extends GameLogic
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
-			showMessage("Pit stop, lost ball!!!");
+			showMessage("Pit stop, lost ball!");
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
 			newBallCntsReset();			
 		}
 		else
 		{
-			showMessage("Accident in front of you, slow down!!!");
+			showMessage("Accident in front of you, slow down!");
 		}	
 		
 		if (magnetsActive)
@@ -359,7 +357,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void showExtraBallMessage()
 	{
-		showMessage("Best lap, extra ball!!!");
+		showMessage("Best lap, extra ball!");
 	}
 	
 	private void playExtraLifeSound()
@@ -369,7 +367,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void showExtraLifeMessage()
 	{
-		showMessage("Lap record, extra fuel!!!");
+		showMessage("Lap record, extra fuel!");
 	}
 	
 	private void playActiveMagnetsSound()
@@ -379,12 +377,12 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("Oil in the course, magnets activated!!!");
+		showMessage("Slippery road ahead!");
 	}
 	
 	private void showDisabledMagnetsMessage()
 	{
-		showMessage("Magnets disabled!!!");
+		showMessage("You escaped from the slippery road.");
 	}
 	
 	// Llamado al perder una vida
@@ -424,7 +422,7 @@ public class CarsThemeGameLogic extends GameLogic
 		super.gameStart();
 		
 		// Mensaje y sonido de nuevo juego
-		showMessage("Gentlemen, start your engines!!!");		
+		showMessage("Gentlemen, start your engines!");		
 		gameStartSound.play();
 		
 		// Desactivar los magnets si es que alguno estaba activo 
@@ -479,7 +477,7 @@ public class CarsThemeGameLogic extends GameLogic
 	}
 	
 	@Override	
-	public String getBallsText()
+	public String getLifesText()
 	{
 		return ballsText;
 	}

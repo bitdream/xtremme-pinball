@@ -100,6 +100,7 @@ public class PinballInputHandler extends FirstPersonHandler
 		/* Nuevo juego */
 		addAction(new NewGameAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_N, InputHandler.AXIS_NONE, false);
         
+		/* Posiciones de camara */
 		addAction(new ChangeCameraAction(game.getCamera(), game.getPinballSettings().getCamStartPos(), game.getPinballSettings().getCamStartLookAt()), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_1, InputHandler.AXIS_NONE, false );
         
@@ -112,8 +113,21 @@ public class PinballInputHandler extends FirstPersonHandler
         addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( 27, 19, 27 ), new Vector3f( 0f, 5f, 0f )), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_4, InputHandler.AXIS_NONE, false );
         
+        /* Activar/desactivar show FPS */
+        addAction(new ShowFPSAction(), InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_F, InputHandler.AXIS_NONE, false);
     }
     
+	/* Accion de activar o desactivar la muestra de FPS */
+    private class ShowFPSAction extends InputAction
+    {
+        public void performAction( InputActionEvent evt )
+        {
+            if (evt.getTriggerPressed())
+            {
+           		game.toggleShowFPS();
+            }        
+    	}
+    }
 
 	/* Accion de comenzar nuevo juego luego de perder */
     private class NewGameAction extends InputAction
