@@ -24,7 +24,7 @@ public class CarsThemeGameLogic extends GameLogic
 	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	private static final int MAX_BALLS = 3;
 	
-	// Multiplicadores para decidir el incremento de vidas y bolas
+	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
 	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
 	
@@ -244,7 +244,6 @@ public class CarsThemeGameLogic extends GameLogic
 			showMessage("Accident in front of you, slow down!!!");
 		}	
 		
-		//TODO descomentar luego de testear imanes
 		if (magnetsActive)
 		{
 			// Desactivar los magnets si es que alguno estaba activo 
@@ -391,7 +390,7 @@ public class CarsThemeGameLogic extends GameLogic
 		// Desactivar los magnets si es que alguno estaba activo 
 		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
 		{
-			((Magnet)magnet.getChild(0)).setActive(false); //TODO para debug de imanes poner true
+			((Magnet)magnet.getChild(0)).setActive(false);
 		}
 		magnetsActive = false;
 	}
@@ -420,12 +419,11 @@ public class CarsThemeGameLogic extends GameLogic
 		extraLifesCnt = 1;
 		extraBallsCnt = 1;
 		
-//		// TODO para debug de imanes. Quitarlo todo!!!
-//		// Desactivar los magnets si es que alguno estaba activo 
-//		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-//		{
-//			((Magnet)magnet.getChild(0)).setActive(/*false*/true); 
-//		}
+		// Desactivar los magnets si es que alguno estaba activo 
+		for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+		{
+			((Magnet)magnet.getChild(0)).setActive(false); 
+		}
 	}
 
 	@Override
