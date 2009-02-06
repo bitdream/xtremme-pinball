@@ -159,9 +159,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
     /* Carga de la mesa completa */
     private boolean loadingComplete = false;
 
-    /* Pausa de la fisica */
-    private boolean pause = false;
-    
 	/* XXX Ubicacion inicial de la bola: cable */
 	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f );
 
@@ -790,14 +787,16 @@ public class PinballGameState extends PhysicsEnhancedGameState
         this.loadingComplete = loadingComplete;
     }
 
-    public void togglePause()
-    {
-        pause = ! pause;
-    }
-    
     ///XXX debug
     // variables de debug
     private boolean showGraphs = false;
+    /* Pausa de la fisica */
+    private boolean pause = false;
+    
+    private void togglePause()
+    {
+        pause = ! pause;
+    }
     
     protected void initDebug()
     {
@@ -836,6 +835,19 @@ public class PinballGameState extends PhysicsEnhancedGameState
 //                
 //            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_Y, InputHandler.AXIS_NONE, false );
             
+            /* Pausar/Despausar fisica */
+            // P pausa fisica
+            pinballInputHandler.addAction(new InputAction()
+            {
+                public void performAction( InputActionEvent evt )
+                {
+                    if ( evt.getTriggerPressed() )
+                    {
+                        togglePause();
+                    }
+                }
+            }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_P, InputHandler.AXIS_NONE, false );
+        
             // F2 mostrar reporte de memoria
             pinballInputHandler.addAction( new InputAction()
             {
