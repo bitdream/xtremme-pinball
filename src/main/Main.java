@@ -35,19 +35,20 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-	    if ( true /*args[0].equals( "debug" )*/ ) // TODO y esto? -> para desactivar las estadisticas y que vaya mas rapido
+	    if ( args.length == 0 )
 	    {
-	        System.setProperty( "jme.stats", "set" );
+	        System.setProperty("jme.debug", "FALSE");
 	    }
 	    else
 	    {
-	        System.setProperty("jme.debug", "FALSE");
+	        if (args[0].equals( "debug" ))
+	            System.setProperty( "jme.stats", "set" );
 	    }
 		/* Logueos severos desde el root logger */
 		Logger.getLogger("").setLevel(Level.SEVERE);
 
 		/* TODO Carga de bibliotecas nativas */
-		//loadNativeLibraries();
+//		loadNativeLibraries();
 		
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
@@ -184,7 +185,7 @@ public class Main
 		if (loadingGS != null)
 		{
 			loadingGS.setActive(false);
-			loadingGS.cleanup();
+			//loadingGS.cleanup();
 			GameStateManager.getInstance().detachChild(loadingGS);
 		}
 	}
@@ -209,13 +210,29 @@ public class Main
 	// TODO Utilizar para cargar las bibliotecas nativas desde el codigo (en vez de desde Eclipse)
 	private static final void loadNativeLibraries()
 	{
+        String os = System.getProperty( "os.name" );
+        
+        if (os.matches( "Linux.*" ))
+            os = "linux";
+        else if (os.matches( "Mac.*" ))
+            os = "macosx";
+        else if (os.matches( "Windows.*"))
+            os = "win32";
+        else
+            throw new RuntimeException("Unsupported system");
+	    
         try
         {
-        	addDir("lib/ode/native");
+            String odeLibDir = "lib/ode/native/";
+            String lwjglLibDir = "lib/lwjgl/native/";
+            
+        	addDir(odeLibDir + os);
+        	addDir(lwjglLibDir + os );
+        	
         } catch (IOException e)
         {
-        	System.err.println("No se pudo cargar las bibliotecas dinamicas.");
-        	e.printStackTrace(System.err);
+        	System.err.println("Unable to load dynamic libraries.");
+        	throw new RuntimeException(e);
         }
 	}
 
