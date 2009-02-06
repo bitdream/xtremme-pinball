@@ -46,7 +46,7 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		music.setTargetVolume(Main.getMusicVolume());
 		
 		/* Accion para abortar */
-	    this.input = new InputHandler();
+	    input = new InputHandler();
 	    input.addAction( new InputAction() {
 
             public void performAction( InputActionEvent evt )
@@ -55,6 +55,18 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             		loadWorker.stopLoading();
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
+	    
+	    /* Accion de mute/unmute */
+		input.addAction( new InputAction() {
+
+            public void performAction( InputActionEvent evt )
+            {
+            	if ( evt.getTriggerPressed() )
+            	{
+	            	Main.toggleMuteAudio();
+            	}
+            }
+        }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_O, InputHandler.AXIS_NONE, false );
 	}
 	
 	/**
