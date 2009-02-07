@@ -159,10 +159,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
     /* Carga de la mesa completa */
     private boolean loadingComplete = false;
 
-	/* XXX Ubicacion inicial de la bola: cable */
-	private Vector3f ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f );
-
-
 	/**
 	 * Crea un estado de juego nuevo.
 	 * @param name Nombre del estado de juego.
@@ -341,7 +337,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 
 		/* Armo la habitacion, la mesa y la bola */
 //        addBall(this.ballStartUp); -> hecho desde la logica (metodo startGame())
-        ballStartUp.rotate( pinballSettings.getInclinationQuaternion() );
+//        ballStartUp.rotate( pinballSettings.getInclinationQuaternion() );
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
@@ -684,10 +680,10 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		return balls;
 	}
 	
-	public Vector3f getBallStartUp() 
-    {
-        return ballStartUp;
-    }
+//	public Vector3f getBallStartUp() 
+//    {
+//        return ballStartUp;
+//    }
 	
     public LightState getLightState()
     {
@@ -697,27 +693,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
     public void setGameLogic(GameLogic gameLogic)
     {
         this.gameLogic = gameLogic;
-    }
-    
-    // Se basa en la posicion del sensor de rampa luego de rotada la mesa.
-    public Vector3f getExtraBallStartUp()
-    {
-		Vector3f sensorOriginalPos = new Vector3f();
-		Vector3f sensorRotatedPos = new Vector3f();
-		
-    	// Se que hay un solo sensor de rampa
-    	for (StaticPhysicsNode sensor : sensors) 
-    	{
-			Sensor s = (Sensor) sensor.getChild(0);
-			
-			if (s.getSensorType().equals(SensorType.RAMP_SENSOR))
-			{
-				sensorOriginalPos = s.getVisualModel().getLocalTranslation();
-				sensorRotatedPos = sensorOriginalPos.rotate(getPinballSettings().getInclinationQuaternion());
-			}			
-		}
-    	// Una vez que se las coordenadas, retorno un vector que sea un poco mas a la izquierda (-x) y arriba (+y). La bola es de diametro 0.5
-    	return sensorRotatedPos.add(new Vector3f(-0.5f, 0.5f, 0f));
     }
     
     public void addBall(Vector3f location)

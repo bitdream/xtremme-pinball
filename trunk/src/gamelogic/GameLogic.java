@@ -1,22 +1,21 @@
 package gamelogic;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import gamestates.PinballGameState;
 import main.Main;
-
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.StaticPhysicsNode;
-
 import components.Bumper;
 import components.Door;
 import components.Flipper;
 import components.Magnet;
 import components.Plunger;
 import components.Spinner;
+
 
 
 public abstract class GameLogic
@@ -38,14 +37,20 @@ public abstract class GameLogic
 	
 	protected PinballGameState pinball;
 	
-	/* Sistema de sonido */
+	// Sistema de sonido
 	protected AudioSystem audio;
 	
-	/* Sonidos default */
+	// Sonidos default
 	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound;
 	
-	// Lista con las posibles ubicaciones de bolas extra para esta mesa
+	// Lista con las posibles ubicaciones de bolas extra para esta mesa, sin considerar la rotacion (es seteada desde el x3d)
 	private List <Vector3f> extraBallPossibleStartUps;
+	
+	// Con las ubicaciones rotadas y visibilidad para las subclases
+	protected List <Vector3f> extraBallRotatedPossibleStartUps;
+	
+	// Ubicacion inicial de la bola en esta mesa. El theme debera sobreescribirlo si necesita (depende del diseño de la mesa)
+	protected Vector3f ballStartUp = new Vector3f(0,0,0); // Deberia llegarle por metadata en el x3d de la tabla de este theme
 
 	public GameLogic(PinballGameState pinball)
 	{
@@ -221,7 +226,7 @@ public abstract class GameLogic
 				playLostLastBallSound();
 				
 				// Nueva bola desde la posicion del plunger
-				pinball.addBall(pinball.getBallStartUp());
+				pinball.addBall(ballStartUp);
 				
 				// Si se perdieron las bolas por estar deshabilitados los flippers debido a abuso de tilt, rehabilitarlos
 				if (tiltAbused)
@@ -294,7 +299,7 @@ public abstract class GameLogic
 		pinball.getBalls().clear();
 		
 		// Crear la bola inicial
-		pinball.addBall(pinball.getBallStartUp());
+		pinball.addBall(ballStartUp);
 		
 		// Activar los componentes y reiniciar la logica del juego
 		restarLogic();
@@ -359,5 +364,15 @@ public abstract class GameLogic
 	public void setExtraBallPossibleStartUps(List<Vector3f> extraBallPossibleStartUps) 
 	{
 		this.extraBallPossibleStartUps = extraBallPossibleStartUps;
+		
+		// Completo la lista de posiciones considerando la rotacion de la mesa
+		this.extraBallRotatedPossibleStartUps = new ArrayList<Vector3f>();
+		
+		// Roto cada posicion recibida para posibles lugares para bola extra
+		for (Vector3f pos : getExtraBallPossibleStartUps()) 
+		{
+			// La subo un poco pq la posicion es al ras del piso (la bola tiene radio 0.25)
+			this.extraBallRotatedPossibleStartUps.add(pos.rotate(pinball.getPinballSettings().getInclinationQuaternion()).add(new Vector3f(0f, 0.75f, 0f)));
+		}		
 	}
 }

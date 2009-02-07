@@ -1,6 +1,8 @@
 package themes;
 
 import main.Main;
+
+import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -75,6 +77,9 @@ public class CarsThemeGameLogic extends GameLogic
 		scoreText = "Distance";
 		ballsText = "Fuel";		
 		gameOverMessage = "Blown engine! Press N to race again.";
+		
+		// Inicializo la posicion inicial de la bola considerando la rotacion de la mesa
+		ballStartUp = new Vector3f( 4.88f, 0.5f, -1.60f ).rotate( pinball.getPinballSettings().getInclinationQuaternion());
 	}
 
 	@Override
@@ -331,8 +336,8 @@ public class CarsThemeGameLogic extends GameLogic
 			if (getInTableBallQty() < MAX_BALLS)
 			{
 				// Agrego una bola extra a la mesa.
-				pinball.addBall(pinball.getExtraBallStartUp());
-
+				pinball.addBall(extraBallRotatedPossibleStartUps.get(0));
+				
 				// Mensaje y sonido al usuario
 				showExtraBallMessage();
 				playExtraBallSound();

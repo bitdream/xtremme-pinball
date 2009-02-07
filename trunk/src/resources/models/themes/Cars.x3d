@@ -6,8 +6,7 @@
 	<meta name="generator" content="Blender 246" />
 	<meta name="translator" content="X3D exporter v1.55 (2006/01/17)" />
     <meta name="theme" content="themes.CarsThemeGameLogic" />
-    <meta name="xtraBallPos" content="0,0,0" />
-    <meta name="xtraBallPos" content="1,1,1" />
+    <meta name="xtraBallPos" content=" -4.6,0.9,-12.75" />
 </head>
 <Scene>
 <NavigationInfo headlight="FALSE" visibilityLimit="0.0" type='"EXAMINE","ANY"' avatarSize="0.25, 1.75, 0.75" />
