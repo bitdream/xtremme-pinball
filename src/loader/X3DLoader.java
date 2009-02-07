@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 
 import org.xml.sax.SAXException;
 
+import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.state.LightState;
 import com.jmex.model.converters.DTDResolver;
@@ -46,6 +48,8 @@ public class X3DLoader extends Observable implements Observer
     private String                   x3dFileName   = null;
 
     private String                   theme         = null;
+    
+    private List<Vector3f>           xtraBalls     = null;
 
     public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
@@ -131,6 +135,7 @@ public class X3DLoader extends Observable implements Observer
         {
             node = (Node) converter.loadScene( this.x3d, null, this.lightState );
             theme = converter.getPinballTheme();
+            xtraBalls = converter.getXtraBallsPos();
         }
         catch ( SAXException saxe )
         {
@@ -280,7 +285,11 @@ public class X3DLoader extends Observable implements Observer
     public GameLogic getTheme( PinballGameState p )
     {
         // acabo de aprender algo de java :P
-        return X3DLoader.<GameLogic> createInstance( this.theme, pinball );
+        GameLogic gl = X3DLoader.<GameLogic> createInstance( this.theme, pinball );
+        
+        gl.setExtraBallPossibleStartUps( this.xtraBalls );
+        
+        return gl;
     }
 
     /* codigo inspectoresco :D */

@@ -106,6 +106,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 <Collision enabled="false">
 <Transform DEF="display" translation="-0.096132 7.667511 -20.050060" scale="5.771116 1.184290 2.037248" rotation="-1.000000 0.000000 0.000000 0.000000">
 <Shape>
+<MetadataString name="type" value="LCDScreen" />
 <Appearance>
 <Material DEF="MA_MaterialPantalla" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
 ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
