@@ -32,7 +32,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = /*500*/ 70; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -104,7 +104,7 @@ public class CarsThemeGameLogic extends GameLogic
 			}
 			
 			// Cada ACTIVE_MAGNETS_BUMPERS rebotes sin perder vidas, contra bumpers de cualquier tipo, activar los imanes hasta que una bola se pierda
-			if ( bumperCollisionCnt == ACTIVE_MAGNETS_BUMPERS)
+			if ( bumperCollisionCnt == ACTIVE_MAGNETS_BUMPERS && !magnetsActive)
 			{
 				// Activar los magnets 
 				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
@@ -217,7 +217,7 @@ public class CarsThemeGameLogic extends GameLogic
 			completeSeqCnt = 0;  
 			
 			// Cada ACTIVE_MAGNETS_RAMP pasajes por rampa que no pertenezcan a la finalizacion de una secuencia, activar los imanes hasta que una bola se pierda
-			if ( rampCnt == ACTIVE_MAGNETS_RAMP)
+			if ( rampCnt == ACTIVE_MAGNETS_RAMP && !magnetsActive)
 			{
 				// Activar los magnets 
 				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
@@ -279,7 +279,20 @@ public class CarsThemeGameLogic extends GameLogic
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
 		{
-			showMessage("Pit stop, lost ball!");
+			
+			
+			// Si con esta bola no sumo ningun punto, regalarle una vida (como si nunca la hubiera perdido)
+			if (thisBallScore == 0)
+			{
+				// Para que no le reste la vida
+				lifes ++;
+				
+				showMessage("Poor performance, try again...");
+			}
+			else
+			{
+				showMessage("Pit stop, lost ball!");
+			}
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
 			newBallCntsReset();			
