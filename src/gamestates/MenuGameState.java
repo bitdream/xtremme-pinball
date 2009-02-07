@@ -3,37 +3,50 @@ package gamestates;
 import input.FengJMEInputHandler;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import main.Main;
 
 import org.fenggui.Button;
 import org.fenggui.ComboBox;
+import org.fenggui.Container;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
 import org.fenggui.Item;
 import org.fenggui.Label;
 import org.fenggui.Slider;
 import org.fenggui.appearance.LabelAppearance;
+import org.fenggui.appearance.TextAppearance;
+import org.fenggui.binding.render.Binding;
+import org.fenggui.binding.render.Font;
+import org.fenggui.binding.render.ITexture;
+import org.fenggui.binding.render.Pixmap;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.composite.Window;
+import org.fenggui.decorator.background.PixmapBackground;
 import org.fenggui.event.ButtonPressedEvent;
 import org.fenggui.event.IButtonPressedListener;
 import org.fenggui.event.ISliderMovedListener;
 import org.fenggui.event.SliderMovedEvent;
+import org.fenggui.event.mouse.MouseEnteredEvent;
+import org.fenggui.layout.RowExLayout;
 import org.fenggui.layout.RowLayout;
-import org.fenggui.layout.StaticLayout;
+import org.fenggui.theme.DefaultTheme;
 import org.fenggui.util.Alignment;
 import org.fenggui.util.Spacing;
+import org.fenggui.util.fonttoolkit.FontFactory;
 
 import com.jme.input.InputHandler;
 import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
+import com.jme.util.GameTaskQueueManager;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 import com.jmex.game.state.BasicGameState;
@@ -71,7 +84,17 @@ public class MenuGameState extends BasicGameState
 	
 	/* Indica si esta en el menu principal o no */
 	private boolean inMainMenu;
-
+	
+	/* Contenedor general de FengGUI */
+	private Container baseContainer;
+	
+	/* Path de la imagen de fondo del menu */
+	private static final String BACKGROUND_IMAGE_PATH = "resources/textures/menu-background.jpg";
+	
+	/* Tipografias usadas por los textos en Feng */
+	private static final String buttonsFontName = "Helvetica", labelsFontName = "Arial";
+	private static final int buttonsFontStyle = java.awt.Font.BOLD, labelsFontStyle = java.awt.Font.ITALIC;
+	private static final int buttonsFontSize = 20, labelsFontSize = 15;
 	
 	public MenuGameState(String name)
 	{
@@ -85,6 +108,81 @@ public class MenuGameState extends BasicGameState
 		
 		/* Obtengo un display en Feng con LWJGL */
 		fengGUIdisplay = new Display(new LWJGLBinding());
+					
+		/* Creo el contenedor general */
+		baseContainer = new Container() {
+			
+			/* Pongo el cursor de manito para todo el menu, para evitar los cambios descentrados de cursor */
+			public void mouseEntered(MouseEnteredEvent mouseEnteredEvent)
+			{
+				Binding.getInstance().getCursorFactory().getHandCursor().show();
+			}
+		};
+		
+		/* Defino el layout del contenedor general */
+		baseContainer.setLayoutManager(new RowExLayout(false));
+		
+		/* Fijo el theme de Feng con la apariencia que deseo */
+		FengGUI.setTheme(new DefaultTheme() {
+			
+			//Font labelsFont = FontFactory.renderStandardFont(new java.awt.Font(labelsFontName, labelsFontStyle, labelsFontSize));
+			Font buttonsFont = FontFactory.renderStandardFont(new java.awt.Font(buttonsFontName, buttonsFontStyle, buttonsFontSize));
+			// TODO el getrenderer me esta devolviendo el mismo renderer en ambos casos... debo removerlo como renderer del boton o label (o tal vez no haga falta) y agregarle otro con la font que quiera
+			@Override 
+			public void setUp(Button arg0)
+			{
+				super.setUp(arg0);
+				
+				/* Textos en botones */
+				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(buttonsFont);
+			}
+			
+			@Override
+			public void setUp(Label arg0)
+			{
+				super.setUp(arg0);
+				
+				/* Textos en labels */
+				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(buttonsFont);
+			}
+		});
+		
+		/* Defino el tamanio al contenedor usando el de toda la pantalla de juego */
+		baseContainer.setWidth(Main.getGameScreenWidth());
+		baseContainer.setHeight(Main.getGameScreenHeight());
+		
+		/* Coloco el contenedor en la pantalla de Feng */
+		fengGUIdisplay.addWidget(baseContainer);
+		
+		/* Hago la carga de la textura de background con una tarea en el thread de OpenGL */		
+		GameTaskQueueManager.getManager().update(new Callable<Void>() {
+			
+	         public Void call() {
+	        	 
+	        	 ITexture backImg;
+	        	 Binding bind = Binding.getInstance();
+	             
+	             /* Voy a usar el classloader para traer los recursos */
+	             bind.setUseClassLoader(true);
+	             
+	             try
+	             {
+	            	 /* La abro */
+	            	 backImg = bind.getTexture(BACKGROUND_IMAGE_PATH);
+	            	 
+	            	 /* Creo un pixmap con ella */
+	                 Pixmap pixMapBackImg = new Pixmap(backImg);
+
+	                 /* La fijo como fondo */
+	                 baseContainer.getAppearance().add(new PixmapBackground(pixMapBackImg, true));
+	             }
+	             catch (IOException e)
+	             {
+	             }
+	             
+	             return null;
+	         }
+		});
 		
 		/* Inicializo el input handler de FengGUI */
 		fengGUIInputHandler = new FengJMEInputHandler(fengGUIdisplay);
@@ -131,18 +229,21 @@ public class MenuGameState extends BasicGameState
 	 */
 	private void buildWindow()
 	{
-		//TODO darle algo de estilo al menu y agregarle un fondo
-		
 		/* Remuevo todos los componentes que puedan haber en la pantalla */
-		fengGUIdisplay.removeAllWidgets();
-		
+		baseContainer.removeAllWidgets();
+
 		/* Creo la ventana del menu */
-		menu = FengGUI.createWindow(fengGUIdisplay, false, false, false, true);
+		menu = new Window(false, false, false, true);
+		
+		/* La agrego al contenedor */
+		baseContainer.addWidget(menu);
+		
+		/* Fijo sus propiedades */
 		menu.setExpandable(false);
 		menu.setResizable(false);
 		menu.setShrinkable(false);
 		menu.setMovable(false);
-		menu.setTitle("Main menu");
+		menu.setTitle("");
 		menu.setSize(300, 300);
 		menu.getContentContainer().setLayoutManager(new RowLayout(false));
 		menu.getContentContainer().getAppearance().setPadding(new Spacing(20, 15));
@@ -196,9 +297,6 @@ public class MenuGameState extends BasicGameState
 			}
 		});
 		
-		/* Lo centro */
-		StaticLayout.center(menu, fengGUIdisplay);
- 
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();
 		
@@ -282,9 +380,6 @@ public class MenuGameState extends BasicGameState
 				cancelNewGame();
 			}
 		});
-		
-		/* Lo centro */
-		StaticLayout.center(menu, fengGUIdisplay);
  
 		/* Actualizo la pantalla con los nuevos componentes */
 		fengGUIdisplay.layout();

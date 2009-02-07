@@ -48,7 +48,7 @@ public class Main
 		Logger.getLogger("").setLevel(Level.SEVERE);
 
 		/* TODO Carga de bibliotecas nativas */
-//		loadNativeLibraries();
+		//loadNativeLibraries();
 		
 		/* Preparo el sistema de sonido */
 		audio = AudioSystem.getSystem();
@@ -281,5 +281,15 @@ public class Main
 			audio.mute();
 		else
 			audio.unmute();
+	}
+	
+	public static int getGameScreenWidth()
+	{
+		return stdGame.getSettings().getWidth();
+	}
+	
+	public static int getGameScreenHeight()
+	{
+		return stdGame.getSettings().getHeight();
 	}
 }
