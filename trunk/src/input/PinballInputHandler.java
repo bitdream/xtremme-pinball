@@ -362,7 +362,7 @@ public class PinballInputHandler extends FirstPersonHandler
 			{
 				// Intensidad de la fuerza a aplicar
 				float forceIntensity = 150;
-				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea
+				// Computo la fuerza a aplicar sobre las bolas. Es la misma para cada una de ellas. La direccion se determina de forma aleatorea, pero en Y es cero para evitar que la bola salte
 				Vector3f force = new Vector3f(FastMath.sign(FastMath.nextRandomInt(-1, 1)),
 						0.0f, /*FastMath.sign(FastMath.nextRandomInt(-1, 1)) , */
 						FastMath.sign(FastMath.nextRandomInt(-1, 1))).mult(forceIntensity);

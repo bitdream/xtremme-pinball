@@ -68,6 +68,9 @@ public class Spinner extends Node
         
         /* Computo su masa */
 		spinnerNode.computeMass();
+		
+        /* Seteo la masa para que sea relativamente facil de pasar por la bola y para evitar que gire demasiado */
+        spinnerNode.setMass(0.06f);
         
         /* Voy a fijar el spinner con un eje rotacional */
         final Joint jointForSpinner = pinball.getPhysicsSpace().createJoint();
