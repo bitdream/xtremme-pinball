@@ -1,7 +1,11 @@
 package gamelogic;
 
+import java.util.List;
+
 import gamestates.PinballGameState;
 import main.Main;
+
+import com.jme.math.Vector3f;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.AudioTrack;
 import com.jmex.physics.DynamicPhysicsNode;
@@ -40,6 +44,9 @@ public abstract class GameLogic
 	/* Sonidos default */
 	private AudioTrack bumpSound, plungerChargeSound, plungerReleaseSound, ballTouchSound, tiltSound, tiltAbuseSound, flipperMoveSound;
 	
+	// Lista con las posibles ubicaciones de bolas extra para esta mesa
+	private List <Vector3f> extraBallPossibleStartUps;
+
 	public GameLogic(PinballGameState pinball)
 	{
 		this.pinball = pinball;
@@ -342,5 +349,15 @@ public abstract class GameLogic
 	public String getLifesText()
 	{
 		return ballsText;
+	}
+	
+	public List<Vector3f> getExtraBallPossibleStartUps() 
+	{
+		return extraBallPossibleStartUps;
+	}
+
+	public void setExtraBallPossibleStartUps(List<Vector3f> extraBallPossibleStartUps) 
+	{
+		this.extraBallPossibleStartUps = extraBallPossibleStartUps;
 	}
 }
