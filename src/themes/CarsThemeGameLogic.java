@@ -32,7 +32,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = /*500*/ 70; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -48,7 +48,7 @@ public class CarsThemeGameLogic extends GameLogic
 	private boolean magnetsActive = false;
 	
 	// Sonidos
-	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, magnetOffSound, music;
+	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, /*magnetOffSound,*/ music;
 	
 	public CarsThemeGameLogic(PinballGameState pinball)
 	{
@@ -64,7 +64,7 @@ public class CarsThemeGameLogic extends GameLogic
 		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/life-up.wav"), false);
 		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/checkpoint.wav"), false);
 		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/magnet-on.wav"), false);
-		magnetOffSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/magnet-off.wav"), false);
+		//magnetOffSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/magnet-off.wav"), false);
 		
 		// Inicializo la musica
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/car-theme/music.wav"), false);
@@ -163,17 +163,6 @@ public class CarsThemeGameLogic extends GameLogic
 				showMessage("Opponent overtook. Ramp for checkpoint!");
 			}
 			// Sino completeSeqCnt valia cero y debe seguir en cero
-			
-//			else
-//			{
-//				if(completeSeqCnt == 2)
-//				{
-//					// No obedecio la secuencia (hizo spinner -> spinner), cartel indicador
-//					showMessage("Next time obey your team. Seqn. aborted!");
-//				}
-//				
-//				completeSeqCnt = 0; //Reseteo la secuencia
-//			}
 		}		
 	}
 	
