@@ -36,9 +36,7 @@ import components.Bumper;
 import components.Door;
 import components.Flipper;
 import components.Plunger;
-import components.Sensor;
 import components.Spinner;
-import components.Sensor.SensorType;
 
 /**
  * Clase principal del juego.
@@ -136,10 +134,11 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	private float bottomTextPosition = 1f;
 	
 	/* Escalas de los textos */
-	private float topTextScale, middleTextScale, bottomTextScale, scoreAndLifesTextScale;
+	private float topTextScale, middleTextScale, bottomTextScale, scoreAndLifesTitleScale, scoreAndLifesTextScale;
 	
 	/* Coeficientes de las rectas que estiman los porcentajes de escalado para las distintas resoluciones */
-	private static final float SL_SCALE_COEF_A = 0.0010119f, SL_SCALE_COEF_B = 0.222857f;
+	private static final float SLT_SCALE_COEF_A = 0.0010119f, SLT_SCALE_COEF_B = 0.222857f;
+	private static final float SL_SCALE_COEF_A = 0.0010119f, SL_SCALE_COEF_B = 0.65f;
 	private static final float TT_SCALE_COEF_A = 0.0002976f, TT_SCALE_COEF_B = 0.5714f;
 	private static final float MT_SCALE_COEF_A = 0.000595238f, MT_SCALE_COEF_B = 0.542857f;
 	private static final float BT_SCALE_COEF_A = 0.00238095f, BT_SCALE_COEF_B = 0.17143f;
@@ -436,7 +435,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
         scoreTitleText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreTitleText.getWidth(), display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
         scoreTitleText.setTextColor(hudTextColor);
-        scoreTitleText.setLocalScale(scoreAndLifesTextScale);
+        scoreTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(scoreTitleText);
         
         scoreText = Text.createDefaultTextLabel("scoreText", String.valueOf(score));
@@ -453,7 +452,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         lifesRemainingTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
         lifesRemainingTitleText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingTitleText.getWidth()) * 0.5f, display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
         lifesRemainingTitleText.setTextColor(hudTextColor);
-        lifesRemainingTitleText.setLocalScale(scoreAndLifesTextScale);
+        lifesRemainingTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(lifesRemainingTitleText);
         
         lifesRemainingText = Text.createDefaultTextLabel("lifesRemainingText", String.valueOf(lifes));
@@ -470,6 +469,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		topTextScale = TT_SCALE_COEF_A * display.getHeight() + TT_SCALE_COEF_B;
 		middleTextScale = MT_SCALE_COEF_A * display.getHeight() + MT_SCALE_COEF_B;
 		bottomTextScale = BT_SCALE_COEF_A * display.getHeight() + BT_SCALE_COEF_B;
+		scoreAndLifesTitleScale = SLT_SCALE_COEF_A * display.getHeight() + SLT_SCALE_COEF_B;
 		scoreAndLifesTextScale = SL_SCALE_COEF_A * display.getHeight() + SL_SCALE_COEF_B;
 	}
 	
