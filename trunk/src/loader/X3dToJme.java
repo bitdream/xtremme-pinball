@@ -123,6 +123,7 @@ import com.jmex.model.converters.FormatConverter;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
+import components.LCDScreen;
 import components.Magnet;
 import components.Obstacle;
 import components.Plunger;
@@ -1060,7 +1061,7 @@ private Node transformNode;
                    
                } else if (type.equals( "LCDScreen" )) {
                    System.out.println("screen");
-                   //shape = new Quad( pinball, "lcd_screen"+lcdCounter++, geom );
+                   shape = new LCDScreen( "lcd_screen"+lcdCounter++, geom );
                }
            }
            
