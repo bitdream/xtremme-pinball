@@ -60,6 +60,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 import java.util.logging.Logger;
@@ -85,7 +87,6 @@ import com.jme.light.PointLight;
 import com.jme.light.SimpleLightNode;
 import com.jme.light.SpotLight;
 import com.jme.math.FastMath;
-import com.jme.math.Matrix3f;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
@@ -100,6 +101,7 @@ import com.jme.scene.shape.Box;
 import com.jme.scene.shape.Cone;
 import com.jme.scene.shape.Cylinder;
 import com.jme.scene.shape.Disk;
+import com.jme.scene.shape.Quad;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
@@ -297,6 +299,18 @@ public class X3dToJme extends FormatConverter {
     // es un cable asquerooooso!!!
     private String pinballTheme; 
     
+    /**
+     * 
+     *
+     */
+    private List<Vector3f>xtraBalls;
+    
+    public List<Vector3f> getXtraBallsPos()
+    {
+        return this.xtraBalls;
+    }
+    
+    
     public String getPinballTheme()
     {
         return this.pinballTheme;
@@ -440,8 +454,12 @@ public class X3dToJme extends FormatConverter {
         // Parse header
         Node header = getChildNode(nodes.item(0), "head");
         pinballTheme = null;
+        xtraBalls = null;
         if (header != null) {
-            pinballTheme = getThemeFromHeader(header);
+            List<String> theme = getListFromHeader( header, "theme", new StringConverter() );
+            if ( theme.size() > 0 )
+                pinballTheme = theme.get( 0 );
+            xtraBalls = getListFromHeader( header, "xtraBallPos", new Vector3fConverter() );
         }
 
         Node scene = getChildNode(nodes.item(0), "Scene");
@@ -512,9 +530,36 @@ public class X3dToJme extends FormatConverter {
 
         return sceneRoot;
     }
-
-    private String getThemeFromHeader(Node header) {
-        String theme = null;
+    
+    private interface HeaderMetadataConverter<T>
+    {
+        public T convertFromString(String s); 
+    }
+    
+    private class Vector3fConverter implements HeaderMetadataConverter<Vector3f>
+    {
+        public Vector3f convertFromString(String s)
+        {
+            String valuesString = s.trim();
+            String[] split = valuesString.split(WHITESPACE_COMMA_REGEX);
+            float[] values = new float[3];
+            for (int i = 0; i < 3; i++) {
+                values[i] = getFloat(split[i], 0);
+            }
+            return new Vector3f( values[0], values[1], values[2] );
+        }
+    }
+    
+    private class StringConverter implements HeaderMetadataConverter<String>
+    {
+        public String convertFromString(String s)
+        {
+            return s;
+        }
+    }
+    
+    private <T> List<T> getListFromHeader(Node header, String key, HeaderMetadataConverter<T> conv) {
+        List<T> lista = new LinkedList<T>();
         
         // Process all child nodes
         Node child = header.getFirstChild();
@@ -523,16 +568,16 @@ public class X3dToJme extends FormatConverter {
             if (type != Node.COMMENT_NODE) {
                 String name = child.getNodeName();
                 if (name.equals("meta")) {
-               		boolean isTheme = child.getAttributes().getNamedItem("name").getNodeValue().equals( "theme" ); 
+                    boolean isTheme = child.getAttributes().getNamedItem("name").getNodeValue().equals( key ); 
                     if (isTheme)
-                        theme = child.getAttributes().getNamedItem("content").getNodeValue();
+                        lista.add( conv.convertFromString( child.getAttributes().getNamedItem("content").getNodeValue() ) );
                 }
 
             }
             child = child.getNextSibling();
         }
         
-        return theme;
+        return lista;
     }
     
     /**
@@ -1012,6 +1057,10 @@ private Node transformNode;
                    }
                    
                    shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
+                   
+               } else if (type.equals( "LCDScreen" )) {
+                   System.out.println("screen");
+                   //shape = new Quad( pinball, "lcd_screen"+lcdCounter++, geom );
                }
            }
            
@@ -1071,6 +1120,7 @@ private Node transformNode;
     private static int spinnerCounter = 0;
     private static int obstacleCounter = 0;
     private static int sensorCounter = 0;
+    private static int lcdCounter = 0;
     
     /**
      * Checks if the given String represents one of the types of geometry nodes
