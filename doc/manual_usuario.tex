@@ -1,0 +1,266 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\spanishdecimal{.} % Si se quiere definir el punto decimal como punto en vez de coma
+\addto\captionsspanish{\def\tablename{Tabla}} % Para renombrar todos los 'Cuadro' con 'Tabla'.
+\usepackage{fancyhdr}
+\usepackage[dvips]{graphicx}
+\usepackage[normal]{caption2}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+%\usepackage{algorithm}
+\pagestyle{fancy} \headheight 13.6pt
+
+
+\lhead{Sistemas de Información} \chead{} \rhead{ITBA}
+\cfoot{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+\newcommand{\expon}[1]{~10^{#1}}
+\newcommand{\dif}[1]{\mathrm{d}#1}
+%\count0=4
+% \\            Line break
+% \today        Fecha del sistema
+% \label{}      Etiqueta
+% \ref{}        Referencia a la etiqueta del mismo nombre (a la sección)
+% \footnote{}       Nota al pie de la página
+% \underline{}      Subrayado
+% \emph{}       Cursiva
+% \textbf{}     Negrita
+% \mbox{}       No separa lo que está entre corchetes
+% \begin{}      Comienza el entorno entre corchetes
+% \end{}        Termina el entrorno entre corchetes
+% \thepage      Número de página
+% \url{}        URL
+% \section{}        Sección
+% \subsection{}     Subsección
+% \subsubsection{}  Subsubsección
+% \frac{a}{b}       Fracción (a sobre b)
+% a_t           A sub t (expr. matemática)
+% $a$           Letra matemática a (puede ser por ejemplo \tau o directamente una letra
+
+% Para enumerar:
+% \begin{itemize}
+% \item Enumerado 1.
+% \item Enumerado 2.
+% \end{itemize}
+
+% Para poner eps:
+% \begin{figure}
+% \begin{center}
+% \includegraphics[scale=0.6]{Nombre del eps}
+% \caption{Lo que va a decir abajo}
+% \label{Para hacerle referencia}
+% \end{center}
+% \end{figure}
+
+% Para hacer ecuación:
+% \begin{equation}
+% \label{Para hacerle referencia}
+% Expresión
+% \end{equation}
+
+% Para hacer ecuación alineando un igual (por columnas)
+%\begin{eqnarray*}
+%\label{Para hacerle referencia}
+%X &=& 3 + 7\\
+%&=& 10
+%\end{eqnarray*}
+
+% Para hacer tabla:
+%\begin{table}
+%\begin{center}
+%\begin{tabular}{|c|c|} \hline %Formato: cada pipe es una línea vertical.
+%a & b \\ \hline %Formato: cada \hline es una línea horizontal.
+%\end{tabular}
+%\caption{Nombre de la tabla.}
+%\label{Para hacerle referencia}
+%\end{center}
+%\end{table}
+
+%\floatname{algorithm}{Algoritmo}
+%\begin{algorithm}{}
+%\caption{Nombre del algoritmo}
+%\label{Para hacerle referencia}
+%\begin{verbatimtab}
+%Algoritmo!
+%\end{verbatimtab}
+%\end{algorithm}
+
+
+\title{{\bf Xtremme Pinball \\ Manual de usuario}}
+
+\begin{document}
+
+\author{M. Besio \and P. García \and I. Scena}
+\date{9 de febrero de 2009}
+\maketitle \thispagestyle{fancy}
+
+\section{Introducción}
+\emph{Xtremme Pinball} es un juego de pinball que además de ofrecer
+las funcionalidades típicas de juegos de su naturaleza, ofrece un
+atractivo diseño 3D. El objetivo es sumar lamayor cantidad de puntos
+posible y evitar que la bola se pierda por entre los flippers o por
+las vias de escape laterales.
+
+En las siguientes secciones se explican los controles del juego, sus
+reglas y los criterios utilizados para el otorgamiento del puntaje.
+
+\section{Nuevo juego}
+Para comenzar un nuevo juego, luego de ingresar al programa
+(\textbf{java -jar extremme-pinball.jar} VER SI VALE!!!!),
+seleccionar del menú de ajustes los parámetros deseados para
+fullscreen y resolución de pantalla. A continuación, seleccionar del
+menú inicial la opción \emph{New Game}. Luego aparecerá en pantalla
+el menú de selección de mesa de juego y nivel de dificultad. Una vez
+elegidos los parámetros deseados, hacer click en el botón
+\emph{Start} para comenzar a jugar.
+
+\section{Datos en pantalla}
+
+En la parte superior de la pantalla se mostrarán las vidas
+restantes, puntaje y mensajes de usuario. AGREGAR
+SCREENSHOT!!!!!!!!!!!!!
+
+\section{Controles}
+
+A continuación se detalla la funcionalidad de cada tecla y el
+momento del juego en el cual es válido el accionamiento de las
+mismas.
+
+\subsection{Durante el juego}\label{teclas_juego}
+\begin{itemize}
+    \item \textbf{mouse}: cambia la orientación de la cámara.
+    \item \textbf{W}: mueve la cámara hacia adelante.
+    \item \textbf{S}: mueve la cámara hacia atrás.
+    \item \textbf{A}: mueve la cámara hacia la izquierda.
+    \item \textbf{D}: mueve la cámara hacia la derecha.
+    \item \textbf{Q}: mueve la cámara hacia arriba.
+    \item \textbf{Z}: mueve la cámara hacia abajo.
+    \item \textbf{C}: Acciona el flipper izquierdo superior e
+    inferior.
+    \item \textbf{M}:Acciona el flipper derecho.
+    \item \textbf{INTRO}: Saque con el plunger (fuerza proporcional
+    a la contracción).
+    \item \textbf{SPACE}: tilt (mover la mesa).
+    \item \textbf{HOME, 1}: ubica la cámara en la posición original
+    (visual de toda la mesa).
+    \item \textbf{2, 3, 4}: cambia a cámaras ubicadas en diferentes
+    posiciones.
+    \item \textbf{F}: activa/desactiva el indicador de frames per
+    second (FPS).
+    \item \textbf{F1}: toma screenshot.
+    \item \textbf{N}: Comienza nuevo juego. Válida únicamente luego
+    de finalizar un juego.
+    \item \textbf{O}: activa/desactiva el sistema de sonido.
+    \item \textbf{ESC}: muestra el menú de juego con opciones para
+    continuar, comenzar un nuevo juego o salir.
+\end{itemize}
+
+
+\subsection{Modo debug}
+Si se entra al juego en modo debug (\textbf{java -jar
+extremme-pinball.jar -debug}, se tendrá la posibilidad de utilizar
+teclas adicionales a las descriptas en la sección \ref{teclas_juego}
+durante el desarrollo de un juego.
+
+\begin{itemize}
+    \item \textbf{P}: pausa la física del juego. Permite mover la cámara en
+    forma precisa para explorar los objetos de la escena.
+    \item \textbf{F2}: muestra reporte de memoria.
+    \item \textbf{F3}: activa/desactiva el debug de física (objetos físicos,
+    fuerzas sobre cada uno, etc).
+    \item \textbf{F4}: activa/desactiva las estadísticas (fps, promedio de
+    objetos en escena, promedio de triángulos, etc).
+    \item \textbf{F5}: activa/desactiva wires.
+    \item \textbf{F6}: activa/desactiva luces.
+    \item \textbf{F7}: activa/desactiva bounding boxes.
+    \item \textbf{F8}: activa/desactiva normales.
+    \item \textbf{F9}: imprime la posición y orientación de la
+    cámara.
+    \item \textbf{F10}: activa/desactiva mostrar cursor.
+\end{itemize}
+
+
+\subsection{En los menúes}
+Si se está en el menú de juego (se presionó \textbf{ESC} durante una
+partida) y se vuelve a presionar \textbf{ESC}, se retorna al juego.
+
+Si se está en el menú de selección de mesa y nivel de dificultad y
+se presiona \textbf{ESC}, se retorna al menú inicial.
+
+Si se está en el menú inicial y se presiona \textbf{ESC}, se sale
+del juego.
+
+\section{Puntajes}
+\subsection{Simples}
+A continuación se enumeran las acciones y los puntajes que otorga
+cada una.
+
+\begin{itemize}
+\item Pasaje por rampa: 50 puntos.
+\item Rebote en un bumper (ya sea los honguitos o los triángulos inferiores): 10 puntos.
+\item Pasaje por spinner: 5 puntos.
+\end{itemize}
+
+\subsection{Misiones}
+Si en el theme de \emph{cars} (VER SI QUEDA ESTO!!!!!!!!) se
+completa la secuencia bumpers superiores (una o mas veces) ->
+spinners (una vez o mas veces) -> rampa (una vez) se obtiene un
+bonus de 300 puntos.
+
+\section{Bonificaciones}
+Cada vez que se sumen 500 puntos, se obtendrá una bola extra (saldrá
+por la rampa), siempre y cuando en la mesa haya menos de tres bolas
+al momento de sumar el puntaje requerido.
+
+Cada 1000 puntos obtenidos con la misma bola (sin perder vidas), se
+obtiene una vida extra.
+
+\section{Otras reglas}
+\subsection{Activación de imanes}
+Cada 40 rebotes, sin perder vidas en el medio, contra bumpers de
+cualquier tipo (honguitos o triángulos), se activarán los imanes
+hasta que una bola se pierda.
+
+Cada 3 pasajes por rampa, que no pertenezcan a la finalizacion de
+una secuencia (misión), se activarán los imanes hasta que una bola
+se pierda.
+
+\subsection{Abuso de tilt} Si se realiza tilt (tecla \textbf{SPACE})5
+veces dentro de un intervalo de 5 segundos, se deshabilitan los
+flippers para que se pierdan todas las bolas que estaban en la mesa,
+sin que ninguna de ellas sume puntos. Por ende, se perderá una vida.
+Si había una bola en el plunger al momento de realizar el abuso de
+tilt, se deberá sacar, accionando el plunger y la bola se perderá,
+ya que los flippers seguirán desactivados hasta que se pierda la
+vida correspondiente.
+
+\section{Fin del juego}
+Luego de perder todas las vidas, se deshabilitan los flippers y en
+caso de querer comenzar un nuevo juego, se lo podrá hacer
+presionando la tecla N (tal como se indicará en pantalla).
+
+\section{Notas adicionales}
+La fuerza aplicada por los bumpers sobre las bolas es proporcional a
+la velocidad de la bola al momento de la colisión.
+
+La fuerza aplicada por los imanes sobre las bolas es más intensa
+cuanto mayor sea el nivel de inclinación seleccionado, esto es para
+mantener una proporción en la fuerza de atracción que contrarreste
+los cambios en los efectos gravitatorios producidos al varias el
+ángulo(nivel de dificultad).
+
+La intensidad y dirección de la fuerza aplicada por el \emph{tilt}
+el aleatoria e independiente de la fuerza aplicada en el \emph{tilt}
+anterior.
+
+
+agregar snapshots donde corresponda!!!!!!!!!!!!!
+
+\newpage
+
+\tableofcontents
+
+\end{document}
