@@ -50,8 +50,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	// Nombre a usar en el nodo fisico de todas las bolas del juego. Es para reconocer las bolas en las colisiones	
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
-	private static final String GAME_NAME = "!xtremme pinball";
-	private static final String GAME_VERSION = "0.6";
+	private static final String GAME_NAME = "xtremme pinball";
+	private static final String GAME_VERSION = "0.7";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
@@ -119,11 +119,13 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	private static final int MAX_GAME_MESSAGE_LEN = 40;
 	
 	/* Colores de las barras */
-	private ColorRGBA hudBackgroundColor = new ColorRGBA(0.2f, 0.2f, 0.4f, 1f);
+	private ColorRGBA hudBackgroundColor = new ColorRGBA(0.153f, 0.396f, 0.588f, 1f);
 	private ColorRGBA hudBackgroundBorderColor = new ColorRGBA(0f, 0f, 0f, 1f);
 	
 	/* Color del texto */
-	private ColorRGBA hudTextColor = new ColorRGBA(0f, 0.7f, 0.7f, 1f);
+	private ColorRGBA hudMessageTextColor = new ColorRGBA(0f, 0.7f, 0.7f, 1f);
+	private ColorRGBA hudTitleTextColor = new ColorRGBA(0.827f, 0.867f, 0.4f, 1f);
+	private ColorRGBA hudValueTextColor = new ColorRGBA(0.827f, 0.867f, 0.4f, 1f);
 	
 	/* Ancho en % del ancho total para los paneles de puntaje y vidas */
 	private final float scoreLifesPanelWidth = 0.09f;
@@ -399,7 +401,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageTextTop.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextTop.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageTextTop.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextTop.getWidth() * 0.5f, display.getHeight() - topTextPosition * hudTopBar.getHeight(), 1));
-        messageTextTop.setTextColor(hudTextColor);
+        messageTextTop.setTextColor(hudMessageTextColor);
         messageTextTop.setLocalScale(topTextScale);
         rootNode.attachChild(messageTextTop);
         
@@ -408,7 +410,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageTextMiddle.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextMiddle.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageTextMiddle.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextMiddle.getWidth() * 0.5f, display.getHeight() - middleTextPosition * hudTopBar.getHeight(), 1));
-        messageTextMiddle.setTextColor(hudTextColor);
+        messageTextMiddle.setTextColor(hudMessageTextColor);
         messageTextMiddle.setLocalScale(middleTextScale);
         rootNode.attachChild(messageTextMiddle);
         
@@ -417,7 +419,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageTextBottom.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextBottom.setLightCombineMode(Spatial.LightCombineMode.Off);
         messageTextBottom.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextBottom.getWidth() * 0.5f, display.getHeight() - bottomTextPosition * hudTopBar.getHeight(), 1));
-        messageTextBottom.setTextColor(hudTextColor);
+        messageTextBottom.setTextColor(hudMessageTextColor);
         messageTextBottom.setLocalScale(bottomTextScale);
         rootNode.attachChild(messageTextBottom);
         
@@ -434,7 +436,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
         scoreTitleText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreTitleText.getWidth(), display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
-        scoreTitleText.setTextColor(hudTextColor);
+        scoreTitleText.setTextColor(hudTitleTextColor);
         scoreTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(scoreTitleText);
         
@@ -442,7 +444,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
         scoreText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreText.getWidth(), display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
-        scoreText.setTextColor(hudTextColor);
+        scoreText.setTextColor(hudValueTextColor);
         scoreText.setLocalScale(scoreAndLifesTextScale);
         rootNode.attachChild(scoreText);
         
@@ -451,7 +453,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         lifesRemainingTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         lifesRemainingTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
         lifesRemainingTitleText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingTitleText.getWidth()) * 0.5f, display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
-        lifesRemainingTitleText.setTextColor(hudTextColor);
+        lifesRemainingTitleText.setTextColor(hudTitleTextColor);
         lifesRemainingTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(lifesRemainingTitleText);
         
@@ -459,7 +461,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
         lifesRemainingText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         lifesRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);
         lifesRemainingText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingText.getWidth()) * 0.5f, display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
-        lifesRemainingText.setTextColor(hudTextColor);
+        lifesRemainingText.setTextColor(hudValueTextColor);
         lifesRemainingText.setLocalScale(scoreAndLifesTextScale);
         rootNode.attachChild(lifesRemainingText);
 	}
