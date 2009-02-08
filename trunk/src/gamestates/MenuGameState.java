@@ -92,9 +92,10 @@ public class MenuGameState extends BasicGameState
 	private static final String BACKGROUND_IMAGE_PATH = "resources/textures/menu-background.jpg";
 	
 	/* Tipografias usadas por los textos en Feng */
-	private static final String buttonsFontName = "Helvetica", labelsFontName = "Arial";
-	private static final int buttonsFontStyle = java.awt.Font.BOLD, labelsFontStyle = java.awt.Font.ITALIC;
-	private static final int buttonsFontSize = 20, labelsFontSize = 15;
+	private static final String fontName = "Helvetica";
+	private static final int fontStyle = java.awt.Font.BOLD;
+	private static final int fontSize = 20;
+	
 	
 	public MenuGameState(String name)
 	{
@@ -125,16 +126,15 @@ public class MenuGameState extends BasicGameState
 		/* Fijo el theme de Feng con la apariencia que deseo */
 		FengGUI.setTheme(new DefaultTheme() {
 			
-			//Font labelsFont = FontFactory.renderStandardFont(new java.awt.Font(labelsFontName, labelsFontStyle, labelsFontSize));
-			Font buttonsFont = FontFactory.renderStandardFont(new java.awt.Font(buttonsFontName, buttonsFontStyle, buttonsFontSize));
-			// TODO el getrenderer me esta devolviendo el mismo renderer en ambos casos... debo removerlo como renderer del boton o label (o tal vez no haga falta) y agregarle otro con la font que quiera
-			@Override 
+			Font font = FontFactory.renderStandardFont(new java.awt.Font(fontName, fontStyle, fontSize));
+
+			@Override
 			public void setUp(Button arg0)
 			{
 				super.setUp(arg0);
 				
 				/* Textos en botones */
-				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(buttonsFont);
+				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(font);
 			}
 			
 			@Override
@@ -143,7 +143,7 @@ public class MenuGameState extends BasicGameState
 				super.setUp(arg0);
 				
 				/* Textos en labels */
-				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(buttonsFont);
+				arg0.getAppearance().getRenderer(TextAppearance.DEFAULTTEXTRENDERER).setFont(font);
 			}
 		});
 		
