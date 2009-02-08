@@ -1,0 +1,359 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\spanishdecimal{.} % Si se quiere definir el punto decimal como punto en vez de coma
+\addto\captionsspanish{\def\tablename{Tabla}} % Para renombrar todos los 'Cuadro' con 'Tabla'.
+\usepackage{fancyhdr}
+\usepackage[dvips]{graphicx}
+\usepackage[normal]{caption2}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+%\usepackage{algorithm}
+\pagestyle{fancy} \headheight 13.6pt
+
+
+\lhead{Sistemas de Información} \chead{} \rhead{ITBA}
+\cfoot{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+\newcommand{\expon}[1]{~10^{#1}}
+\newcommand{\dif}[1]{\mathrm{d}#1}
+%\count0=4
+% \\            Line break
+% \today        Fecha del sistema
+% \label{}      Etiqueta
+% \ref{}        Referencia a la etiqueta del mismo nombre (a la sección)
+% \footnote{}       Nota al pie de la página
+% \underline{}      Subrayado
+% \emph{}       Cursiva
+% \textbf{}     Negrita
+% \mbox{}       No separa lo que está entre corchetes
+% \begin{}      Comienza el entorno entre corchetes
+% \end{}        Termina el entrorno entre corchetes
+% \thepage      Número de página
+% \url{}        URL
+% \section{}        Sección
+% \subsection{}     Subsección
+% \subsubsection{}  Subsubsección
+% \frac{a}{b}       Fracción (a sobre b)
+% a_t           A sub t (expr. matemática)
+% $a$           Letra matemática a (puede ser por ejemplo \tau o directamente una letra
+
+% Para enumerar:
+% \begin{itemize}
+% \item Enumerado 1.
+% \item Enumerado 2.
+% \end{itemize}
+
+% Para poner eps:
+% \begin{figure}
+% \begin{center}
+% \includegraphics[scale=0.6]{Nombre del eps}
+% \caption{Lo que va a decir abajo}
+% \label{Para hacerle referencia}
+% \end{center}
+% \end{figure}
+
+% Para hacer ecuación:
+% \begin{equation}
+% \label{Para hacerle referencia}
+% Expresión
+% \end{equation}
+
+% Para hacer ecuación alineando un igual (por columnas)
+%\begin{eqnarray*}
+%\label{Para hacerle referencia}
+%X &=& 3 + 7\\
+%&=& 10
+%\end{eqnarray*}
+
+% Para hacer tabla:
+%\begin{table}
+%\begin{center}
+%\begin{tabular}{|c|c|} \hline %Formato: cada pipe es una línea vertical.
+%a & b \\ \hline %Formato: cada \hline es una línea horizontal.
+%\end{tabular}
+%\caption{Nombre de la tabla.}
+%\label{Para hacerle referencia}
+%\end{center}
+%\end{table}
+
+%\floatname{algorithm}{Algoritmo}
+%\begin{algorithm}{}
+%\caption{Nombre del algoritmo}
+%\label{Para hacerle referencia}
+%\begin{verbatimtab}
+%Algoritmo!
+%\end{verbatimtab}
+%\end{algorithm}
+
+
+\title{{\bf Xtremme Pinball \\ Informe técnico}}
+
+\begin{document}
+
+\author{M. Besio \and P. García \and I. Scena}
+\date{9 de febrero de 2009}
+\maketitle \thispagestyle{fancy}
+
+\section{Introducción}
+En el presente informe se describen los lineamientos generales
+tenidos en cuenta al llevar a cabo un desarrollo que permita la
+simulación y visualización en 3D de un juego en tiempo real. La
+implementación fue realizada en lenguaje \emph{JAVA} y se utilizaron
+herramientas tales como un motor gráfico que se ocupe de los
+aspectos de la visualización y bibliotecas para el manejo de la
+física.
+
+El juego desarrollado es un pinbal. Una bola es lanzada sobre un
+panel con obstáculos (imanes, rampas, spinners, bumpers, puertas y
+objetos estáticos) que la van desviado de su camino y que van
+haciendo sumar puntaje al usuario. Mediante el uso de flippers, el
+jugador debe intentar evitar que la bola se pierda por entre medio
+de ellos o por las vías de escape laterales. El objetivo del juego
+es sumar la mayor cantidad de puntos posibles.
+
+En la figura XXX se expone un screenshot del juego.
+
+TODO DONDE CORRESPONDA AGREGAR SCREENSHOTS!!!
+
+\section{Herramientas utilizadas}
+A continuación se hace una breve descripción de las herramientas
+usadas para el desarrollo del juego.
+
+\subsection{JMonkey Engine 2 (JME2)}
+\emph{JME} es un motor gráfico escrito en \emph{JAVA} y distribuido
+bajo licencia \emph{BSD}, que ofrece una API basada en un grafo para
+la descripción de la escena. Si bien la idea de su diseño es la de
+permitir el uso de cualquier sistema de rendering, en la actualidad
+el único soportado es \emph{LWJGL}.
+
+Además de ocuparse del rendering de la escena y de su representación
+en memoria mediante un grafo, JME permite la utilización de
+texturas, ilumunación y sonidos entre otras cosas.
+
+La versión de JME utilizada es la 2.0, la rasterización es realizada
+mediante \emph{OpenGL} (la librería utilizada es \emph{lwjgl}), el
+sistema de ilumunación usado por \emph{JME} es el de \emph{Phong}
+?????????? y para el audio se utilizó la librería \emph{OpenAL}.
+
+Para más información ver \cite{JME}
+
+%Metodo de rasterizacion lo hace OpenGL Metodo de iluminacion
+%(shading) de Phong?
+
+%Libreria usada para el rendering: lwjgl y para el sonido OpenAL
+%(cross-platform 3D audio API appropriate for use with gaming
+%applications and many other types of audio applications).
+
+%Consigna
+%La rasterización podrá hacerse por el método a elección de los
+%alumnos (RayTracing, RayCasting. OpenGL, DirectX, etc.)
+
+%La escena deberá contener al menos una luz puntual (no en el
+%infinito), y el efecto sobre los objetos que la componen deberá ser
+%dinámico (si un objeto se mueve, deberá verse el cambio de la
+%iluminación en su superficie). Se deberá usar al menos un modelo de
+%flatshading para mostrar la iluminación en los objetos.
+
+\subsection{JME Physics 2}
+Para el manejo de la física se utilizó \emph{JME Physics2}. Esta
+herramienta provee una interfaz entre \emph{JME} y \emph{ODE} (Open
+Dynamics Engine), facilitando la inclusión de fuerzas y todo tipo de
+dinámica entre los objetos que componen la escena.
+
+Para su funcionamiento, \emph{JME Physics} hace uso de las librerias
+de ODE (\emph{odejava}).
+
+Para más información ver \cite{JME_Physics}
+
+\subsection{FenGUI}
+\emph{FengGUI} es una API basada en \emph{OpenGl} y escrita
+puramente en \emph{JAVA} que permite programar interaces gráficas de
+usuario (GUI) en diversas aplicaciones. Provee todos los componentes
+típicos de una \emph{GUI}, como botones, sliders, áreas de texto y
+tabs.
+
+Durante el desarrollo del juego, se la utilizó para el diseño de
+todos los menúes. La razón de su elección fue principalmente que
+provee una \emph{API} completa, fácil de usar, se integra muy bien
+con \emph{JME} por estar escritos ambos ne \emph{JAVA} y permite la
+obtención de un producto de mayor calidad que Swing a un menor
+precio (esfuerzo).
+
+Para más información ver \cite{Feng}
+
+\section{Fases y diseño del proyecto}
+A continuación se hace una breve reseña sobre las fases en las que
+se puede dividir la implementación y algunos puntos del diseño
+utilizado para llevar adelante el desarrollo.
+
+Para poder tener una visión más profunda sobre la implementación, el
+diseño y los problemas enfrentados en cada etapa, ver
+\cite{GoogleCode}, donde además de poder encontrar el código fuente
+del proyecto, hay una breve descripción del mismo y un issue tracker
+con las tareas que lo conforman.
+
+La implementación puede dividirse en diversas etapas, donde cada una
+de ellas cubre aspectos diferentes en lo que respecta al desarrollo
+del juego.
+
+\subsection{Conversor de X3D a JME}
+En la implementación, la descripción de la escena se efectúa por
+medio de 3 archivos X3D. El primero de ellos, \emph{Room.x3d}
+describe la habitación en la que está contenida la máquina, el
+segundo, \emph{Machine.x3d}, descibe a la máquina es sí, y el
+tercero, cuyo nombre depende del theme que se quiera utilizar (cuya
+elección se hace desde el menú de juego nuevo), contiene información
+sobre la mesa de juego con todos los componentes que la conforman.
+
+hablar aca de la ubicacion de las luces????
+
+Como la composición de la escena viene dada en formato X3D, y JME
+utiliza un grafo para llevar a cabo la descripción de la misma, es
+necesario efectuar una conversión entre ambos formatos. La clase
+encargada de realizar la traducción es \emph{X3dToJme} y la misma
+realiza lo siguiente..... MARIANO.... (BREVE descripcion de como se
+lleva a cabo la conversion y generacion de nodos del grafo (quien es
+hijo de quien o lo que quieras)).
+
+
+\subsection{Gamestates}
+PABLO
+
+Gamestates -> uno para cada estado posible del juego (menu, juego,
+cargando, fisica...) EXPLICAR BREVEMENTE POR QUÉ SE USARON (HACEN
+THREADING COMO SUPONIAMOS?), DE QUÉ SE ENCARGA CADA UNO Y EL NOMBRE
+DE LAS CLASES QUE LOS IMPLEMENTAN.
+
+HABLAR DE LOS THREADS ???
+
+\subsection{Diseño de componentes}
+En el package components, se encuentran las clases que implementan
+cada uno de los componetes que pueden ubicarse sobre la mesa de
+juego. Algunos de ellos son dinámicos: flippers, spinners, plunger,
+doors y bumpers saltarines (los que tiene forma de hongo) y otros
+estáticos: magnets, bumpers estáticos (los triangulares ubicados
+arriba de los flippers), sensores y obstáculos fijos.
+
+Los componentes Bumper, Flipper y Magnet, implementan la interfaz
+ActivableComponet, mediante ello, los mismos pueden ser activados y
+desactivados por la lógica del juego según sea necesario. Por
+ejemplo, en el theme \emph{cars}, los imanes se activan únicamente
+cuando el usuario logró cierta cantidad de rebotes contra bumpers
+sin perder vidas o cuando realizó un cierto número de pasajes por la
+rampa.
+
+Cada una de las clases que los implementan determinan el
+comportamiento de los mismos. Por ejemplo, los bumpers saltarines,
+cuando están activos, al sufrir una colisión con una bola, ejercen
+dos acciones: por un lado, aplican una fuerza sobre la bola cuya
+intensidad es proporcional a la velocidad que la misma traía al
+momento del impacto. Por otro, una fuerza vertical es aplicda sobre
+el bumper, a fin de hacerlo saltar. Los imanes, cuando están
+activos, ejercen una fuerza atractora sobre todas las bolas de la
+mesa que se encuentren dentro de su radio de acción. Esta fuerza es
+suficiente para desviar la trayectoria de las bolas, pero no para
+retenerlas.
+
+Un aspecto importante en el diseño de los componentes es la elección
+del material con el que están hechos, ya que esto repercute
+directamente en la densidad que tendrán, en el coeficiente de
+rozamiento y el rebote contra otros materiales. Al material usado
+para los spinners se le seteó un valor de densidad que permitiera no
+hacerlos muy pesados, pero evitar que los mismos giraran de forma
+indefinida cada vez que una bola los golpeara. Para los bumpers se
+creó un material que tuviera la densidad sufuciente como para que la
+bola no los corra de lugar al impactarlos, y para los flippers se
+utilizó plástico, un material que viene incorporado en \emph{JME}.
+
+
+\subsection{Lógica del juego}
+Para la implementación de la lógica y reglas del juego, se diseñó la
+clase \emph{GameLogic} que implementa las reglas y comportamientos
+default de un juevo de pinball. Cuando finaliza el juego desactiva
+los flippers, al perder una bola, si es que ésta era la única que
+quedaba en la mesa, se decrementa en uno la cantidad de vidas
+restante, detecta el abuso en el uso de tilt y efectúa la
+penalización correspondiente y provee una serie de sonidos y
+mensajes de usuario default para ciertos eventos tales como perder
+una bola o mover un flipper.
+
+En caso de querer agregar reglas nuevas, misiones o secuencias que
+brinden bonus por su completitud, sonidos acordes al theme de la
+mesa seleccionada o bonificaciones especiales (por ejemplo dar bolas
+extra o bonus en puntaje o vidas), basta con generar una clase que
+extienda a \emph{GameLogic} y le agregue el comportamiento
+necesario. En la implementación presentada, por ejemplo, el theme
+\emph{cars}, a través de la clase \emph{CarsThemeGameLogic}, agrega
+sonidos relacionados con autos para cada evento posible y overridea
+los mensajes default para simular una carrera de automóviles.
+
+La idea es que mediante el agregado de un archivo X3D (que describa
+la mesa a agregar) y un archivo .class que contenga el binario de
+una clase que extienda a \emph{GameLogic}, se pueda cambiar
+totalmente el look, sonidos y las reglas del juego. Es como si se
+pusiera un nuevo 'cartucho' de juego que reutilice toda la
+implementación desarrollada y agregue un comportamiento y aspecto
+visual que lo diferencie del resto de los otros 'cartuchos'.
+
+
+\subsection{Inputs de usuario}
+El manejo de las input de usuario se llevó a cabo a través de la API
+provista por JME. La forma de utilización consiste en instalar
+listeners para cada tecla a utilizar y asociarla a la accion que la
+misma deba ejercer. Por ejemplo, la tecla SPACE realiza tilt sobre
+la mesa, aplicando una fuerza sobre las bolas que están sobre la
+misma y generando un movimiento de la cámara que de la sensación de
+que la mesa se está moviendo.
+
+
+PENDIENTE:  Aplicacion de texturas desde donde???????
+
+\section{Problemas encontrados}
+Uno de los principales problemas que se tuvieron durante el
+desarrollo del proyecto fue la poca documentacion disponible sobre
+\emph{JME} y \emph{JME Physics}, por lo cual, se tuvo que recurrir
+mucho a los foros disponibles en las páginas de ambos proyectos. Los
+aspectos que no se pudieron resolver por los medios anteriores,
+fueron solucionados experimentando por prueba y error.
+
+La dll de ODE provista por JME, contenía asserts de debug, lo cual
+causaba que durante el juego surgieran excepciones runtime con la
+información de debug. Para solucionar este problema, se tuvo que
+recompilar la dll sin los asserts problemáticos.
+
+
+AGREGAR ALGUNO SI SE LES OCURRE!!!
+
+%\section{Conclusiones y posibles extensiones}
+%Si bien el uso de JME y JME Physics resuelve ciertos aspectos de
+%visualización, manejo de la física y facilita la tarea de los
+%desarrolladores, solos no hacen nada, sino que hay que tener una
+%buena idea de cómo usarlos, qué funcionalidades ofrecen y adaptarlos
+%a las necesidades del juego a desarrollar. Para ello son necesarios
+%conocimientos sobre las características de los diversos métodos de
+%ilumuinación, rasterización, etc para poder elegir cuál utilizar en
+%cada caso. CAMBIAR ESTA BOSTA!!!
+
+\section{Posibles extensiones}
+Como posible extensión se puede mencionar la de implementar una
+feature que permita almacenar y ver los puntajes más altos. Si bien
+no requiere de gran trabajo, no se ha implementado por motivos de
+tiempo. Otra extensión posible es el diseño de más mesas de juego
+que se agreguen a las que el usuario pueda elegir en el menú
+inicial.
+
+\begin{thebibliography}{99}
+\bibitem{JME} \url{http://www.jmonkeyengine.com/}
+\bibitem{JME_Physics} \url{https://jmephysics.dev.java.net/}
+\bibitem{Feng} \url{https://fenggui.dev.java.net/}
+\bibitem{GoogleCode} \url{http://code.google.com/p/xtremme-pinball/}
+\end{thebibliography}
+
+\newpage
+
+\tableofcontents
+
+\end{document}
