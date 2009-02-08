@@ -38,7 +38,7 @@ public class LCDScreen extends Node
         pinball.setLCDScreen(this);
 
         /* Texto inicial nulo */
-        setText("", 20, ColorRGBA.black);
+        setText("", 24, ColorRGBA.black);
     }
     
     public void setText(final String text, final int size, final ColorRGBA color)
@@ -65,7 +65,7 @@ public class LCDScreen extends Node
             }).get();
         }
         catch (Exception e)
-        {        
+        {
         }
         
         /* Lo aplasto en Z */

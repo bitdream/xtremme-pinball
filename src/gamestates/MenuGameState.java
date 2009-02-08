@@ -90,6 +90,7 @@ public class MenuGameState extends BasicGameState
 	
 	/* Path de la imagen de fondo del menu */
 	private static final String BACKGROUND_IMAGE_PATH = "resources/textures/menu-background.jpg";
+	private static PixmapBackground pmBckg = null;
 	
 	/* Tipografias usadas por los textos en Feng */
 	private static final String fontName = "Helvetica";
@@ -167,14 +168,20 @@ public class MenuGameState extends BasicGameState
 	             
 	             try
 	             {
-	            	 /* La abro */
-	            	 backImg = bind.getTexture(BACKGROUND_IMAGE_PATH);
-	            	 
-	            	 /* Creo un pixmap con ella */
-	                 Pixmap pixMapBackImg = new Pixmap(backImg);
-
+	            	 /* Si no lo tenia, lo traigo */
+	                 if (pmBckg == null)
+	                 {
+	                	 /* La abro */
+		            	 backImg = bind.getTexture(BACKGROUND_IMAGE_PATH);
+		            	 
+		            	 /* Creo un pixmap con ella */
+		                 Pixmap pixMapBackImg = new Pixmap(backImg);
+		                 
+	                	 pmBckg = new PixmapBackground(pixMapBackImg, true);
+	                 }
+	                 
 	                 /* La fijo como fondo */
-	                 baseContainer.getAppearance().add(new PixmapBackground(pixMapBackImg, true));
+	                 baseContainer.getAppearance().add(pmBckg);
 	             }
 	             catch (IOException e)
 	             {
