@@ -513,7 +513,20 @@ public class MenuGameState extends BasicGameState
 	        themesDirURI = null;
 	    }
 		
-		File themesDir = new File(themesDirURI.getPath());
+	    File themesDir;
+		if ( themesDirURI.toString().startsWith( "jar" ))
+		{
+		    themesDir = null;
+		    System.out.println();
+		    System.out.println("****************************");
+		    System.out.println("bug conocido!!!!! no issuear");
+		    System.out.println("****************************");
+		    System.out.println();
+		}
+		else
+		{
+		    themesDir = new File(themesDirURI.getPath());
+		}
 		
 		/* Obtengo todos los archivos en el directorio de themes */
 		File[] files = themesDir.listFiles();

@@ -1060,7 +1060,7 @@ private Node transformNode;
                    shape = Sensor.create( pinball, "sensor"+sensorCounter++, geom, sensorType );
                    
                } else if (type.equals( "LCDScreen" )) {
-                   System.out.println("screen");
+//                   System.out.println("screen");
                    shape = new LCDScreen( pinball, "lcd_screen"+lcdCounter++, geom );
                }
            }

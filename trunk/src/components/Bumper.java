@@ -64,7 +64,7 @@ public class Bumper extends Node implements ActivableComponent
 		
 		pinballInstance = pinball;	
 
-		// Preparo el nodo fisico para el bumper estático
+		// Preparo el nodo fisico para el bumper estatico
 		prepareBumperPhysicNode(bumperNode, name, visualModel);
         
         /* Agrego el componente a la lista del pinball */

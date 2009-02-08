@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="xtremme-pinball">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="xtremme-pinball.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/lwjgl/jinput.jar"/>
+        <pathelement location="lib/lwjgl/lwjgl_util_applet.jar"/>
+        <pathelement location="lib/lwjgl/lwjgl_util.jar"/>
+        <pathelement location="lib/lwjgl/lwjgl.jar"/>
+        <pathelement location="lib/jme.jar"/>
+        <pathelement location="lib/jme-audio.jar"/>
+        <pathelement location="lib/jme-awt.jar"/>
+        <pathelement location="lib/jme-collada.jar"/>
+        <pathelement location="lib/jme-editors.jar"/>
+        <pathelement location="lib/jme-effects.jar"/>
+        <pathelement location="lib/jme-font.jar"/>
+        <pathelement location="lib/jme-gamestates.jar"/>
+        <pathelement location="lib/jme-model.jar"/>
+        <pathelement location="lib/jme-scene.jar"/>
+        <pathelement location="lib/jme-swt.jar"/>
+        <pathelement location="lib/jme-terrain.jar"/>
+        <pathelement location="lib/jme-xml.jar"/>
+        <pathelement location="lib/jbullet/jbullet.jar"/>
+        <pathelement location="lib/jbullet/stack-alloc.jar"/>
+        <pathelement location="lib/jbullet/vecmath.jar"/>
+        <pathelement location="lib/ode/odejava-jni.jar"/>
+        <pathelement location="lib/jme-physics.jar"/>
+        <pathelement location="lib/jorbis/jorbis-0.0.17.jar"/>
+        <pathelement location="lib/FengGUI.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src" excludes="**/*.launch, **/*.testsuite, **/*.deploy, **/*.location, **/*.execution, **/*.datapool, **/*.artifact, **/*.html, **/*.java, **/*.blend"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    	<delete file="build/pinball.jar"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build">
+		<mkdir dir="build"/>
+		<jar destfile="build/pinball.jar" basedir="bin">
+			<manifest>
+				<attribute name="Built-By" value="Besio-Garcia-Scena" />
+				<attribute name="Main-Class" value="main.Main" />
+			</manifest>
+		</jar>
+    	<delete dir="bin"/>
+	</target>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="xtremme-pinball.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="Pinball">
+        <java classname="main.Main" failonerror="true" fork="yes">
+            <classpath refid="xtremme-pinball.classpath"/>
+        </java>
+    </target>
+    <target name="Pinball (debug)">
+        <java classname="main.Main" failonerror="true" fork="yes">
+            <arg line="debug"/>
+            <classpath refid="xtremme-pinball.classpath"/>
+        </java>
+    </target>
+</project>
