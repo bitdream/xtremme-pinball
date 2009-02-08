@@ -6,7 +6,7 @@ import com.jme.math.*;
 
 public class PinballGameStateSettings
 {
-	private static final float camMoveSpeedDefault = 15f, camTurnSpeedDefault = 0.5f;
+	private static final float camMoveSpeedDefault = 5f, camTurnSpeedDefault = 0.25f;
 	
 	private static final int inclinationLevelDefault = 5;
 	
