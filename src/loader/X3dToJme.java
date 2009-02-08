@@ -48,6 +48,7 @@
 
 package loader;
 
+
 import gamestates.PinballGameState;
 
 import java.io.File;
@@ -98,10 +99,8 @@ import com.jme.scene.SwitchNode;
 import com.jme.scene.TexCoords;
 import com.jme.scene.TriMesh;
 import com.jme.scene.shape.Box;
-import com.jme.scene.shape.Cone;
 import com.jme.scene.shape.Cylinder;
 import com.jme.scene.shape.Disk;
-import com.jme.scene.shape.Quad;
 import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.BlendState;
 import com.jme.scene.state.CullState;
@@ -1850,6 +1849,7 @@ private static int  ifscount = 0;
      *            generic title is used.
      * @return The jME Cone
      */
+    @SuppressWarnings("deprecation") // es un tema del jar utilizado
     private Geometry parseCone(Node node, String title) {
         String heightAtt = node.getAttributes().getNamedItem("height")
                 .getNodeValue().trim();
@@ -1871,14 +1871,15 @@ private static int  ifscount = 0;
             String bottomAtt = botNode.getNodeValue().trim();
             bottom = Boolean.valueOf(bottomAtt);
         }
+        
         if (side) {
             // Sides active: Create a cone
-            Cone cone = null;
+            com.jme.scene.shape.Cone cone = null;
             if (title != null) {
-                cone = new Cone(title, CYLINDER_AXIS_SAMPLES,
+                cone = new com.jme.scene.shape.Cone(title, CYLINDER_AXIS_SAMPLES,
                         CYLINDER_RADIAL_SAMPLES, radius, height, bottom);
             } else {
-                cone = new Cone("X3D_Cone", CYLINDER_AXIS_SAMPLES,
+                cone = new com.jme.scene.shape.Cone("X3D_Cone", CYLINDER_AXIS_SAMPLES,
                         CYLINDER_RADIAL_SAMPLES, radius, height, bottom);
             }
             cone.getLocalRotation().fromAngleNormalAxis(FastMath.HALF_PI,
