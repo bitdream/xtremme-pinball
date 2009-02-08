@@ -24,6 +24,8 @@ public class LCDScreen extends Node
     
     private String currentText;
     
+    private Font3D font;
+    
     
     public LCDScreen(PinballGameState pinball, String name, Geometry geom)
     {
@@ -36,6 +38,23 @@ public class LCDScreen extends Node
         
         /* Lo fijo al pinball como la unica pantalla */
         pinball.setLCDScreen(this);
+        
+    	/* Creo la tarea de armar la fuente */
+        try
+        {
+            GameTaskQueueManager.getManager().update(new Callable<Void>() {
+    
+                public Void call() throws Exception {
+
+                    font = new Font3D(new Font("Helvetica", Font.PLAIN, 24), 0.001f, true, true, true);
+                    
+                    return null;
+                }
+            }).get();
+        }
+        catch (Exception e)
+        {
+        }
 
         /* Texto inicial nulo */
         setText("", 24, ColorRGBA.black);
@@ -48,25 +67,9 @@ public class LCDScreen extends Node
     	
     	/* Le saco el texto anterior */
     	detachChild(text3d);
-    	
-    	/* Creo la tarea de armar la fuente */
-        try
-        {
-            GameTaskQueueManager.getManager().update(new Callable<Void>() {
-    
-                public Void call() throws Exception {
-
-                    Font3D font = new Font3D(new Font("Helvetica", Font.PLAIN, size), 0.001f, true, true, true);
-                    
-                    text3d = font.createText(text, size, 0);
-                    
-                    return null;
-                }
-            }).get();
-        }
-        catch (Exception e)
-        {
-        }
+        
+        /* Creo el texto */
+        text3d = font.createText(text, size, 0);
         
         /* Lo aplasto en Z */
         text3d.setLocalScale(new Vector3f(1.0f, 1.0f, 0.01f));
