@@ -80,10 +80,15 @@ public class LCDScreen extends Node
         
         /* Le fijo el color */
         text3d.setFontColor(color);
-        
+
         background.updateWorldVectors();
         text3d.setLocalTranslation(background.getWorldTranslation());
+        
+        /* Le agrego el nuevo texto */
         attachChild(text3d);
+        
+        /* Y lo actualizo */
+        text3d.updateRenderState();
     }
 
 	public String getCurrentText()
