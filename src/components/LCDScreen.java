@@ -31,6 +31,10 @@ public class LCDScreen extends Node
     {
         super(name);
         
+        java.util.logging.Logger.getLogger( 
+            com.jmex.font3d.math.Triangulator.class.getName() 
+        ).setLevel( java.util.logging.Level.OFF );
+
         background = geom;
 
         /* Fijo el fondo */
