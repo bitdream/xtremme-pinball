@@ -151,6 +151,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* ------------------------------------------------------ */
 	
+	/* Pantalla LCD */
+	private static final String screenText = "Lifes: %02d  Score: %05d";
+		
 	/* Mostrar o no los FPS */
 	private boolean showFPS = false;
 	
@@ -644,7 +647,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		scoreText.getText().replace(0, scoreText.getText().length(), String.valueOf(score));
 		
 		/* Actualizo el texto de score en LCD */
-		lcdScreen.setText("Lifes: XX - Score: YYYYYY", 24, ColorRGBA.red);
+		lcdScreen.setText(String.format(screenText, lifes, score), 24, ColorRGBA.red);
 	}
 	
 	public void setLifes(int lifes)
@@ -655,7 +658,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		lifesRemainingText.getText().replace(0, lifesRemainingText.getText().length(), String.valueOf(lifes));
 		
 		/* Actualizo el texto de vidas en LCD */
-		//lcdScreen.setText("Lifes: XX - Score: YYYYYY", 12, ColorRGBA.red);
+		lcdScreen.setText(String.format(screenText, lifes, score), 24, ColorRGBA.red);
 	}
 
 	public void showGameMessage(String message)

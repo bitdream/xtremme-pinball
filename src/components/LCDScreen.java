@@ -31,9 +31,8 @@ public class LCDScreen extends Node
     {
         super(name);
         
-        java.util.logging.Logger.getLogger( 
-            com.jmex.font3d.math.Triangulator.class.getName() 
-        ).setLevel( java.util.logging.Level.OFF );
+        /* Apago el logger */
+        java.util.logging.Logger.getLogger(com.jmex.font3d.math.Triangulator.class.getName()).setLevel(java.util.logging.Level.OFF);
 
         background = geom;
 
@@ -59,9 +58,6 @@ public class LCDScreen extends Node
         catch (Exception e)
         {
         }
-
-        /* Texto inicial nulo */
-        setText("", 24, ColorRGBA.black);
     }
     
     public void setText(final String text, final int size, final ColorRGBA color)
@@ -81,14 +77,23 @@ public class LCDScreen extends Node
         /* Le fijo el color */
         text3d.setFontColor(color);
 
-        background.updateWorldVectors();
-        text3d.setLocalTranslation(background.getWorldTranslation());
+        /* Ubico al texto en el fondo */
+        centerText();
         
         /* Le agrego el nuevo texto */
         attachChild(text3d);
         
         /* Y lo actualizo */
         text3d.updateRenderState();
+    }
+    
+    private void centerText()
+    {
+    	background.updateWorldVectors();
+    	
+    	Vector3f bckgCenter = background.getWorldTranslation();
+    	
+    	text3d.setLocalTranslation(new Vector3f(bckgCenter.getX() - background.getLocalScale().getX() + 0.2f, bckgCenter.getY() - 0.3f * background.getLocalScale().getY(), bckgCenter.getZ()));
     }
 
 	public String getCurrentText()
