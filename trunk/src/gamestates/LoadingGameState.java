@@ -1,6 +1,8 @@
 package gamestates;
 
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Callable;
 
 import loader.LoaderThread;
@@ -21,9 +23,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	/* Musica de loading */
 	private AudioTrack music;
 
-	/* Configuracion del a crear */
-	private PinballGameStateSettings settings;
-
 	/* Recurso de la mesa */
 	private URL tableResource;
 	
@@ -36,7 +35,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	
 	public LoadingGameState(PinballGameStateSettings settings, URL tableResource)
 	{
-		this.settings = settings;
 		this.tableResource = tableResource;
 		
 		/* Inicializo la musica */
@@ -52,7 +50,10 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             public void performAction( InputActionEvent evt )
             {
             	if ( evt.getTriggerPressed() )
+            	{
             		loadWorker.stopLoading();
+            		setProgress( 0, "Aborting" );
+            	}
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_ESCAPE, InputHandler.AXIS_NONE, false );
 	    
@@ -67,32 +68,32 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             	}
             }
         }, InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_O, InputHandler.AXIS_NONE, false );
-	}
-	
-	/**
-	 * Se pone a cargar la mesa seleccionada al construir el loadinggamestate.
-	 */
-	public void startLoading()
-	{
+		
         /* Creo el juego nuevo */
         final PinballGameState pinballGS = Main.newPinballGame(settings);
         
         /* Agrego como tarea la carga */
         loadWorker = new LoadWorker(pinballGS, this);
         
-        Thread t = new Thread(loadWorker, "LoadingThread");
-        t.start();
-        
-        GameTaskQueueManager.getManager().update(loadWorker);
+		
+		setProgress( 0, "Loading..." );
+	}
+	
+
+	public void startLoading()
+	{
+
 	}
 
 	private void endLoad()
 	{
         /* Termino de cargar, destruyo el loadinggamestate */
-		Main.endLoading();
+	    Main.endLoading();
 		
         if (loadWorker.aborted)
+        {
             Main.newMenu().setActive(true);
+        }
         else
             loadWorker.endWork();
 	}
@@ -106,52 +107,58 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		{
 			/* Muestro el cursor */
 			MouseInput.get().setCursorVisible(true);
-		
+			
+			 /* Se pone a cargar la mesa seleccionada al construir el loadinggamestate. */
+	        Thread t = new Thread(loadWorker, "LoadingThread");
+	        t.start();
+	        
 			/* Inicio su musica */
 			Main.getAudioSystem().getMusicQueue().addTrack(music);
 			Main.getAudioSystem().getMusicQueue().setCurrentTrack(music);
 		}
 		else
 		{
-			/* Oculto el cursor */
-			MouseInput.get().setCursorVisible(false);
+			/* Oculto el cursor unicamente cuando arranca el juego */
+		    if (loadWorker.isCompleted())
+		    {
+		        if (!loadWorker.aborted)
+		            MouseInput.get().setCursorVisible(false);
+		        
+	            endLoad();
+		    }
 		}
 	}
 	
 	@Override
 	public void update(float tpf)
 	{
-		super.update(tpf);
+		super.update( tpf );
 
 		input.update( tpf );
-		
-		if (loadWorker.isCompleted())
-		{
-		    endLoad();
-		}
 
 		/* Actualizo el sistema de sonido */
         Main.getAudioSystem().update();
 	}
 	
-	@Override
-	public void render(float tpf)
-	{
-		super.render(tpf);
-	}
+//	@Override
+//	public void render(float tpf)
+//	{
+//        super.render(tpf);
+//	}
 	
 	public void cleanup()
 	{
-//	    System.out.println("clean");
+	    rootNode.detachAllChildren();
+	    rootNode.clearControllers();
 	}
 	
-	private class LoadWorker implements Runnable, Callable<Void>
+	private class LoadWorker implements Runnable, Callable<Void>, Observer
 	{
 	    private PinballGameState pinballGS;
 	    private LoadingGameState loadingGS;
 	    private LoaderThread roomLoader, machineLoader, tableLoader;
-	    private volatile boolean complete = false, started = false, aborted = false;
-		private float percentage = 0f;
+	    private volatile boolean complete = false, aborted = false;
+		private volatile float percentageMachine = 0f, percentageRoom = 0f, percentageTable = 0f;
 		
 		public LoadWorker(PinballGameState pinballGS, LoadingGameState loadingGS)
 		{
@@ -167,12 +174,7 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 
 	    public float getPercentage()
 	    {
-	        if (started)
-	        {
-	            percentage = (machineLoader.getPercentComplete() + roomLoader.getPercentComplete() + tableLoader.getPercentComplete());
-	        }
-
-	        return (percentage / 3);
+	        return (percentageRoom + percentageMachine + percentageTable)/3 ;
 	    }
 	    
 	    public void endWork() 
@@ -185,13 +187,16 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		public void run()
 		{
 			/* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
-            roomLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS);
+            roomLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS, 0);
+            roomLoader.addObserver( this );
             Thread roomThread = new Thread(roomLoader, "roomLoadThread");
             
-            machineLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS);
+            machineLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS, 1);
+            machineLoader.addObserver( this );
             Thread machineThread = new Thread(machineLoader, "machineLoadThread");
             
-            tableLoader = new LoaderThread( tableResource, pinballGS );
+            tableLoader = new LoaderThread( tableResource, pinballGS, 2 );
+            tableLoader.addObserver( this );
             Thread tableThread = new Thread(tableLoader, "tableLoadThread");
             
             // Paralelizo
@@ -200,7 +205,7 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
                 roomThread.start();
                 machineThread.start();
                 tableThread.start();
-                started = true;
+                
                 try
                 {
                     roomThread.join();
@@ -211,7 +216,6 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
                 {
                 }
             }
-            
             /* Accion para abortar */
             if ( !aborted )
             {
@@ -227,16 +231,14 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             }
             
             this.complete = true;
+            this.loadingGS.setProgress( 1 );
 		}
 
         public Void call() throws Exception
         {
-            this.loadingGS.setProgress( getPercentage(), "Loading..." );
-            if (!complete && !aborted)
-                GameTaskQueueManager.getManager().update(this);
-            else
-                this.loadingGS.setProgress( 1, "Aborting" );
-            
+            if (!complete)
+                this.loadingGS.setProgress( getPercentage() );
+//            System.out.println("percent " + Integer.toString( (int)(getPercentage() * 100) ) + ": " + Boolean.toString( (int)(getPercentage() * 100) == 100) );
             return null;
         }
         
@@ -246,6 +248,27 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
             machineLoader.stop();
             tableLoader.stop();
             aborted = true;
+        }
+
+        @Override
+        public void update( Observable o, Object arg )
+        {
+            if (o instanceof LoaderThread)
+            {
+                LoaderThread lt = (LoaderThread)o;
+                int id = lt.getID();
+                if (id == 0)
+                    percentageRoom = lt.getPercentComplete();
+                else if (id == 1)
+                    percentageMachine = lt.getPercentComplete();
+                else if (id == 2)
+                    percentageTable = lt.getPercentComplete();
+            }
+            
+            if (!complete && !aborted )
+            {
+                GameTaskQueueManager.getManager().update(this);
+            }
         }
         
 	}

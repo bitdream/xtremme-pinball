@@ -365,7 +365,6 @@ public class MenuGameState extends BasicGameState
 				/* Creo el gamestate de loading con la configuracion del pinball a crear y el recurso de su mesa */
 				LoadingGameState lgs = Main.newLoading(settings, (((Theme)tableList.getList().getSelectedItem().getUserData()).getResource()));
 				lgs.setActive(true);
-				lgs.startLoading();
 			}
 		});
 		

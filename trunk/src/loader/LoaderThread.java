@@ -11,7 +11,7 @@ import java.util.Observer;
 import com.jme.scene.Spatial;
 
 
-public class LoaderThread implements Runnable, Observer
+public class LoaderThread extends Observable implements Runnable, Observer
 {
     private volatile boolean shouldStop = false;
     
@@ -25,10 +25,18 @@ public class LoaderThread implements Runnable, Observer
     
     private Spatial scene;
     
-    public LoaderThread(URL resource, PinballGameState pinballGS)
+    private int id;
+    
+    public LoaderThread(URL resource, PinballGameState pinballGS, int id)
     {
         this.resource = resource;
         this.pinballGS = pinballGS;
+        this.id = id;
+    }
+    
+    public int getID()
+    {
+        return this.id;
     }
     
     public void run()
@@ -85,6 +93,8 @@ public class LoaderThread implements Runnable, Observer
         if (shouldStop) {
             throw new LoadingStopException();
         }
+        super.setChanged();
+        super.notifyObservers( null );
     }
     
     public void stop()
