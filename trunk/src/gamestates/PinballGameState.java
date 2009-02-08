@@ -35,6 +35,7 @@ import com.jmex.physics.material.Material;
 import components.Bumper;
 import components.Door;
 import components.Flipper;
+import components.LCDScreen;
 import components.Plunger;
 import components.Spinner;
 
@@ -85,6 +86,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Plunger del juego */
 	private DynamicPhysicsNode plunger;
+	
+	/* LCD Screen del juego */
+	private LCDScreen lcdScreen;
 	
 	/* Configuracion del juego */
 	private PinballGameStateSettings pinballSettings;
@@ -638,6 +642,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Actualizo el texto de score en pantalla */
 		scoreText.getText().replace(0, scoreText.getText().length(), String.valueOf(score));
+		
+		/* Actualizo el texto de score en LCD */
+		//lcdScreen.setText("Lifes: XX - Score: YYYYYY", 12, ColorRGBA.red);
 	}
 	
 	public void setLifes(int lifes)
@@ -646,6 +653,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Actualizo el texto de vidas en pantalla */
 		lifesRemainingText.getText().replace(0, lifesRemainingText.getText().length(), String.valueOf(lifes));
+		
+		/* Actualizo el texto de vidas en LCD */
+		//lcdScreen.setText("Lifes: XX - Score: YYYYYY", 12, ColorRGBA.red);
 	}
 
 	public void showGameMessage(String message)
@@ -967,7 +977,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
             
             
             /* libre para pruebas */
-            pinballInputHandler.addAction( new InputAction() 
+            pinballInputHandler.addAction( new InputAction()
             {
                 public void performAction( InputActionEvent evt ) {
                     if ( evt.getTriggerPressed() ) {
@@ -980,4 +990,8 @@ public class PinballGameState extends PhysicsEnhancedGameState
         
     }
 
+	public void setLCDScreen(LCDScreen lcdScreen)
+	{
+		this.lcdScreen = lcdScreen;
+	}
 }
