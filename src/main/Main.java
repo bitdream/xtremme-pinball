@@ -1,19 +1,21 @@
 package main;
 
+import gamestates.LoadingGameState;
+import gamestates.MenuGameState;
+import gamestates.PinballGameState;
+import gamestates.PinballGameStateSettings;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import gamestates.LoadingGameState;
-import gamestates.MenuGameState;
-import gamestates.PinballGameState;
-import gamestates.PinballGameStateSettings;
-import com.jme.app.AbstractGame.ConfigShowMode;
+
+import com.jme.system.GameSettings;
 import com.jmex.audio.AudioSystem;
 import com.jmex.audio.MusicTrackQueue.RepeatType;
-import com.jmex.editors.swing.settings.GameSettingsPanel;
 import com.jmex.game.StandardGame;
+import com.jmex.game.StandardGame.GameType;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
 
@@ -21,7 +23,7 @@ import com.jmex.game.state.GameStateManager;
 public class Main
 {
 	
-	private static StandardGame stdGame;
+    private static StandardGame stdGame;
 	
 	private static AudioSystem audio;
 	
@@ -63,31 +65,11 @@ public class Main
 		audio.getMusicQueue().setRepeatType(RepeatType.ONE);
 	
 		/* Inicializacion del juego principal */
-		stdGame = new StandardGame("xtremme-pinball");
-		//You can make a new GameSettings object from the code in AbstractGame.getAttributes() and then initialize StandardGame like this
-		// StandardGame game = new StandardGame("Game", GameType.GRAPHICAL, settings);
-		
-		// (y se guarda en $HOME/.java/main/.userPrefs en linux y en windows en el registro, HKEY_CURRENT_USER\Software\JavaSoft\Prefs\)
-		// TODO si se pone algo diferente a AlwaysShow, igual simpre lo muestra, el prompt deberia ser condicional segun se tenga o no 
-		// el archivo de config, pero hay que hacerlo por codigo.
-		stdGame.setConfigShowMode(ConfigShowMode.AlwaysShow);
-		
-		try
-		{
-	        // show the GameSettingsPanel
-	        if (!GameSettingsPanel.prompt(stdGame.getSettings(), "Xtremme-pinball Settings"))
-	        {
-	            // user pressed Cancel
-	            return;
-	        } 
-		}
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
+		stdGame = new StandardGame("xtremme-pinball", GameType.GRAPHICAL, getNewSettings( "xtremme-pinball" ));
        
-        
+        /* Para multithreading */
 		gamestates.PhysicsEnhancedGameState.game = stdGame;
+		
 		/* Doy comienzo al juego */
 		stdGame.start();
 		
@@ -184,8 +166,9 @@ public class Main
 	{
 		if (loadingGS != null)
 		{
-			loadingGS.setActive(false);
-			//loadingGS.cleanup();
+		    // esto lo hace el fade
+			//loadingGS.setActive(false);
+			loadingGS.cleanup();
 			GameStateManager.getInstance().detachChild(loadingGS);
 		}
 	}
@@ -292,4 +275,27 @@ public class Main
 	{
 		return stdGame.getSettings().getHeight();
 	}
+	
+    private static GameSettings getNewSettings( String gameName ) 
+    {
+        //XXX NOTA GIGANTE: ojo al editar la case de las pref,
+        //que fue autogenerada por el visual editor
+        XtremmePreferences prefs = new XtremmePreferences();
+
+        try
+        {
+//            System.out.println("waiting");
+            synchronized ( prefs )
+            {
+                prefs.wait();    
+            }
+//            System.out.println("notified");
+        }
+        catch (InterruptedException e)
+        {
+            
+        }
+        return prefs;
+
+    }
 }

@@ -107,11 +107,14 @@ public class PinballInputHandler extends FirstPersonHandler
         addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.92f, 0.5f, 1.0f ), new Vector3f(-0.92f,0.90f,-1.30f)), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_2, InputHandler.AXIS_NONE, false );
         
-        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.90f, 13.5f, -21.5f ), new Vector3f( -0.90f, -15.5f, 0f )), 
+        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.90f, 13.5f, -18.5f ), new Vector3f( -0.90f, -12.0f, 0f )), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_3, InputHandler.AXIS_NONE, false );
         
         addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( 27, 19, 27 ), new Vector3f( 0f, 5f, 0f )), 
             InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_4, InputHandler.AXIS_NONE, false );
+        
+        addAction( new ChangeCameraAction(game.getCamera(), new Vector3f( -0.92f, 25.3f, 7.4f ), new Vector3f( -.92f, 0f, -13.8f )), 
+            InputHandler.DEVICE_KEYBOARD, KeyInput.KEY_5, InputHandler.AXIS_NONE, false );
         
         // reset de camara
         addAction(new ChangeCameraAction(game.getCamera(), game.getPinballSettings().getCamStartPos(), game.getPinballSettings().getCamStartLookAt()), 

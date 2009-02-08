@@ -49,7 +49,7 @@ public abstract class GameLogic
 	// Con las ubicaciones rotadas y visibilidad para las subclases
 	protected List <Vector3f> extraBallRotatedPossibleStartUps;
 	
-	// Ubicacion inicial de la bola en esta mesa. El theme debera sobreescribirlo si necesita (depende del diseño de la mesa)
+	// Ubicacion inicial de la bola en esta mesa. El theme debera sobreescribirlo si necesita (depende del disenio de la mesa)
 	protected Vector3f ballStartUp = new Vector3f(0,0,0); // Deberia llegarle por metadata en el x3d de la tabla de este theme
 
 	public GameLogic(PinballGameState pinball)
