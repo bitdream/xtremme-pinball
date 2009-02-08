@@ -47,7 +47,7 @@
     	<delete file="build/pinball.jar"/>
     </target>
     <target depends="clean" name="cleanall"/>
-    <target depends="build-subprojects,build-project" name="build">
+    <target depends="build-project" name="build">
 		<mkdir dir="build"/>
 		<jar destfile="build/pinball.jar" basedir="bin">
 			<manifest>
@@ -57,24 +57,11 @@
 		</jar>
     	<delete dir="bin"/>
 	</target>
-    <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="xtremme-pinball.classpath"/>
         </javac>
-    </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="Pinball">
-        <java classname="main.Main" failonerror="true" fork="yes">
-            <classpath refid="xtremme-pinball.classpath"/>
-        </java>
-    </target>
-    <target name="Pinball (debug)">
-        <java classname="main.Main" failonerror="true" fork="yes">
-            <arg line="debug"/>
-            <classpath refid="xtremme-pinball.classpath"/>
-        </java>
     </target>
 </project>
