@@ -100,9 +100,9 @@
 \section{Introducción}
 \emph{Xtremme Pinball} es un juego de pinball que además de ofrecer
 las funcionalidades típicas de juegos de su naturaleza, ofrece un
-atractivo diseño 3D. El objetivo es sumar lamayor cantidad de puntos
-posible y evitar que la bola se pierda por entre los flippers o por
-las vias de escape laterales.
+atractivo diseño 3D. El objetivo es sumar la mayor cantidad de
+puntos posible y evitar que la bola se pierda por entre los flippers
+o por las vias de escape laterales.
 
 En las siguientes secciones se explican los controles del juego, sus
 reglas y los criterios utilizados para el otorgamiento del puntaje.
@@ -111,20 +111,19 @@ reglas y los criterios utilizados para el otorgamiento del puntaje.
 Para comenzar un nuevo juego, luego de ingresar al programa
 (\textbf{java -jar extremme-pinball.jar} VER SI VALE!!!!!!!!),
 seleccionar del menú de ajustes los parámetros deseados para
-fullscreen y resolución de pantalla. A continuación, seleccionar del
-menú inicial la opción \emph{New Game}. Luego aparecerá en pantalla
-el menú de selección de mesa de juego y nivel de dificultad. Una vez
-elegidos los parámetros deseados, hacer click en el botón
-\emph{Start} para comenzar a jugar.
+fullscreen, resolución de pantalla y activación del sonido. A
+continuación, seleccionar del menú inicial la opción \emph{New
+Game}. Luego aparecerá en pantalla el menú de selección de mesa de
+juego y nivel de dificultad. Una vez elegidos los parámetros
+deseados, hacer click en el botón \emph{Start} para comenzar a
+jugar.
 
 \section{Datos en pantalla}
-
 En la parte superior de la pantalla se mostrarán las vidas
 restantes, puntaje y mensajes de usuario. AGREGAR
 SCREENSHOT!!!!!!!!!!!!!
 
 \section{Controles}
-
 A continuación se detalla la funcionalidad de cada tecla y el
 momento del juego en el cual es válido el accionamiento de las
 mismas.
@@ -161,12 +160,13 @@ mismas.
 
 \subsection{Modo debug}
 Si se entra al juego en modo debug (\textbf{java -jar
-extremme-pinball.jar -debug}, se tendrá la posibilidad de utilizar
-teclas adicionales a las descriptas en la sección \ref{teclas_juego}
-durante el desarrollo de un juego.
+extremme-pinball.jar -debug} (ver si ese será el nombre del jar!!!),
+se tendrá la posibilidad de utilizar teclas adicionales a las
+descriptas en la sección \ref{teclas_juego} durante el desarrollo de
+un juego.
 
 \begin{itemize}
-    \item \textbf{P}: pausa la física del juego. Permite mover la cámara en
+    \item \textbf{P}: pausa de la física del juego. Permite mover la cámara en
     forma precisa para explorar los objetos de la escena.
     \item \textbf{F2}: muestra reporte de memoria.
     \item \textbf{F3}: activa/desactiva el debug de física (objetos físicos,
@@ -228,7 +228,7 @@ Cada 3 pasajes por rampa, que no pertenezcan a la finalizacion de
 una secuencia (misión), se activarán los imanes hasta que una bola
 se pierda.
 
-\subsection{Abuso de tilt} Si se realiza tilt (tecla \textbf{SPACE})5
+\subsection{Abuso de tilt} Si se realiza tilt (tecla \textbf{SPACE}) 5
 veces dentro de un intervalo de 5 segundos, se deshabilitan los
 flippers para que se pierdan todas las bolas que estaban en la mesa,
 sin que ninguna de ellas sume puntos. Por ende, se perderá una vida.
@@ -250,7 +250,7 @@ La fuerza aplicada por los imanes sobre las bolas es más intensa
 cuanto mayor sea el nivel de inclinación seleccionado, esto es para
 mantener una proporción en la fuerza de atracción que contrarreste
 los cambios en los efectos gravitatorios producidos al varias el
-ángulo(nivel de dificultad).
+ángulo (nivel de dificultad).
 
 Se ha permitido que la cámara traspase las paredes de la habitación
 y cualquier tipo de objeto con el que se tope con la finalidad de
@@ -258,7 +258,7 @@ brindar libertad en sus movimientos y de permitir explorar cualquier
 parte de la escena, incluso lugares físicamente inaccesibles.
 
 La intensidad y dirección de la fuerza aplicada por el \emph{tilt}
-el aleatoria e independiente de la fuerza aplicada en el \emph{tilt}
+es aleatoria e independiente de la fuerza aplicada en el \emph{tilt}
 anterior.
 
 
