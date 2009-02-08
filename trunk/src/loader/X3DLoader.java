@@ -64,7 +64,7 @@ public class X3DLoader extends Observable implements Observer
                 System.out.println("Error que no deberia pasar");
                 x3dURI = null;
             }
-            this.x3d = new FileInputStream( x3dURI.getPath() ); //TODO aca toque, agregue el replace
+            this.x3d = new FileInputStream( x3dURI.getPath() );
             this.x3dFileName = x3dFilename.getPath(); 
         }
         catch ( FileNotFoundException e )

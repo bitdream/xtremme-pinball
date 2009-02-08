@@ -5,8 +5,6 @@ import gamestates.MenuGameState;
 import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +47,7 @@ public class Main
 		/* Logueos severos desde el root logger */
 		Logger.getLogger("").setLevel(Level.SEVERE);
 
-		/* TODO Carga de bibliotecas nativas */
+		/* Carga de bibliotecas nativas */
 		//loadNativeLibraries();
 		
 		/* Preparo el sistema de sonido */
@@ -175,7 +173,7 @@ public class Main
 	
 	public static void shutdownGame()
 	{
-		/* Termino con el sistema de sonido TODO no anda? */
+		/* Termino con el sistema de sonido */
 		getAudioSystem().fadeOutAndClear(2);
 		
 //		if (AudioSystem.isCreated())
@@ -190,68 +188,68 @@ public class Main
 		return audio;
 	}
 	
-	// TODO Utilizar para cargar las bibliotecas nativas desde el codigo (en vez de desde Eclipse)
-	private static final void loadNativeLibraries()
-	{
-        String os = System.getProperty( "os.name" );
-        
-        if (os.matches( "Linux.*" ))
-            os = "linux";
-        else if (os.matches( "Mac.*" ))
-            os = "macosx";
-        else if (os.matches( "Windows.*"))
-            os = "win32";
-        else
-            throw new RuntimeException("Unsupported system");
-	    
-        try
-        {
-            String odeLibDir = "lib/ode/native/";
-            String lwjglLibDir = "lib/lwjgl/native/";
-            
-        	addDir(odeLibDir + os);
-        	addDir(lwjglLibDir + os );
-        	
-        } catch (IOException e)
-        {
-        	System.err.println("Unable to load dynamic libraries.");
-        	throw new RuntimeException(e);
-        }
-	}
-
-	private static void addDir(String s) throws IOException
-	{
-	    try
-	    {
-	    	Field field = ClassLoader.class.getDeclaredField("usr_paths");
-	    	
-	        field.setAccessible(true);
-	        
-	        String[] paths = (String[])field.get(null);
-	        
-	        for (int i = 0; i < paths.length; i++)
-	        {
-	        	if (s.equals(paths[i]))
-	        	{
-	        		return;
-	        	}
-	        }
-	        
-			String[] tmp = new String[paths.length+1];
-			
-			System.arraycopy(paths, 0, tmp, 0, paths.length);
-			tmp[paths.length] = s;
-			
-			field.set(null,tmp);
-			
-		} catch (IllegalAccessException e)
-		{
-			throw new IOException("Se produjo un fallo al obtener los permisos para definir el library path.");
-		} catch (NoSuchFieldException e)
-		{
-			throw new IOException("Se produjo un fallo al obtener el manejador del campo para definir el library path.");
-		}
-    }
+	// Utilizar para cargar las bibliotecas nativas desde el codigo (en vez de desde Eclipse)
+//	private static final void loadNativeLibraries()
+//	{
+//        String os = System.getProperty( "os.name" );
+//        
+//        if (os.matches( "Linux.*" ))
+//            os = "linux";
+//        else if (os.matches( "Mac.*" ))
+//            os = "macosx";
+//        else if (os.matches( "Windows.*"))
+//            os = "win32";
+//        else
+//            throw new RuntimeException("Unsupported system");
+//	    
+//        try
+//        {
+//            String odeLibDir = "lib/ode/native/";
+//            String lwjglLibDir = "lib/lwjgl/native/";
+//            
+//        	addDir(odeLibDir + os);
+//        	addDir(lwjglLibDir + os );
+//        	
+//        } catch (IOException e)
+//        {
+//        	System.err.println("Unable to load dynamic libraries.");
+//        	throw new RuntimeException(e);
+//        }
+//	}
+//
+//	private static void addDir(String s) throws IOException
+//	{
+//	    try
+//	    {
+//	    	Field field = ClassLoader.class.getDeclaredField("usr_paths");
+//	    	
+//	        field.setAccessible(true);
+//	        
+//	        String[] paths = (String[])field.get(null);
+//	        
+//	        for (int i = 0; i < paths.length; i++)
+//	        {
+//	        	if (s.equals(paths[i]))
+//	        	{
+//	        		return;
+//	        	}
+//	        }
+//	        
+//			String[] tmp = new String[paths.length+1];
+//			
+//			System.arraycopy(paths, 0, tmp, 0, paths.length);
+//			tmp[paths.length] = s;
+//			
+//			field.set(null,tmp);
+//			
+//		} catch (IllegalAccessException e)
+//		{
+//			throw new IOException("Se produjo un fallo al obtener los permisos para definir el library path.");
+//		} catch (NoSuchFieldException e)
+//		{
+//			throw new IOException("Se produjo un fallo al obtener el manejador del campo para definir el library path.");
+//		}
+//    }
 
 	public static float getMusicVolume()
 	{

@@ -41,7 +41,7 @@ public class Plunger extends Node
 	private Joint joint;
 	
 	/* Juego que lo contiene */
-	private PinballGameState pinball;
+//	private PinballGameState pinball;
 	
 	/* Pinball en el que esta */
 	private static PinballGameState pinballInstance;
@@ -94,7 +94,7 @@ public class Plunger extends Node
         plunger.setJoint(jointForPlunger);
         
         /* Guardo el juego en el componente */
-        plunger.setPinball(pinball);
+//        plunger.setPinball(pinball);
         
         /* Agrego el componente al pinball */
         pinball.setPlunger(plungerNode);
@@ -188,10 +188,10 @@ public class Plunger extends Node
 		this.joint = joint;
 	}
 
-	public void setPinball(PinballGameState pinball)
-	{
-		this.pinball = pinball;
-	}
+//	public void setPinball(PinballGameState pinball)
+//	{
+//		this.pinball = pinball;
+//	}
 	
 	public void update(float time)
 	{
