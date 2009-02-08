@@ -1,8 +1,9 @@
 package components;
 
+import gamestates.PinballGameState;
+
 import java.awt.Font;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
@@ -12,57 +13,74 @@ import com.jme.util.GameTaskQueueManager;
 import com.jmex.font3d.Font3D;
 import com.jmex.font3d.Text3D;
 
+
 public class LCDScreen extends Node
 {
     private static final long serialVersionUID = 1L;
     
-    private Geometry fondo;
+    private Geometry background;
     
-    private Text3D texto;
+    private Text3D text3d;
+    
+    private String currentText;
     
     
-    //proof of concept... al menos hay que apagar los logs
-    public LCDScreen(String name, Geometry geom)
+    public LCDScreen(PinballGameState pinball, String name, Geometry geom)
     {
         super(name);
         
-        this.fondo = geom;
+        background = geom;
 
-        this.attachChild( fondo );
+        /* Fijo el fondo */
+        attachChild(background);
         
-        try 
+        /* Lo fijo al pinball como la unica pantalla */
+        pinball.setLCDScreen(this);
+
+        /* Texto inicial nulo */
+        setText("", 20, ColorRGBA.black);
+    }
+    
+    public void setText(final String text, final int size, final ColorRGBA color)
+    {
+    	/* Fijo el texto actual */
+    	currentText = text;
+    	
+    	/* Le saco el texto anterior */
+    	detachChild(text3d);
+    	
+    	/* Creo la tarea de armar la fuente */
+        try
         {
             GameTaskQueueManager.getManager().update(new Callable<Void>() {
     
                 public Void call() throws Exception {
-                    // por motivos ratas la fuente la debe generar el thread de gl
+
+                    Font3D font = new Font3D(new Font("Helvetica", Font.PLAIN, size), 0.001f, true, true, true);
                     
-                    //esta linea tiene un tema importante en jme.... tiene un thread en el foro muy
-                    // reciente que dice que tiene problemas.. y lo veran en el syserr
-                    Font3D font = new Font3D(new Font("Arial", Font.PLAIN, 24), 0.001f, true, true, true);
+                    text3d = font.createText(text, size, 0);
                     
-                    
-                    texto = font.createText("Testing 1, 2, 3", 50.0f, 0);
                     return null;
                 }
             }).get();
         }
-        catch (ExecutionException e)
-        {
-        
-        }
-        catch (InterruptedException e)
-        {
-            
+        catch (Exception e)
+        {        
         }
         
-        texto.setLocalScale(new Vector3f(5.0f, 5.0f, 0.01f));
+        /* Lo aplasto en Z */
+        text3d.setLocalScale(new Vector3f(1.0f, 1.0f, 0.01f));
         
-        texto.setFontColor( ColorRGBA.red );
+        /* Le fijo el color */
+        text3d.setFontColor(color);
         
-        this.fondo.updateWorldVectors();
-        texto.setLocalTranslation( fondo.getWorldTranslation() );
-        this.attachChild( this.texto );
+        background.updateWorldVectors();
+        text3d.setLocalTranslation(background.getWorldTranslation());
+        attachChild(text3d);
     }
 
+	public String getCurrentText()
+	{
+		return currentText;
+	}
 }

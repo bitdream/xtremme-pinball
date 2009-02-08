@@ -1061,7 +1061,7 @@ private Node transformNode;
                    
                } else if (type.equals( "LCDScreen" )) {
                    System.out.println("screen");
-                   shape = new LCDScreen( "lcd_screen"+lcdCounter++, geom );
+                   shape = new LCDScreen( pinball, "lcd_screen"+lcdCounter++, geom );
                }
            }
            

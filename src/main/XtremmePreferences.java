@@ -58,6 +58,7 @@ public class XtremmePreferences extends JFrame implements GameSettings
         this.setPreferredSize(this.getSize());
         this.setResizable(false);
         this.setContentPane(getJPanel());
+        this.setLocationRelativeTo(null);
     }
 
 

@@ -22,9 +22,6 @@ public class Spinner extends Node
 	
 	private static float speedDecreasePercentageX = 0.995f, speedDecreasePercentageY = 0.995f;
 	
-	/* Tipos de spinner */
-	public enum SpinnerType {NORMAL_SPINNER, RAMP_EXIT_SPINNER, RAMP_ENTRANCE_SPINNER};
-	
 	/* Joint que lo fija a la mesa */
 	private Joint joint;
 	
@@ -45,7 +42,7 @@ public class Spinner extends Node
 	 * @param visualModel Modelo visual del molinete.
 	 * @return El nodo creado.
      */
-	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel/*, SpinnerType spinnerType*/)
+	public static DynamicPhysicsNode create(PinballGameState pinball, String name, Geometry visualModel)
 	{
 		DynamicPhysicsNode spinnerNode = pinball.getPhysicsSpace().createDynamicNode();
 		
@@ -120,7 +117,7 @@ public class Spinner extends Node
                     // Actualizo el tiempo de la ultima colision considerada
                 	spinner.setLastConsideredCollisionTime(now);
                 }
-                // Sino no hago nada pq es una colision repetida        
+                // Sino no hago nada porque es una colision repetida        
         		
            }
 
