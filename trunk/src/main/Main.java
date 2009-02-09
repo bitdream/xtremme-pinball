@@ -86,10 +86,10 @@ public class Main
 		return menuGS;
 	}
 	
-	public static LoadingGameState newLoading(PinballGameStateSettings settings, URL tableResource)
+	public static LoadingGameState newLoading(PinballGameStateSettings settings, URL tableResource, URL textureResouce)
 	{
 		/* Creo un nuevo loading screen */
-		loadingGS = new LoadingGameState(settings, tableResource);
+		loadingGS = new LoadingGameState(settings, tableResource, textureResouce);
 		
 		/* Lo agrego al GameStateManager */
 		GameStateManager.getInstance().attachChild(loadingGS);

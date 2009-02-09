@@ -3,10 +3,14 @@ package gamestates;
 import input.FengJMEInputHandler;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
@@ -80,7 +84,7 @@ public class MenuGameState extends BasicGameState
 	private ComboBox tableList;
 
 	/* Directorio donde se guardan los temas */
-	private static final String THEMES_DIRECTORY = "resources/models/themes/";
+	private static final String THEMES_LIST = "themeslist";
 	
 	/* Indica si esta en el menu principal o no */
 	private boolean inMainMenu;
@@ -370,7 +374,9 @@ public class MenuGameState extends BasicGameState
 				settings.setInclinationLevel(getInclinationLevel(slider.getValue()));
 				
 				/* Creo el gamestate de loading con la configuracion del pinball a crear y el recurso de su mesa */
-				LoadingGameState lgs = Main.newLoading(settings, (((Theme)tableList.getList().getSelectedItem().getUserData()).getResource()));
+				LoadingGameState lgs = Main.newLoading(settings, 
+				    (((Theme)tableList.getList().getSelectedItem().getUserData()).getResource()),
+				    (((Theme)tableList.getList().getSelectedItem().getUserData()).getTextureResource()));
 				lgs.setActive(true);
 			}
 		});
@@ -502,70 +508,112 @@ public class MenuGameState extends BasicGameState
 	
 	private void populateTableList(ComboBox list)
 	{
-		URI themesDirURI;
+		URI themeListURI;
+		List<String> themes;
 		
 	    try 
 	    {
-	        themesDirURI = MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY).toURI();
+	        themeListURI = MenuGameState.class.getClassLoader().getResource(THEMES_LIST).toURI();
 	    } catch ( URISyntaxException e )
 	    {
 	        System.out.println("Error que no deberia pasar");
-	        themesDirURI = null;
+	        themeListURI = null;
 	    }
 		
-	    File themesDir;
-		if ( themesDirURI.toString().startsWith( "jar" ))
-		{
-		    themesDir = null;
-		    System.out.println();
-		    System.out.println("****************************");
-		    System.out.println("bug conocido!!!!! no issuear");
-		    System.out.println("****************************");
-		    System.out.println();
-		}
-		else
-		{
-		    themesDir = new File(themesDirURI.getPath());
-		}
+	    File themesList = new File(themeListURI);
 		
-		/* Obtengo todos los archivos en el directorio de themes */
-		File[] files = themesDir.listFiles();
-		
-		/* Voy a buscar aquellos archivos que sean x3d */
-		String themeFilename;
-		Theme theme;
-		Pattern x3dFiles = Pattern.compile(".*\\.x3d", Pattern.CASE_INSENSITIVE);
+	    try
+	    {
+	        themes = parseThemes( themesList );
+	    }
+	    catch (IOException e)
+	    {
+	        System.err.println("Invalid themes list");
+	        e.printStackTrace();
+	        return;
+	    }
+	    
+	    for ( String themeName : themes )
+        {
+	        URI tablesURI;
+	        
+	        String basePath = themeName+"/models/";
+	        
+	        try 
+	        {
+	            tablesURI = MenuGameState.class.getClassLoader().getResource(basePath).toURI();
+	        } catch ( URISyntaxException e )
+	        {
+	            System.err.println("Malformed theme name");
+	            e.printStackTrace();
+	            return;
+	        }
+	        
+	        File tablesDir = new File(tablesURI);
+	        
+	        /* Obtengo todos los archivos en el directorio de themes */
+	        File[] files = tablesDir.listFiles();
+	        
+	        /* Voy a buscar aquellos archivos que sean x3d */
+	        String tableFilename;
+	        Theme theme;
+	        Pattern x3dFiles = Pattern.compile(".*\\.x3d", Pattern.CASE_INSENSITIVE);
 
-		for (int i = 0; i < files.length; i++)
-		{
-			/* Obtengo el nombre de archivo del theme */
-			themeFilename = files[i].getName();
-		
-			/* Si corresponde a un archivo x3d lo incorporo al menu */
-			if (x3dFiles.matcher(themeFilename).find())
-			{
-				/* Creo el theme obteniendo su nombre del nombre de archivo y formando su recurso */
-				theme = new Theme(themeFilename.substring(0, themeFilename.length() - 4),
-						MenuGameState.class.getClassLoader().getResource(THEMES_DIRECTORY + themeFilename));
-				
-				/* Lo agrego a la lista */
-				Item item = new Item(theme.getName(), new LabelAppearance(new Label(theme.getName())));
-				item.setData(theme);
-				list.addItem(item);
-			}
-		}
+	        for (int i = 0; i < files.length; i++)
+	        {
+	            /* Obtengo el nombre de archivo del theme */
+	            tableFilename = files[i].getName();
+	        
+	            /* Si corresponde a un archivo x3d lo incorporo al menu */
+	            if (x3dFiles.matcher(tableFilename).find())
+	            {
+	                /* Creo el theme obteniendo su nombre del nombre de archivo y formando su recurso */
+	                theme = new Theme(tableFilename.substring(0, tableFilename.length() - 4),
+	                        MenuGameState.class.getClassLoader().getResource(basePath + tableFilename),
+	                        MenuGameState.class.getClassLoader().getResource(themeName + "/textures/"));
+	                
+	                /* Lo agrego a la lista */
+	                Item item = new Item(theme.getName(), new LabelAppearance(new Label(theme.getName())));
+	                item.setData(theme);
+	                list.addItem(item);
+	            }
+	        }
+        }
+	    
 	}
+	
+    private static List<String> parseThemes( File themesList ) throws IOException
+    {
+        List<String> ret = new ArrayList<String>();
+        
+        LineNumberReader lnr = new LineNumberReader(new FileReader(themesList));
+        
+        String line;
+        while ((line = lnr.readLine()) != null)
+        {
+            if (!line.startsWith( "#" ))
+                ret.add( line );
+        }
+        
+        
+        System.out.println(ret);
+        return ret;
+    }
 	
 	private class Theme
 	{
 		private String name;
 		
-		private URL resource;
+		private URL resource, textureResource;
 		
-		public Theme(String name, URL resource)
+		public Theme(String name, URL resource, URL texureResource)
 		{
 			this.name = name;
 			this.resource = resource;
+			this.textureResource = texureResource;
+			System.out.println(name);
+			System.out.println(resource);
+			System.out.println(texureResource);
 		}
 
 		public String getName()
@@ -576,6 +624,11 @@ public class MenuGameState extends BasicGameState
 		public URL getResource()
 		{
 			return resource;
+		}
+		
+		public URL getTextureResource()
+		{
+		    return textureResource;
 		}
 	}
 }
