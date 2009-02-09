@@ -93,7 +93,7 @@
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialLogo" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="theme-logo.jpg"/>
+ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="logo.jpg"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_Logo" 
