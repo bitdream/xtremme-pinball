@@ -129,7 +129,7 @@ ambientIntensity="0.167" shininess="0.338" transparency="0.0" /><ImageTexture ur
 </Transform>
 </Collision>
 
-<!--<PointLight DEF="Luz2" ambientIntensity="0.4" color="1.0 1.0 1.0" intensity="0.80" radius="100.0" location="1.439 20.904 6.537" />-->
+<PointLight DEF="Luz2" ambientIntensity="0.4" color="1.0 1.0 1.0" intensity="0.80" radius="100.0" location="1.439 20.904 6.537" />
 
 
 </Scene>
