@@ -279,7 +279,10 @@ el bumper, a fin de hacerlo saltar. Los imanes, cuando están
 activos, ejercen una fuerza atractora sobre todas las bolas de la
 mesa que se encuentren dentro de su radio de acción. Esta fuerza es
 suficiente para desviar la trayectoria de las bolas, pero no para
-retenerlas.
+retenerlas. En las implementaciones realizadas, los imanes están
+ubicados debajo de la mesa (no son obstáculos visibles) en zonas
+elegidas con la finalidad de atraer las bolas hacia una via de
+escape lateral.
 
 Un aspecto importante en el diseño de los componentes es la elección
 del material con el que están hechos, ya que esto repercute
@@ -369,8 +372,8 @@ fueron solucionados experimentando por prueba y error.
 La dll de ODE provista por JME, contenía asserts de debug, lo cual
 causaba que durante el juego surgieran excepciones runtime con la
 información de debug. Para solucionar este problema, se tuvo que
-recompilar la dll sin los asserts problemáticos. Con todo lo que 
-ello acarrea para poder realizar los binds con las funciones de java. 
+recompilar la dll sin los asserts problemáticos. Con todo lo que
+ello acarrea para poder realizar los binds con las funciones de java.
 
 
 AGREGAR ALGUNO SI SE LES OCURRE!!!
