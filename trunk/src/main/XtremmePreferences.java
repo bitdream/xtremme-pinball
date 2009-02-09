@@ -1,51 +1,97 @@
 package main;
 
 import java.awt.Dimension;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.jme.system.GameSettings;
+import com.jme.system.PropertiesGameSettings;
 
 //XXX NOTA GIGANTE: ojo al editar, que esto fue autogenerado por el visual editor
-public class XtremmePreferences extends JFrame implements GameSettings
+public class XtremmePreferences extends JFrame
 {
+    
+    static final int[][] RESOLUTIONS = {
+        {640, 480},
+        {800, 600},
+        {1024, 768},
+        {1280, 1024},
+        {1440, 900},
+        {1600, 1024},
+        {1600, 1200},
+        {1920, 1200}
+    };
+    
+    static final int[] DEPTHS = { 16, 24, 32 };
+    
+    static final int[] FREQUENCIES = new int[] { 60, 70, 72, 75, 85, 100, 120, 140 };
+    
     private static final long serialVersionUID = 1L;
-    private int width = 800;
-    private int height = 600;
-    private boolean fullScreen = false;
-    private boolean sound = true;
+    
+    private PropertiesGameSettings preferences;
     private JPanel jPanel = null;
     private JButton okButton = null;
     private JButton cancelButton = null;
-    private JCheckBox soundCheckBox = null;
     private JCheckBox fullScreenCheckBox = null;
     private JComboBox sizeCombo = null;
-    private JLabel title = null;
+    private JComboBox freqCombo = null;
+    private JComboBox depthCombo = null;
+    private JLabel sizeLabel = null;
+    private JLabel frequencyLabel = null;
+    private JLabel depthLabel = null;
+    private JLabel titleLabel = null;
+    private JButton restoreButton = null;
+    private JImagePanel imagePanel = null;
 
+    private static void setDefaults( PropertiesGameSettings preferences )
+    {
+        preferences.setDepth( 24 );
+        preferences.setFrequency( 60 );
+        preferences.setWidth( 800 );
+        preferences.setHeight( 600 );
+        preferences.setFullscreen( false );
+    }
+    
     /**
      * This method initializes 
      * 
      */
     public XtremmePreferences() {
     	super();
+        preferences = new PropertiesGameSettings("xtremme-pinball.properties", null);
+        if (!preferences.load())
+        {
+            setDefaults( preferences );
+        } 
+    	
     	initialize();
         this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     	this.pack();
     	this.setVisible( true );
+
     }
 
+    public GameSettings getSettings()
+    {
+        return this.preferences;
+    }
+    
     /**
      * This method initializes this
      * 
@@ -54,7 +100,7 @@ public class XtremmePreferences extends JFrame implements GameSettings
         this.setLayout(null);
         this.setName("Preferences");
         this.setTitle("Preferences");
-        this.setSize(new Dimension(250, 260));
+        this.setSize(new Dimension(465, 360));
         this.setPreferredSize(this.getSize());
         this.setResizable(false);
         this.setContentPane(getJPanel());
@@ -72,19 +118,35 @@ public class XtremmePreferences extends JFrame implements GameSettings
     {
         if ( jPanel == null )
         {
-            title = new JLabel();
-            title.setBounds(new Rectangle(20, 13, 204, 34));
-            title.setText("Screen Size");
+            titleLabel = new JLabel();
+            titleLabel.setBounds(new Rectangle(20, 110, 205, 20));
+            titleLabel.setText("Choose your display preferences");
+            sizeLabel = new JLabel();
+            sizeLabel.setBounds(new Rectangle(20, 140, 205, 20));
+            sizeLabel.setText("Screen Size");
+            frequencyLabel = new JLabel();
+            frequencyLabel.setBounds(new Rectangle(240, 140, 205, 20));
+            frequencyLabel.setText("Frequency");
+            depthLabel = new JLabel();
+            depthLabel.setBounds(new Rectangle(240, 200, 205, 20));
+            depthLabel.setText("Depth");
+            
             jPanel = new JPanel();
             jPanel.setLayout(null);
-            jPanel.setBounds(new Rectangle(0, 0, 245, 220));
+            jPanel.setBounds(new Rectangle(0, 100, 465, 260));
+            
             jPanel.add(getOkButton(), null);
-
 			jPanel.add(getCancelButton(), null);
-			jPanel.add(getSoundCheckBox(), null);
 			jPanel.add(getFullScreenCheckBox(), null);
 			jPanel.add(getSizeCombo(), null);
-			jPanel.add(title, null);
+			jPanel.add(getFrequencyCombo(), null);
+			jPanel.add(getDepthCombo(), null);
+			jPanel.add(sizeLabel, null);
+			jPanel.add(frequencyLabel, null);
+			jPanel.add(depthLabel, null);
+			jPanel.add(titleLabel, null);
+			jPanel.add(getRestoreButton(), null);
+			jPanel.add(getImagePanel(), null);
         }
         return jPanel;
     }
@@ -99,12 +161,21 @@ public class XtremmePreferences extends JFrame implements GameSettings
         if ( okButton == null )
         {
             okButton = new JButton();
-            okButton.setBounds(new Rectangle(15, 180, 100, 40));
+            okButton.setBounds(new Rectangle(15, 280, 100, 40));
             okButton.setText("OK");
             okButton.addActionListener( new java.awt.event.ActionListener()
             {
                 public void actionPerformed( java.awt.event.ActionEvent e )
                 {
+                    try
+                    {
+                        preferences.save();
+                    }
+                    catch( IOException ioe )
+                    {
+                        System.err.println("Could not save preferences");
+                        ioe.printStackTrace();
+                    }
                     dispose();
                 }
             } );
@@ -122,7 +193,7 @@ public class XtremmePreferences extends JFrame implements GameSettings
         if ( cancelButton == null )
         {
             cancelButton = new JButton();
-            cancelButton.setBounds(new Rectangle(130, 180, 100, 40));
+            cancelButton.setBounds(new Rectangle(340, 280, 100, 40));
             cancelButton.setText("Cancel");
             cancelButton.addActionListener( new java.awt.event.ActionListener()
             {
@@ -136,32 +207,6 @@ public class XtremmePreferences extends JFrame implements GameSettings
     }
 
     /**
-     * This method initializes soundCheckBox	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getSoundCheckBox()
-    {
-        if ( soundCheckBox == null )
-        {
-            soundCheckBox = new JCheckBox();
-            soundCheckBox.setBounds(new Rectangle(20, 140, 205, 20));
-            soundCheckBox.setSelected(true);
-            soundCheckBox.setText("Enable Sound");
-            soundCheckBox.addChangeListener( new ChangeListener() {
-
-                
-                public void stateChanged( ChangeEvent e )
-                {
-                    sound = !sound;
-                }
-                
-            });
-        }
-        return soundCheckBox;
-    }
-
-    /**
      * This method initializes fullScreenCheckBox	
      * 	
      * @return javax.swing.JCheckBox	
@@ -171,14 +216,15 @@ public class XtremmePreferences extends JFrame implements GameSettings
         if ( fullScreenCheckBox == null )
         {
             fullScreenCheckBox = new JCheckBox();
-            fullScreenCheckBox.setBounds(new Rectangle(20, 100, 205, 20));
+            fullScreenCheckBox.setBounds(new Rectangle(20, 220, 205, 20));
+            fullScreenCheckBox.setSelected( preferences.isFullscreen() );
             fullScreenCheckBox.setText("Fullscreen");
             fullScreenCheckBox.addChangeListener( new ChangeListener() {
 
                 
                 public void stateChanged( ChangeEvent e )
                 {
-                    fullScreen = !fullScreen;
+                    preferences.setFullscreen( !preferences.isFullscreen() );
                 }
                 
             });
@@ -196,24 +242,89 @@ public class XtremmePreferences extends JFrame implements GameSettings
         if ( sizeCombo == null )
         {
             sizeCombo = new JComboBox();
-            sizeCombo.setBounds(new Rectangle(20, 60, 205, 20));
-            sizeCombo.addItem( new ScreenSize(640,480) );
-            sizeCombo.addItem( new ScreenSize(800,600) );
-            sizeCombo.addItem( new ScreenSize(1024,768) );
-            sizeCombo.setSelectedIndex(1);
+            sizeCombo.setBounds(new Rectangle(20, 160, 205, 20));
+            
+            for ( int[] size : RESOLUTIONS )
+            {
+                sizeCombo.addItem( new ScreenSize(size[0],size[1]) );
+            }
+
+            sizeCombo.setSelectedItem( new ScreenSize(preferences.getWidth(),preferences.getHeight()) );
             sizeCombo.addItemListener( new ItemListener() {
 
                 
                 public void itemStateChanged( ItemEvent e )
                 {
                     ScreenSize ss = (ScreenSize)e.getItem();
-                    width = ss.w;
-                    height = ss.h;
+                    preferences.setWidth(ss.w);
+                    preferences.setHeight(ss.h);
                 }
                 
             });
         }
         return sizeCombo;
+    }
+    
+    /**
+     * This method initializes frequencyCombo    
+     *  
+     * @return javax.swing.JComboBox    
+     */
+    private JComboBox getFrequencyCombo()
+    {
+        if ( freqCombo == null )
+        {
+            freqCombo = new JComboBox();
+            freqCombo.setBounds(new Rectangle(240, 160, 205, 20));
+            
+            for ( int freq : FREQUENCIES )
+            {
+                freqCombo.addItem( freq );
+            }
+
+            freqCombo.setSelectedItem( preferences.getFrequency() );
+            freqCombo.addItemListener( new ItemListener() {
+
+                
+                public void itemStateChanged( ItemEvent e )
+                {
+                    preferences.setFrequency( (Integer)e.getItem() );
+                }
+                
+            });
+        }
+        return freqCombo;
+    }
+    
+    /**
+     * This method initializes depthCombo    
+     *  
+     * @return javax.swing.JComboBox    
+     */
+    private JComboBox getDepthCombo()
+    {
+        if ( depthCombo == null )
+        {
+            depthCombo = new JComboBox();
+            depthCombo.setBounds(new Rectangle(240, 220, 205, 20));
+            
+            for ( int depth : DEPTHS )
+            {
+                depthCombo.addItem( depth );
+            }
+
+            depthCombo.setSelectedItem( preferences.getDepth() );
+            depthCombo.addItemListener( new ItemListener() {
+
+                
+                public void itemStateChanged( ItemEvent e )
+                {
+                   preferences.setDepth( (Integer)e.getItem() );
+                }
+                
+            });
+        }
+        return depthCombo;
     }
 
     private final class ScreenSize
@@ -231,6 +342,36 @@ public class XtremmePreferences extends JFrame implements GameSettings
         {
             return new String( w + "x" + h );
         }
+
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode()
+        {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + h;
+            result = prime * result + w;
+            return result;
+        }
+
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals( Object obj )
+        {
+            if ( this == obj ) return true;
+            if ( obj == null ) return false;
+            if ( !( obj instanceof ScreenSize ) ) return false;
+            final ScreenSize other = (ScreenSize) obj;
+            if ( h != other.h ) return false;
+            if ( w != other.w ) return false;
+            return true;
+        }
     }
     
     public void dispose() {
@@ -242,292 +383,33 @@ public class XtremmePreferences extends JFrame implements GameSettings
         
     }
     
-    
-    public void clear() throws IOException
-    {
-        // DO NOTHING
-    }
 
-    
-    public String get( String name, String defaultValue )
+    /**
+     * This method initializes restoreButton	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getRestoreButton()
     {
-        return null;
-    }
-
-    
-    public int getAlphaBits()
-    {
-        return DEFAULT_ALPHA_BITS;
-    }
-
-    
-    public boolean getBoolean( String name, boolean defaultValue )
-    {
-        return false;
-    }
-
-    
-    public byte[] getByteArray( String name, byte[] bytes )
-    {
-        return null;
-    }
-
-    
-    public String getDefaultSettingsWidgetImage()
-    {
-        return null;
-    }
-
-    
-    public int getDepth()
-    {
-        return DEFAULT_DEPTH;
-    }
-
-    
-    public int getDepthBits()
-    {
-        return DEFAULT_DEPTH_BITS;
-    }
-
-    
-    public double getDouble( String name, double defaultValue )
-    {
-        return 0;
-    }
-
-    
-    public float getFloat( String name, float defaultValue )
-    {
-        return 0;
-    }
-
-    
-    public int getFramerate()
-    {
-        return DEFAULT_FRAMERATE;
-    }
-
-    
-    public int getFrequency()
-    {
-        return DEFAULT_FREQUENCY;
-    }
-
-    @Override
-    public int getHeight()
-    {
-        return this.height;
-    }
-
-    
-    public int getInt( String name, int defaultValue )
-    {
-        return 0;
-    }
-
-    
-    public long getLong( String name, long defaultValue )
-    {
-        return 0;
-    }
-
-    
-    public Object getObject( String name, Object obj )
-    {
-        return null;
-    }
-
-    
-    public String getRenderer()
-    {
-        return DEFAULT_RENDERER;
-    }
-
-    
-    public int getSamples()
-    {
-        return DEFAULT_SAMPLES;
-    }
-
-    
-    public int getStencilBits()
-    {
-        return DEFAULT_STENCIL_BITS;
-    }
-
-    @Override
-    public int getWidth()
-    {
-        return this.width;
-    }
-
-    
-    public boolean isFullscreen()
-    {
-        return this.fullScreen;
-    }
-
-    
-    public boolean isMusic()
-    {
-        return this.sound;
-    }
-
-    
-    public boolean isNew()
-    {
-        return false;
-    }
-
-    
-    public boolean isSFX()
-    {
-        return this.sound;
-    }
-
-    
-    public boolean isVerticalSync()
-    {
-        return DEFAULT_VERTICAL_SYNC;
-    }
-
-    
-    public void save() throws IOException
-    {
-        // DO NOTHING
-    }
-
-    
-    public void set( String name, String value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setAlphaBits( int alphaBits )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setBoolean( String name, boolean value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setByteArray( String name, byte[] bytes )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setDepth( int depth )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setDepthBits( int depthBits )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setDouble( String name, double value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setFloat( String name, float value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setFramerate( int framerate )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setFrequency( int frequency )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setFullscreen( boolean fullscreen )
-    {
-        this.fullScreen = fullscreen;
-    }
-
-    
-    public void setHeight( int height )
-    {
-        this.height = height;
-    }
-
-    
-    public void setInt( String name, int value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setLong( String name, long value )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setMusic( boolean musicEnabled )
-    {
-        this.sound = musicEnabled;
-    }
-
-    
-    public void setObject( String name, Object obj )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setRenderer( String renderer )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setSFX( boolean sfxEnabled )
-    {
-        this.sound = sfxEnabled;
-    }
-
-    
-    public void setSamples( int samples )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setStencilBits( int stencilBits )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setVerticalSync( boolean vsync )
-    {
-        // DO NOTHING
-    }
-
-    
-    public void setWidth( int width )
-    {
-        this.width = width;
+        if ( restoreButton == null )
+        {
+            restoreButton = new JButton();
+            restoreButton.setBounds(new Rectangle(177, 280, 100, 40));
+            restoreButton.setText("Restore");
+            restoreButton.addActionListener( new java.awt.event.ActionListener()
+            {
+                public void actionPerformed( java.awt.event.ActionEvent e )
+                {
+                    if (!preferences.load())
+                        setDefaults( preferences );
+                    sizeCombo.setSelectedItem( new ScreenSize(preferences.getWidth(),preferences.getHeight() ));
+                    depthCombo.setSelectedItem( preferences.getDepth() );
+                    freqCombo.setSelectedItem( preferences.getFrequency());
+                    fullScreenCheckBox.setSelected( preferences.isFullscreen() );
+                }
+            } );
+        }
+        return restoreButton;
     }
     
 //  return new PreferencesGameSettings( userPrefsRoot.node( gameName ), false, "game-defaults.properties" );
@@ -548,4 +430,63 @@ public class XtremmePreferences extends JFrame implements GameSettings
     return pgs;
     */
     
+    private JImagePanel getImagePanel()
+    {
+        if (imagePanel == null)
+        {
+            imagePanel = new JImagePanel();
+            imagePanel.setLayout(null);
+            imagePanel.setBounds(new Rectangle(0,0, 465, 100));
+            try
+            {
+                imagePanel.openImage( "resources/textures/preferences-logo.jpg" );
+            }
+            catch (IOException e)
+            {
+                System.err.println("error");
+            }
+        }
+        
+        return imagePanel;
+    }
+    
+    private class JImagePanel extends JPanel 
+    {
+        private static final long serialVersionUID = 1L;
+        private BufferedImage image;
+        private String imageFileName;
+        
+        public JImagePanel() 
+        {
+            super();
+        }
+        
+        public void openImage( String imageFileName ) throws IOException
+        {
+            this.imageFileName = imageFileName;
+
+            File input;
+            try
+            {
+                input = new File(XtremmePreferences.class.getClassLoader().getResource(imageFileName).toURI());
+            }
+            catch (URISyntaxException e) {
+                throw new IOException();
+            }
+            
+            image = ImageIO.read(input);
+        }
+
+        public String getImageFileName()
+        {
+            return this.imageFileName;
+        }
+        
+        public void paint(Graphics g) 
+        {
+            g.drawImage( image, 0, 0, null);
+        }
+      
+    }
+   
 }  //  @jve:decl-index=0:visual-constraint="15,15"
