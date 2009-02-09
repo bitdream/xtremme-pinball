@@ -26,6 +26,8 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	/* Recurso de la mesa */
 	private URL tableResource;
 	
+	private URL tableTextureResource;
+	
 	/* El cargador */
 	private LoadWorker loadWorker;
 	
@@ -33,9 +35,10 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	private InputHandler input;
 
 	
-	public LoadingGameState(PinballGameStateSettings settings, URL tableResource)
+	public LoadingGameState(PinballGameStateSettings settings, URL tableResource, URL tableTextureResources)
 	{
 		this.tableResource = tableResource;
+		this.tableTextureResource = tableTextureResources;
 		
 		/* Inicializo la musica */
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("resources/sounds/loading/music.wav"), false);
@@ -187,15 +190,24 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 		public void run()
 		{
 			/* Creo los threads que crean la habitacion, la maquina y la mesa requerida */
-            roomLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ), pinballGS, 0);
+		    
+            /* sorry por el numero magico id... deberia ser un array y el id estatico en el loader 
+             * pero no deberia cambiar mucho este codigo */
+            roomLoader = new LoaderThread(
+                LoadingGameState.class.getClassLoader().getResource( "resources/models/Room.x3d" ),
+                pinballGS, 0, null);
+            
             roomLoader.addObserver( this );
             Thread roomThread = new Thread(roomLoader, "roomLoadThread");
+
+            machineLoader = new LoaderThread(
+                LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), 
+                pinballGS, 1, tableTextureResource);
             
-            machineLoader = new LoaderThread(LoadingGameState.class.getClassLoader().getResource( "resources/models/Machine.x3d" ), pinballGS, 1);
             machineLoader.addObserver( this );
             Thread machineThread = new Thread(machineLoader, "machineLoadThread");
             
-            tableLoader = new LoaderThread( tableResource, pinballGS, 2 );
+            tableLoader = new LoaderThread( tableResource, pinballGS, 2, tableTextureResource );
             tableLoader.addObserver( this );
             Thread tableThread = new Thread(tableLoader, "tableLoadThread");
             

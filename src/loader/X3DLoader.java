@@ -120,6 +120,7 @@ public class X3DLoader extends Observable implements Observer
         if ( this.textureDirURL != null )
         {
             converter.setProperty( "textures", textureDirURL );
+System.out.println(textureDirURL);
         }
         else
         {
@@ -308,27 +309,28 @@ public class X3DLoader extends Observable implements Observer
         }
         catch ( ClassNotFoundException e )
         {
-            System.out.println( "Can't find class " + className );
+            System.err.println( "Can't find class " + className );
         }
         catch ( InstantiationException e )
         {
-            System.out.println( "Class " + className + " is not concrete" );
+            System.err.println( "Class " + className + " is not concrete" );
         }
         catch ( IllegalAccessException e )
         {
-            System.out.println( "Class " + className + " needs a public constructor" );
+            System.err.println( "Class " + className + " needs a public constructor" );
         }
         catch ( ClassCastException e )
         {
-            System.out.println( "Class " + className + " doesn't implement expected interface" );
+            System.err.println( "Class " + className + " doesn't implement expected interface" );
         }
         catch (NoSuchMethodException e)
         {
-            System.out.println( "Class " + className + " needs a public constructor with paramater pinball" );
+            System.err.println( "Class " + className + " needs a public constructor with paramater pinball" );
         }
         catch (InvocationTargetException e)
         {
-            System.out.println( "Class " + className + " no idea" );
+            System.err.println( "Class " + className + " throws exception" );
+            e.printStackTrace();
         }
         return null;
     }

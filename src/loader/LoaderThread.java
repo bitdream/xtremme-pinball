@@ -19,6 +19,8 @@ public class LoaderThread extends Observable implements Runnable, Observer
     
     private URL resource;
     
+    private URL textureDir;
+    
     private PinballGameState pinballGS;
     
     private X3DLoader loader;
@@ -27,11 +29,12 @@ public class LoaderThread extends Observable implements Runnable, Observer
     
     private int id;
     
-    public LoaderThread(URL resource, PinballGameState pinballGS, int id)
+    public LoaderThread(URL resource, PinballGameState pinballGS, int id, URL textureDir)
     {
         this.resource = resource;
         this.pinballGS = pinballGS;
         this.id = id;
+        this.textureDir = textureDir;
     }
     
     public int getID()
@@ -50,6 +53,9 @@ public class LoaderThread extends Observable implements Runnable, Observer
             
             /* Le fijo su pinball */
             loader.setPinball(pinballGS);
+            
+            /* Le fijo su directorio de texturas */
+            loader.setTextureDir( textureDir );
 
             /* Le fijo su lightState */
             loader.setLightState(pinballGS.getLightState());
