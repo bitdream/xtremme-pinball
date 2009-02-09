@@ -48,14 +48,14 @@ public class EvilThemeGameLogic extends GameLogic
 	private boolean magnetsActive = false;
 	
 	// Sonidos
-	private AudioTrack rampUpSound, lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, /*magnetOffSound,*/ music;
+	private AudioTrack /*rampUpSound, */lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, /*magnetOffSound,*/ music;
 	
 	public EvilThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
 		// Preparo las pistas de audio que voy a usar 
-		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/ramp-up.wav"), false);
+//		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/ramp-up.wav"), false);
 		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/lost-ball.wav"), false);
 		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/lost-last-ball.wav"), false);
 		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/start.wav"), false);
