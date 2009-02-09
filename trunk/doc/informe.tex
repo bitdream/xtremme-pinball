@@ -14,8 +14,7 @@
 \pagestyle{fancy} \headheight 13.6pt
 
 
-\lhead{Sistemas de Información} \chead{} \rhead{ITBA}
-\cfoot{\thepage}
+\lhead{Computación Gráfica} \chead{} \rhead{ITBA} \cfoot{\thepage}
 \renewcommand{\footrulewidth}{0.4pt}
 \newcommand{\expon}[1]{~10^{#1}}
 \newcommand{\dif}[1]{\mathrm{d}#1}
@@ -133,10 +132,9 @@ Además de ocuparse del rendering de la escena y de su representación
 en memoria mediante un grafo, JME permite la utilización de
 texturas, ilumunación y sonidos entre otras cosas.
 
-La versión de JME utilizada es la 2.0, la rasterización es realizada
-mediante \emph{OpenGL} (la librería utilizada es \emph{lwjgl}), el
-sistema de ilumunación usado por \emph{JME} es el de \emph{Phong}
-?????????? y para el audio se utilizó la librería \emph{OpenAL}.
+La versión de JME utilizada es la 2.0, la rasterización y shading
+son realizados mediante \emph{OpenGL} (la librería utilizada es
+\emph{lwjgl}), y para el audio se utilizó la librería \emph{OpenAL}.
 
 Para más información ver \cite{JME}
 
@@ -189,11 +187,11 @@ A continuación se hace una breve reseña sobre las fases en las que
 se puede dividir la implementación y algunos puntos del diseño
 utilizado para llevar adelante el desarrollo.
 
-Para poder tener una visión más profunda sobre la implementación, el
-diseño y los problemas enfrentados en cada etapa, ver
-\cite{GoogleCode}, donde además de poder encontrar el código fuente
-del proyecto, hay una breve descripción del mismo y un issue tracker
-con las tareas que lo conforman.
+%Para poder tener una visión más profunda sobre la implementación, el
+%diseño y los problemas enfrentados en cada etapa, ver
+%\cite{GoogleCode}, donde además de poder encontrar el código fuente
+%del proyecto, hay una breve descripción del mismo y un issue tracker
+%con las tareas que lo conforman.
 
 La implementación puede dividirse en diversas etapas, donde cada una
 de ellas cubre aspectos diferentes en lo que respecta al desarrollo
@@ -208,15 +206,40 @@ tercero, cuyo nombre depende del theme que se quiera utilizar (cuya
 elección se hace desde el menú de juego nuevo), contiene información
 sobre la mesa de juego con todos los componentes que la conforman.
 
-hablar aca de la ubicacion de las luces????
-
 Como la composición de la escena viene dada en formato X3D, y JME
 utiliza un grafo para llevar a cabo la descripción de la misma, es
 necesario efectuar una conversión entre ambos formatos. La clase
-encargada de realizar la traducción es \emph{X3dToJme} y la misma
-realiza lo siguiente..... MARIANO.... (BREVE descripcion de como se
-lleva a cabo la conversion y generacion de nodos del grafo (quien es
-hijo de quien o lo que quieras)).
+encargada de realizar la traducción es \emph{X3dToJme} y la misma se
+encarga de crear un DOM con el xml y recorrer cada uno de los nodos
+del árbol para convertirlos en nodos de \emph{JME}. Todas las
+figuras complejas son interpretadas como mallas de triángulos para
+poder rasterizarlas con \emph{OpenGL}. En el archivo \emph{X3D} se
+encuentra la \emph{metadata}, o información que no pertenece al
+formato \emph{X3D}, y que describe el comportamiento de cada uno de
+los elementos de la mesa. Así, cada mesa puede tener la cantidad de
+flippers que desee, y cada flipper puede tener su propia
+\emph{metadata}. Con este diseño se busca aumentar la extensibilidad
+y flexibilidad del modelo. Todos los elementos de la mesa pueden
+tener \emph{metadata}, por ejemplo, se puede configurar que un
+bumper sea fijo o que salte al contacto con la bola cambiando su
+propiedad de "jumper". Por simplicidad, los elementos que no tienen
+\emph{metadata} son considerados obstáculos y son entes
+completamente estáticos. El archivo \emph{X3D} además tiene la
+información del theme de la mesa a utilizar. Con este esquema, se
+permite el desacople de la lógica del juego, del modelo y del motor
+del mismo. Un mismo archivo \emph{X3D} se puede utilizar con
+distintas lógicas cambiando una línea del mismo y una misma lógica
+puede tener varios modelos asociados.
+
+En el X3D, la mesa se encuentra en un ángulo de 0 grados y la
+rotación se efectúa al momento de la carga. Para reducir el tiempo
+de carga, la misma se paraleliza porque el acceso, análisis y
+cálculo de normales de tres archivos con grandes cantidades de datos
+numéricos es una operación costosa en tiempo.
+
+
+
+hablar aca de la ubicacion de las luces???? -> Mariano?
 
 
 \subsection{Gamestates}
@@ -240,10 +263,10 @@ arriba de los flippers), sensores y obstáculos fijos.
 Los componentes Bumper, Flipper y Magnet, implementan la interfaz
 ActivableComponet, mediante ello, los mismos pueden ser activados y
 desactivados por la lógica del juego según sea necesario. Por
-ejemplo, en el theme \emph{cars}, los imanes se activan únicamente
-cuando el usuario logró cierta cantidad de rebotes contra bumpers
-sin perder vidas o cuando realizó un cierto número de pasajes por la
-rampa.
+ejemplo, en el theme \emph{Just Race!}, los imanes se activan
+únicamente cuando el usuario logró cierta cantidad de rebotes contra
+bumpers sin perder vidas o cuando realizó un cierto número de
+pasajes por la rampa.
 
 Cada una de las clases que los implementan determinan el
 comportamiento de los mismos. Por ejemplo, los bumpers saltarines,
@@ -286,9 +309,10 @@ mesa seleccionada o bonificaciones especiales (por ejemplo dar bolas
 extra o bonus en puntaje o vidas), basta con generar una clase que
 extienda a \emph{GameLogic} y le agregue el comportamiento
 necesario. En la implementación presentada, por ejemplo, el theme
-\emph{cars}, a través de la clase \emph{CarsThemeGameLogic}, agrega
-sonidos relacionados con autos para cada evento posible y overridea
-los mensajes default para simular una carrera de automóviles.
+\emph{Just Race!}, a través de la clase \emph{CarsThemeGameLogic},
+agrega sonidos relacionados con autos para cada evento posible y
+overridea los mensajes default para simular una carrera de
+automóviles.
 
 La idea es que mediante el agregado de un archivo X3D (que describa
 la mesa a agregar) y un archivo .class que contenga el binario de
@@ -309,19 +333,27 @@ misma y generando un movimiento de la cámara que de la sensación de
 que la mesa se está moviendo.
 
 
+\subsection{Aplicación de texturtas}
 PENDIENTE:  Aplicacion de texturas desde donde??????? Poner
 screenshot del antes y despues de aplicacion de texturas!!! En la
 figura \ref{no_texturas} se observa un screenshot del juego cuando
-aún no se le habían aplicado texturas y colores. Lo único que se
-había hecho era marcar con diversos colores las zonas de ubicación
-de cada uno de los componentes de la mesa.
+aún no se le habían aplicado texturas y colores. Mientras que en la
+figura \ref{si_texturas} se expone el resultado obtenido luego de la
+aplicación de texturas y colores a la mesa y sus componentes.
 
 \begin{figure}
 \begin{center}
-\includegraphics[angle=0,scale=0.4]{images/sin_texturas.eps}
-\caption{\emph{HUD de Xtremme Pinball}} \label{no_texturas}
+\includegraphics[angle=0,scale=0.4]{images/sin_texturas2.eps}
+\caption{\emph{Con texturas}} \label{no_texturas}
 \end{center}
 \end{figure}
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[angle=0,scale=0.4]{images/con_texturas.eps}
+%\caption{\emph{Sin texturas aplicadas}} \label{si_texturas}
+%\end{center}
+%\end{figure}
 
 
 
@@ -349,7 +381,7 @@ AGREGAR ALGUNO SI SE LES OCURRE!!!
 %a las necesidades del juego a desarrollar. Para ello son necesarios
 %conocimientos sobre las características de los diversos métodos de
 %ilumuinación, rasterización, etc para poder elegir cuál utilizar en
-%cada caso. CAMBIAR ESTA BOSTA!!!
+%cada caso.
 
 \section{Posibles extensiones}
 Como posible extensión se puede mencionar la de implementar una
@@ -359,11 +391,19 @@ tiempo. Otra extensión posible es el diseño de más mesas de juego
 que se agreguen a las que el usuario pueda elegir en el menú
 inicial.
 
+Por último, debido a la gran complejidad del lenguaje de
+programación de shades de \emph{OpenGL} (\emph{glsl}) se decidió
+omitir la creación de shaders particulares para acortar los tiempos
+de desarrollo. Por lo tanto, para la iluminación se utilizó el
+shader default de \emph{OpenGL}. Como una posible extensión para
+mejorar el aspecto visual del juego se podrían implementar los
+shaders correspondientes.
+
 \begin{thebibliography}{99}
 \bibitem{JME} \url{http://www.jmonkeyengine.com/}
 \bibitem{JME_Physics} \url{https://jmephysics.dev.java.net/}
 \bibitem{Feng} \url{https://fenggui.dev.java.net/}
-\bibitem{GoogleCode} \url{http://code.google.com/p/xtremme-pinball/}
+%\bibitem{GoogleCode} \url{http://code.google.com/p/xtremme-pinball/}
 \end{thebibliography}
 
 \newpage
