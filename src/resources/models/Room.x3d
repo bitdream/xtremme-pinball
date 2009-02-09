@@ -40,7 +40,7 @@
 </Transform>
 </Collision>
 
-<SpotLight DEF="Luz1" radius="50.571" ambientIntensity="0.4" intensity="0.400" color="1.0 1.0 1.0" beamWidth="0.166" cutOffAngle="0.216" direction="-0.0 -0.99 0.138" location="1.511 16.247 40.484" />
+<SpotLight DEF="Luz1" radius="50.571" ambientIntensity="0.5" intensity="0.400" color="1.0 1.0 0.8" beamWidth="0.166" cutOffAngle="0.216" direction="-0.0 -0.99 0.138" location="1.511 16.247 40.484" />
 
 <Collision enabled="false">
 <Transform DEF="Techo" translation="1.280302 24.083630 7.234467" scale="33.683258 33.683258 6.736651" rotation="-0.000000 -0.707107 0.707107 3.141593">
@@ -61,8 +61,8 @@
 <Transform DEF="ParedEste" translation="34.963562 7.242003 7.234467" scale="33.683258 16.841629 6.736651" rotation="-0.707107 -0.000000 0.707107 3.141593">
 <Shape>
 <Appearance>
-<Material DEF="MA_MaterialPared" diffuseColor="0.91 0.871 0.737" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-	ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+<Material DEF="MA_MaterialPared" diffuseColor="0.7 0.276 0.254" specularColor="0.201 0.201 0.201" emissiveColor="0.0 0.0 0.0" 
+	ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="wall.jpg" /> <TextureTransform scale="6 6"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_ParedEste" 
@@ -76,7 +76,7 @@
 <Transform DEF="ParedOeste" translation="-32.402954 7.242003 7.234467" scale="33.683258 16.841629 6.736651" rotation="0.707107 -0.000000 0.707107 3.141593">
 <Shape>
 <Appearance>
-<Material USE="MA_MaterialPared" />
+<Material USE="MA_MaterialPared" /><ImageTexture url="wall.jpg" /> <TextureTransform scale="6 6"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_ParedOeste" 
@@ -90,7 +90,7 @@
 <Transform DEF="ParedNorte" translation="1.280302 7.242002 -26.448792" scale="33.683258 16.841629 6.736651" rotation="-1.000000 0.000000 0.000000 0.000000">
 <Shape>
 <Appearance>
-<Material USE="MA_MaterialPared" />
+<Material USE="MA_MaterialPared" /><ImageTexture url="wall.jpg" /> <TextureTransform scale="6 6"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_ParedNorte" 
@@ -104,7 +104,7 @@
 <Transform DEF="ParedSur" translation="1.280302 7.242004 40.917736" scale="33.683258 16.841629 6.736651" rotation="1.000000 0.000000 0.000000 3.141593">
 <Shape>
 <Appearance>
-<Material USE="MA_MaterialPared" />
+<Material USE="MA_MaterialPared" /><ImageTexture url="wall.jpg" /> <TextureTransform scale="6 6"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_ParedSur" 
@@ -129,7 +129,7 @@ ambientIntensity="0.167" shininess="0.338" transparency="0.0" /><ImageTexture ur
 </Transform>
 </Collision>
 
-<PointLight DEF="Luz2" ambientIntensity="0.4" color="1.0 1.0 1.0" intensity="0.80" radius="100.0" location="1.439 20.904 6.537" />
+<PointLight DEF="Luz2" ambientIntensity="0.4" color="1.0 1.0 1.0" intensity="0.90" radius="80.0" location="1.439 20.904 6.537" />
 
 
 </Scene>
