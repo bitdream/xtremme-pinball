@@ -93,7 +93,7 @@
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialLogo" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="theme-logo.jpg"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_Logo" 
@@ -109,7 +109,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 <MetadataString name="type" value="LCDScreen" />
 <Appearance>
 <Material DEF="MA_MaterialPantalla" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
+ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="ledpanel.jpg"/>
 </Appearance>
 <IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 <Coordinate DEF="coord_display" 
@@ -196,7 +196,7 @@ ambientIntensity="0.167" shininess="0.098" transparency="0.0" />
 <Shape>
 <Appearance>
 <Material DEF="MA_MaterialVidrio" diffuseColor="1.0 1.0 1.0" specularColor="0.567 0.567 0.567" emissiveColor="0.0 0.0 0.0" 
-ambientIntensity="0.167" shininess="0.998" transparency="0.689" />
+ambientIntensity="0.167" shininess="0.998" transparency="0.850" />
 </Appearance>
 <IndexedFaceSet solid="true" creaseAngle="0.524" coordIndex="0 3 2 1 -1, 0 7 4 3 -1, 3 4 5 2 -1, 2 5 6 1 -1, 7 0 1 6 -1, 5 4 7 6 -1, ">
 <Coordinate DEF="coord_Vidrio" 
