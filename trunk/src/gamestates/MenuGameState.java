@@ -542,7 +542,12 @@ public class MenuGameState extends BasicGameState
 	        try 
 	        {
 	            tablesURI = MenuGameState.class.getClassLoader().getResource(basePath).toURI();
-	        } catch ( URISyntaxException e )
+	        }
+	        catch ( NullPointerException npe )
+	        {
+	            continue;
+	        }
+	        catch ( URISyntaxException e )
 	        {
 	            System.err.println("Malformed theme name");
 	            e.printStackTrace();
@@ -595,8 +600,6 @@ public class MenuGameState extends BasicGameState
                 ret.add( line );
         }
         
-        
-        System.out.println(ret);
         return ret;
     }
 	
@@ -611,9 +614,6 @@ public class MenuGameState extends BasicGameState
 			this.name = name;
 			this.resource = resource;
 			this.textureResource = texureResource;
-			System.out.println(name);
-			System.out.println(resource);
-			System.out.println(texureResource);
 		}
 
 		public String getName()

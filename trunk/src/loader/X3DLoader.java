@@ -3,14 +3,11 @@ package loader;
 import gamelogic.GameLogic;
 import gamestates.PinballGameState;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -53,24 +50,14 @@ public class X3DLoader extends Observable implements Observer
 
     public X3DLoader( URL x3dFilename ) throws FileNotFoundException
     {
-        try
+        try 
         {
-            URI x3dURI;
-            try 
-            {
-                x3dURI = x3dFilename.toURI();
-            } catch ( URISyntaxException e )
-            {
-                System.out.println("Error que no deberia pasar");
-                x3dURI = null;
-            }
-            this.x3d = new FileInputStream( x3dURI.getPath() );
-            this.x3dFileName = x3dFilename.getPath(); 
+            this.x3d = x3dFilename.openStream();
         }
-        catch ( FileNotFoundException e )
+        catch (IOException e )
         {
             logger.severe( "file: " + x3dFilename + " does not exist" );
-            throw e;
+            throw new FileNotFoundException(e.getMessage());
         }
     }
 
@@ -120,7 +107,6 @@ public class X3DLoader extends Observable implements Observer
         if ( this.textureDirURL != null )
         {
             converter.setProperty( "textures", textureDirURL );
-System.out.println(textureDirURL);
         }
         else
         {
