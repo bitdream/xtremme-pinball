@@ -439,7 +439,7 @@ public class XtremmePreferences extends JFrame
             imagePanel.setBounds(new Rectangle(0,0, 465, 112));
             try
             {
-                imagePanel.openImage( "resources/textures/preferences-logo2.jpg" );
+                imagePanel.openImage( "resources/textures/preferences-logo.jpg" );
             }
             catch (IOException e)
             {

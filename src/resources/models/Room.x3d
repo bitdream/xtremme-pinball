@@ -11,7 +11,7 @@
 <Background groundColor="0.057 0.221 0.4" skyColor="0.057 0.221 0.4" />
 
 <Collision enabled="false">
-	<Transform DEF="Marco" translation="-32.180367 12.425900 3.601142" scale="17.839344 4.773404 4.773404" rotation="-0.000000 1.000000 0.000000 1.570796">
+	<Transform DEF="Marco" translation="-32.180367 12.425900 3.601142" scale="5.946448 1.59113467 1.59113467" rotation="-0.000000 1.000000 0.000000 1.570796">
 	<Shape>
 		<Appearance>
 			<Material DEF="MA_MaterialMadera" diffuseColor="0.639 0.517 0.316" specularColor="0.119 0.119 0.119" emissiveColor="0.0 0.0 0.0" 
@@ -26,11 +26,11 @@
 </Collision>
 
 <Collision enabled="false">
-<Transform DEF="CuadroITBA" translation="-32.180367 12.425900 3.601142" scale="17.839344 4.773404 4.773404" rotation="0.000000 1.000000 0.000000 1.570796">
+<Transform DEF="CuadroITBA" translation="-32.180367 12.425900 3.601142" scale="5.946448 1.59113467 1.59113467" rotation="0.000000 1.000000 0.000000 1.570796">
 <Shape>
 	<Appearance>
 		<Material DEF="MA_MaterialCuadro" diffuseColor="0.8 0.8 0.8" specularColor="0.401 0.401 0.401" emissiveColor="0.0 0.0 0.0" 
-			ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="Logo_ITBA.jpeg" />		
+			ambientIntensity="0.167" shininess="0.098" transparency="0.0" /><ImageTexture url="ITBAlogo.jpg" />		
 	</Appearance>
 	<IndexedFaceSet solid="true" coordIndex="0 3 2 1 -1, ">
 		<Coordinate DEF="coord_CuadroITBA" 
