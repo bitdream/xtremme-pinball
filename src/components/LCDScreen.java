@@ -7,8 +7,11 @@ import java.util.concurrent.Callable;
 
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.Renderer;
 import com.jme.scene.Geometry;
 import com.jme.scene.Node;
+import com.jme.scene.state.RenderState;
+import com.jme.system.DisplaySystem;
 import com.jme.util.GameTaskQueueManager;
 import com.jmex.font3d.Font3D;
 import com.jmex.font3d.Text3D;
@@ -99,5 +102,16 @@ public class LCDScreen extends Node
 	public String getCurrentText()
 	{
 		return currentText;
+	}
+	
+	public void draw(Renderer r)
+	{
+	    RenderState rs = this.setRenderState( DisplaySystem.getDisplaySystem().getRenderer()
+            .createTextureState() );
+	    this.updateRenderState();
+	    this.text3d.onDraw( r );
+	    this.setRenderState( rs );
+	    this.updateRenderState();
+	    this.background.onDraw( r );
 	}
 }
