@@ -33,8 +33,8 @@
 <Transform DEF="CubreSalida" translation="-0.154087 1.462147 1.059600" scale="5.905298 0.929609 0.207531" rotation="-1.000000 0.000000 0.000000 1.570796">
 <Shape>
 	<Appearance>
-		<Material DEF="MA_MaterialCaja" diffuseColor="0.32 0.32 0.32" specularColor="0.213 0.213 0.213" emissiveColor="0.0 0.0 0.0" 
-			ambientIntensity="0.167" shininess="0.469" transparency="0.0" />		
+		<Material DEF="MA_MaterialCaja" diffuseColor="0.0 0.0 0.0" specularColor="0.10 0.10 0.10" emissiveColor="0.0 0.0 0.0" 
+			ambientIntensity="0.167" shininess="0.469" transparency="0.0" />
 	</Appearance>
 	<IndexedFaceSet solid="true" coordIndex="0 1 2 3 -1, 4 7 6 5 -1, 0 4 5 1 -1, 1 5 6 2 -1, 2 6 7 3 -1, 4 0 3 7 -1, ">
 		<Coordinate DEF="coord_CubreSalida" 
