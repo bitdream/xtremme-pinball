@@ -31,6 +31,7 @@ public class XtremmePreferences extends JFrame
         {800, 600},
         {1024, 768},
         {1280, 1024},
+        {1280, 800},
         {1440, 900},
         {1600, 1024},
         {1600, 1200},
