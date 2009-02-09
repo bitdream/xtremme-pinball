@@ -83,20 +83,13 @@ public class EvilThemeGameLogic extends GameLogic
 	@Override
 	public void bumperCollision(Bumper bumper)
 	{
+		boolean seqCompleteDetected = false;
 		super.bumperCollision(bumper);
 		
 		// Si el bumper esta activo, se hace la suma de puntos y de colisiones contra bumpers
 		// El abuso de tilt lo desactiva asi que no se realizara la sumatoria de puntos
 		if (bumper.isActive())
 		{
-			// Actualizo el score global y el hecho con esta bola (en esta mano)
-			score += BUMPER_SCORE;
-			thisBallScore += BUMPER_SCORE;
-			
-			// Se actualiza los datos de pantalla de usuario
-			showScore();
-			bumperCollisionCnt ++;
-			
 			// Ver si forma parte de la secuencia spinner+ -> bumper saltarin+ -> bumper estatico			
 			if (bumper.getBumperType().equals(BumperType.JUMPER))
 			{
@@ -106,16 +99,17 @@ public class EvilThemeGameLogic extends GameLogic
 					completeSeqCnt = 2;
 					
 					// Mensaje al usuario diciendo el proximo paso a seguir
-					showMessage("Poner algo!"); //TODO
+					showMessage("Anda a el bosque para huir de los ALFAJORES!"); //TODO
 				}
 				// Sino valia cero y debe seguir asi
-
 			}
 			else // Es un bumper estatico
 			{
 				// Ver si completo la secuencia
 				if (completeSeqCnt == 2)
 				{
+					seqCompleteDetected = true;
+					
 					// Otorgar el bonus por secuencia completa
 					score += COMPLETE_SEQ_SCORE;
 					thisBallScore += COMPLETE_SEQ_SCORE;
@@ -126,7 +120,28 @@ public class EvilThemeGameLogic extends GameLogic
 					// Sonido de checkpoint
 					sequenceCompletedSound.play();
 				}
+				else if (completeSeqCnt == 1)
+				{
+					// Reiniciar la secuencia
+					completeSeqCnt = 0;
+					
+					// Mensaje al usuario diciendo que perdio la secuencia
+					showMessage("Te perdiste en el bosque maldito!"); //TODO
+				}
+				// Sino es cero y debe seguir asi
+
 			}
+			
+			// Actualizo el score global y el hecho con esta bola (en esta mano) si es que ya no lo hice al detectar secuencia completa
+			if (!seqCompleteDetected)
+			{
+				score += BUMPER_SCORE;
+				thisBallScore += BUMPER_SCORE;
+			}
+			
+			// Se actualiza los datos de pantalla de usuario
+			showScore();
+			bumperCollisionCnt ++;
 			
 			// Cada ACTIVE_MAGNETS_BUMPERS rebotes sin perder vidas, contra bumpers de cualquier tipo, activar los imanes hasta que una bola se pierda
 			if ( bumperCollisionCnt == ACTIVE_MAGNETS_BUMPERS && !magnetsActive)
@@ -201,67 +216,67 @@ public class EvilThemeGameLogic extends GameLogic
 		}		
 	}
 	
-	public void sensorRampCollision()
-	{
-		// No sumar si hay abuso de tilt
-		if (!tiltAbused)
-		{			
-			// Ver si forma parte de la secuencia bumper saltarin+ -> spinner+ -> rampa
-			if (completeSeqCnt == 2)
-			{
-				// Otorgar el bonus por secuencia completa
-				score += COMPLETE_SEQ_SCORE;
-				thisBallScore += COMPLETE_SEQ_SCORE;
-				
-				// Mensaje al usuario avisando del bonus obtenido
-				showMessage("Checkpoint!!!");
-				
-				// Sonido de checkpoint
-				sequenceCompletedSound.play();
-			}
-			else
-			{
-				// Sonido de este theme para el pasaje por rampa
-				rampUpSound.play();
-				
-				// Solo sumar los puntos de pasaje por rampa
-				score += RAMP_SCORE;
-				thisBallScore += RAMP_SCORE;
-				
-				// Solo incrementado si no termina la secuencia con este pasaje por rampa
-				rampCnt++;
-				
-				if(completeSeqCnt == 1)
-				{
-					// No obedecio la secuencia, cartel indicador
-					showMessage("Next time obey your team. Seqn. aborted!");
-				}
-			}
-			// Reinicio la secuencia siempre
-			completeSeqCnt = 0;  
-			
-			// Cada ACTIVE_MAGNETS_RAMP pasajes por rampa que no pertenezcan a la finalizacion de una secuencia, activar los imanes hasta que una bola se pierda
-			if ( rampCnt == ACTIVE_MAGNETS_RAMP && !magnetsActive)
-			{
-				// Activar los magnets 
-				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-				{
-					((Magnet)magnet.getChild(0)).setActive(true);
-				}
-				magnetsActive = true;
-				
-				// Mensaje y sonido al usuario
-				showActiveMagnetsMessage();
-				playActiveMagnetsSound();
-				
-				// Reinicio el contador
-				rampCnt = 0;
-			}
-			
-			// Se actualizan los datos de pantalla de usuario
-			showScore();
-		}
-	}
+//	public void sensorRampCollision()
+//	{
+//		// No sumar si hay abuso de tilt
+//		if (!tiltAbused)
+//		{			
+//			// Ver si forma parte de la secuencia bumper saltarin+ -> spinner+ -> rampa
+//			if (completeSeqCnt == 2)
+//			{
+//				// Otorgar el bonus por secuencia completa
+//				score += COMPLETE_SEQ_SCORE;
+//				thisBallScore += COMPLETE_SEQ_SCORE;
+//				
+//				// Mensaje al usuario avisando del bonus obtenido
+//				showMessage("Checkpoint!!!");
+//				
+//				// Sonido de checkpoint
+//				sequenceCompletedSound.play();
+//			}
+//			else
+//			{
+//				// Sonido de este theme para el pasaje por rampa
+//				rampUpSound.play();
+//				
+//				// Solo sumar los puntos de pasaje por rampa
+//				score += RAMP_SCORE;
+//				thisBallScore += RAMP_SCORE;
+//				
+//				// Solo incrementado si no termina la secuencia con este pasaje por rampa
+//				rampCnt++;
+//				
+//				if(completeSeqCnt == 1)
+//				{
+//					// No obedecio la secuencia, cartel indicador
+//					showMessage("Next time obey your team. Seqn. aborted!");
+//				}
+//			}
+//			// Reinicio la secuencia siempre
+//			completeSeqCnt = 0;  
+//			
+//			// Cada ACTIVE_MAGNETS_RAMP pasajes por rampa que no pertenezcan a la finalizacion de una secuencia, activar los imanes hasta que una bola se pierda
+//			if ( rampCnt == ACTIVE_MAGNETS_RAMP && !magnetsActive)
+//			{
+//				// Activar los magnets 
+//				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
+//				{
+//					((Magnet)magnet.getChild(0)).setActive(true);
+//				}
+//				magnetsActive = true;
+//				
+//				// Mensaje y sonido al usuario
+//				showActiveMagnetsMessage();
+//				playActiveMagnetsSound();
+//				
+//				// Reinicio el contador
+//				rampCnt = 0;
+//			}
+//			
+//			// Se actualizan los datos de pantalla de usuario
+//			showScore();
+//		}
+//	}
 
 	@Override
 	public void tilt()
@@ -302,20 +317,18 @@ public class EvilThemeGameLogic extends GameLogic
 				
 		// Muestro el mensaje de este theme
 		if (getInTableBallQty() == 1)
-		{
-			
-			
+		{			
 			// Si con esta bola no sumo ningun punto, regalarle una vida (como si nunca la hubiera perdido)
 			if (thisBallScore == 0)
 			{
 				// Para que no le reste la vida
 				lifes ++;
 				
-				showMessage("Poor performance, try again...");
+				showMessage("Poor performance, try again..."); //TODO
 			}
 			else
 			{
-				showMessage("Pit stop, lost ball!");
+				showMessage("Pit stop, lost ball!"); //TODO
 			}
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
@@ -323,7 +336,7 @@ public class EvilThemeGameLogic extends GameLogic
 		}
 		else
 		{
-			showMessage("Accident in front of you, slow down!");
+			showMessage("Accident in front of you, slow down!"); //TODO se fue una bola que no me hizo perder vida
 		}	
 		
 		if (magnetsActive)
@@ -394,7 +407,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showExtraBallMessage()
 	{
-		showMessage("Best lap, extra ball!");
+		showMessage("Best lap, extra ball!"); //TODO
 	}
 	
 	private void playExtraLifeSound()
@@ -404,7 +417,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showExtraLifeMessage()
 	{
-		showMessage("Lap record, extra fuel!");
+		showMessage("Lap record, extra fuel!");//TODO
 	}
 	
 	private void playActiveMagnetsSound()
@@ -414,12 +427,12 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("Slippery road ahead!");
+		showMessage("Slippery road ahead!");//TODO ruido a pantano??
 	}
 	
 	private void showDisabledMagnetsMessage()
 	{
-		showMessage("You escaped from the slippery road.");
+		showMessage("You escaped from the slippery road.");//TODO
 	}
 	
 	// Llamado al perder una vida
@@ -459,7 +472,7 @@ public class EvilThemeGameLogic extends GameLogic
 		super.gameStart();
 		
 		// Mensaje y sonido de nuevo juego
-		showMessage("Gentlemen, start your engines!");		
+		showMessage("Run for your life!");
 		gameStartSound.play();
 		
 		// Desactivar los magnets si es que alguno estaba activo 

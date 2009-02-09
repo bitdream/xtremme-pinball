@@ -1,7 +1,6 @@
 package cars;
 
 import main.Main;
-
 import com.jme.math.Vector3f;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
@@ -33,7 +32,7 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int ACTIVE_MAGNETS_BUMPERS = 40;
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
-	private static final int EXTRA_LIFE_STEP = 1000 /*500*/; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = 750 /*500*/; //TODO ajustar valores para la entrega
 	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
 	
 	// Contadores
