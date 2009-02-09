@@ -119,7 +119,7 @@ public class XtremmePreferences extends JFrame
         if ( jPanel == null )
         {
             titleLabel = new JLabel();
-            titleLabel.setBounds(new Rectangle(20, 110, 205, 20));
+            titleLabel.setBounds(new Rectangle(20, 117, 205, 20));
             titleLabel.setText("Choose your display preferences");
             sizeLabel = new JLabel();
             sizeLabel.setBounds(new Rectangle(20, 140, 205, 20));
@@ -436,10 +436,10 @@ public class XtremmePreferences extends JFrame
         {
             imagePanel = new JImagePanel();
             imagePanel.setLayout(null);
-            imagePanel.setBounds(new Rectangle(0,0, 465, 100));
+            imagePanel.setBounds(new Rectangle(0,0, 465, 112));
             try
             {
-                imagePanel.openImage( "resources/textures/preferences-logo.jpg" );
+                imagePanel.openImage( "resources/textures/preferences-logo2.jpg" );
             }
             catch (IOException e)
             {
