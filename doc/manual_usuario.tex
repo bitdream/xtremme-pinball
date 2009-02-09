@@ -112,19 +112,52 @@ Para comenzar un nuevo juego, luego de ingresar al programa
 (doble click en \textbf{xtremme-pinball.bat} para plataforma Windows
  doble click en \textbf{xtremme-pinball.sh} para plataforma Linux),
 seleccionar del menú de ajustes los parámetros deseados para
-fullscreen, resolución de pantalla y activación del sonido. A
-continuación, seleccionar del menú inicial la opción \emph{New
-Game}. Luego aparecerá en pantalla el menú de selección de mesa de
-juego y nivel de dificultad. El nivel de dificultad determina el ángulo
-en que está inclinada la mesa. A mayor nivel, mayor inclinación.
-El menor ángulo posible es 1 grado y el mayor 10 grados.
-Una vez elegidos los parámetros deseados, hacer click en el 
-botón \emph{Start} para comenzar a jugar.
+fullscreen, resolución de pantalla y activación del sonido (VER SI
+QUEDA EN LOS SETTINGS!!!). A continuación, seleccionar del menú
+inicial la opción \emph{New Game}(ver figura \ref{menu_principal}).
+Luego aparecerá en pantalla el menú de selección de mesa de juego y
+nivel de dificultad (ver figura \ref{menu_nuevo_juego}). El nivel de
+dificultad determina el ángulo en que está inclinada la mesa. A
+mayor nivel, mayor inclinación. El menor ángulo posible es 1 grado y
+el mayor 10 grados. Una vez elegidos los parámetros deseados, hacer
+click en el botón \emph{Start} para comenzar a jugar.
 
 \section{Datos en pantalla}
-En la parte superior de la pantalla se mostrarán las vidas
-restantes, puntaje y mensajes de usuario. AGREGAR
-SCREENSHOT!!!!!!!!!!!!!
+En la parte superior de la pantalla se muestran las vidas restantes,
+puntaje y un historial de 3 mensajes de usuario. Dichos mensajes
+contienen información útil para el usuario, ya que, entre otras
+cosas, van guiando paso a paso la forma de realizar misiones o
+secuencias cuyo cumplimiento otorga bonus al jugador. El mensaje
+inferior, que tiene mayor tamaño de fuente, es el más reciente,
+mientras que el superior (el más pequeño) es el mensaje más antigüo
+de los 3 mostrados. Los datos mencionados pueden verse en la figura
+\ref{fig_hud}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[angle=0,scale=0.3]{images/menu_principal.eps}
+\caption{\emph{Menú principal}} \label{menu_principal}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[angle=0,scale=0.3]{images/menu_nuevo_juego.eps}
+\caption{\emph{Menú de nuevo juego}} \label{menu_nuevo_juego}
+\end{center}
+\end{figure}
+
+Cabe aclarar que el nombre dado a las vidas y a los puntos obtenidos
+puede variar según el theme o mesa elegida para jugar. Por ejemplo,
+si se elige el theme \emph{cars}, a las vidas o bolas restantes se
+le llama \emph{fuel} y a los puntos obtenidos \emph{distance}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[angle=0,scale=0.4]{images/HUD.eps}
+\caption{\emph{HUD de Xtremme Pinball}} \label{fig_hud}
+\end{center}
+\end{figure}
 
 \section{Controles}
 A continuación se detalla la funcionalidad de cada tecla y el
@@ -146,7 +179,7 @@ mismas.
     \item \textbf{INTRO}: Saque con el plunger (fuerza proporcional
     a la contracción).
     \item \textbf{SPACE}: tilt (mover la mesa).
-    \item \textbf{HOME, 1}: ubica la cámara en la posición original
+    \item \textbf{HOME, 1}: ubican la cámara en la posición original
     (visual de toda la mesa).
     \item \textbf{2, 3, 4, 5}: cambia a cámaras ubicadas en diferentes
     posiciones.
@@ -162,11 +195,11 @@ mismas.
 
 
 \subsection{Modo debug}
-Si se entra al juego en modo debug (ejecutar en la consola 
-\textbf{xtremme-pinball.bat debug} o \textbf{xtremme-pinball.sh debug} 
-según su plataforma), se tendrá la posibilidad de utilizar teclas 
-adicionales a las descriptas en la sección \ref{teclas_juego} durante el 
-desarrollo de un juego.
+Si se entra al juego en modo debug (ejecutar en la consola
+\textbf{xtremme-pinball.bat debug} o \textbf{xtremme-pinball.sh
+debug} según la plataforma utilizada plataforma), se tendrá la
+posibilidad de utilizar teclas adicionales a las descriptas en la
+sección \ref{teclas_juego} durante el desarrollo de un juego.
 
 \begin{itemize}
     \item \textbf{P}: pausa de la física del juego. Permite mover la cámara en
@@ -210,9 +243,9 @@ cada una.
 
 \subsection{Misiones}
 Si en el theme de \emph{cars} (VER SI QUEDA ESTO!!!!!!!!) se
-completa la secuencia bumpers superiores (una o mas veces) ->
-spinners (una vez o mas veces) -> rampa (una vez) se obtiene un
-bonus de 300 puntos.
+completa la secuencia bumpers superiores (una o mas veces)
+$\rightarrow$ spinners (una vez o mas veces) $\rightarrow$ rampa
+(una vez) se obtiene un bonus de 300 puntos.
 
 \section{Bonificaciones}
 Cada vez que se sumen 500 puntos, se obtendrá una bola extra (saldrá
@@ -264,9 +297,6 @@ parte de la escena, incluso lugares físicamente inaccesibles.
 La intensidad y dirección de la fuerza aplicada por el \emph{tilt}
 es aleatoria e independiente de la fuerza aplicada en el \emph{tilt}
 anterior.
-
-
-agregar snapshots donde corresponda!!!!!!!!!!!!!
 
 \newpage
 
