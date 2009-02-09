@@ -13,7 +13,9 @@ import com.jme.input.KeyInput;
 import com.jme.input.MouseInput;
 import com.jme.input.action.InputAction;
 import com.jme.input.action.InputActionEvent;
+import com.jme.system.DisplaySystem;
 import com.jme.util.GameTaskQueueManager;
+import com.jme.util.TextureManager;
 import com.jmex.audio.AudioTrack;
 import com.jmex.audio.AudioTrack.TrackType;
 
@@ -182,6 +184,9 @@ public class LoadingGameState extends com.jmex.game.state.load.LoadingGameState
 	    
 	    public void endWork() 
 	    {
+	    	/* Precargo texturas */
+	    	TextureManager.preloadCache( DisplaySystem.getDisplaySystem().getRenderer() );
+	    	
             /* Ya se cargo la escena en el pinball creado. Ahora lo inicio. */
             pinballGS.initGame();
             pinballGS.setActive(true);
