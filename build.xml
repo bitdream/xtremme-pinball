@@ -47,7 +47,9 @@
     	<delete file="build/pinball.jar"/>
     </target>
     <target depends="clean" name="cleanall"/>
-    <target depends="build-project" name="build">
+	<target depends="build-jar,build-themes" name="build"/>
+    
+	<target depends="build-project" name="build-jar">
 		<mkdir dir="build"/>
 		<jar destfile="build/pinball.jar" basedir="bin">
 			<manifest>
@@ -62,6 +64,14 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="xtremme-pinball.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-jar" name="build-themes">
+        <echo message="${ant.project.name}: themes"/>
+        <javac debug="true" debuglevel="${debuglevel}" source="${source}" target="${target}">
+            <src path="themes"/>
+            <classpath refid="xtremme-pinball.classpath"/>
+        	<classpath location="build/pinball.jar"/>
         </javac>
     </target>
 </project>

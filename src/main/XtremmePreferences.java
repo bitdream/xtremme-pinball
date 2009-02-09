@@ -6,9 +6,8 @@ import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -465,14 +464,7 @@ public class XtremmePreferences extends JFrame
         {
             this.imageFileName = imageFileName;
 
-            File input;
-            try
-            {
-                input = new File(XtremmePreferences.class.getClassLoader().getResource(imageFileName).toURI());
-            }
-            catch (URISyntaxException e) {
-                throw new IOException();
-            }
+            InputStream input = this.getClass().getClassLoader().getResource(imageFileName).openStream();
             
             image = ImageIO.read(input);
         }
