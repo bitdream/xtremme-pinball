@@ -144,7 +144,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	
 	/* Coeficientes de las rectas que estiman los porcentajes de escalado para las distintas resoluciones */
 	private static final float SLT_SCALE_COEF_A = 0.0010119f, SLT_SCALE_COEF_B = 0.222857f;
-	private static final float SL_SCALE_COEF_A = 0.0010119f, SL_SCALE_COEF_B = 0.65f;
+	private static final float SL_SCALE_COEF_A = 0.0010119f, SL_SCALE_COEF_B = 0.55f;
 	private static final float TT_SCALE_COEF_A = 0.0002976f, TT_SCALE_COEF_B = 0.5714f;
 	private static final float MT_SCALE_COEF_A = 0.000595238f, MT_SCALE_COEF_B = 0.542857f;
 	private static final float BT_SCALE_COEF_A = 0.00238095f, BT_SCALE_COEF_B = 0.17143f;
@@ -342,10 +342,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
         CullState cs = display.getRenderer().createCullState();
         cs.setCullFace(CullState.Face.Back);
         rootNode.setRenderState(cs);
-
-		/* Armo la habitacion, la mesa y la bola */
-//        addBall(this.ballStartUp); -> hecho desde la logica (metodo startGame())
-//        ballStartUp.rotate( pinballSettings.getInclinationQuaternion() );
         
         // Inicializo las vidas
         lifes = gameLogic.getLifes();
@@ -407,27 +403,27 @@ public class PinballGameState extends PhysicsEnhancedGameState
         messageTextTop = Text.createDefaultTextLabel("messageText", "");
         messageTextTop.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextTop.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextTop.setLocalScale(topTextScale);
         messageTextTop.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextTop.getWidth() * 0.5f, display.getHeight() - topTextPosition * hudTopBar.getHeight(), 1));
         messageTextTop.setTextColor(hudMessageTextColor);
-        messageTextTop.setLocalScale(topTextScale);
         rootNode.attachChild(messageTextTop);
         
         /* Mensaje central */
         messageTextMiddle = Text.createDefaultTextLabel("messageText", "");
         messageTextMiddle.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextMiddle.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextMiddle.setLocalScale(middleTextScale); 
         messageTextMiddle.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextMiddle.getWidth() * 0.5f, display.getHeight() - middleTextPosition * hudTopBar.getHeight(), 1));
         messageTextMiddle.setTextColor(hudMessageTextColor);
-        messageTextMiddle.setLocalScale(middleTextScale);
         rootNode.attachChild(messageTextMiddle);
         
         /* Mensaje inferior */
         messageTextBottom = Text.createDefaultTextLabel("messageText", "");
         messageTextBottom.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         messageTextBottom.setLightCombineMode(Spatial.LightCombineMode.Off);
+        messageTextBottom.setLocalScale(bottomTextScale); 
         messageTextBottom.setLocalTranslation(new Vector3f(display.getWidth() * 0.5f - messageTextBottom.getWidth() * 0.5f, display.getHeight() - bottomTextPosition * hudTopBar.getHeight(), 1));
         messageTextBottom.setTextColor(hudMessageTextColor);
-        messageTextBottom.setLocalScale(bottomTextScale);
         rootNode.attachChild(messageTextBottom);
         
         /* Texto de fps */
@@ -442,34 +438,34 @@ public class PinballGameState extends PhysicsEnhancedGameState
         scoreTitleText = Text.createDefaultTextLabel("scoreTitleText", gameLogic.getScoreText());
         scoreTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        scoreTitleText.setLocalScale(scoreAndLifesTitleScale);
         scoreTitleText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreTitleText.getWidth(), display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
         scoreTitleText.setTextColor(hudTitleTextColor);
-        scoreTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(scoreTitleText);
         
         scoreText = Text.createDefaultTextLabel("scoreText", String.valueOf(score));
         scoreText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         scoreText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        scoreText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreText.getWidth(), display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
-        scoreText.setTextColor(hudValueTextColor);
         scoreText.setLocalScale(scoreAndLifesTextScale);
+        scoreText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreText.getWidth(), display.getHeight() - 0.9f * hudTopBar.getHeight(), 1));
+        scoreText.setTextColor(hudValueTextColor);
         rootNode.attachChild(scoreText);
         
         /* Vidas restantes */
         lifesRemainingTitleText = Text.createDefaultTextLabel("lifesRemainingTitleText", gameLogic.getLifesText());
         lifesRemainingTitleText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
         lifesRemainingTitleText.setLightCombineMode(Spatial.LightCombineMode.Off);
+        lifesRemainingTitleText.setLocalScale(scoreAndLifesTitleScale);        
         lifesRemainingTitleText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingTitleText.getWidth()) * 0.5f, display.getHeight() - 0.45f * hudTopBar.getHeight(), 1));
         lifesRemainingTitleText.setTextColor(hudTitleTextColor);
-        lifesRemainingTitleText.setLocalScale(scoreAndLifesTitleScale);
         rootNode.attachChild(lifesRemainingTitleText);
         
         lifesRemainingText = Text.createDefaultTextLabel("lifesRemainingText", String.valueOf(lifes));
         lifesRemainingText.setRenderQueueMode(Renderer.QUEUE_ORTHO);
-        lifesRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);
-        lifesRemainingText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingText.getWidth()) * 0.5f, display.getHeight() - 0.85f * hudTopBar.getHeight(), 1));
-        lifesRemainingText.setTextColor(hudValueTextColor);
+        lifesRemainingText.setLightCombineMode(Spatial.LightCombineMode.Off);        
         lifesRemainingText.setLocalScale(scoreAndLifesTextScale);
+        lifesRemainingText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingText.getWidth()) * 0.5f, display.getHeight() - 0.9f * hudTopBar.getHeight(), 1));
+        lifesRemainingText.setTextColor(hudValueTextColor);
         rootNode.attachChild(lifesRemainingText);
 	}
 	
@@ -646,6 +642,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		/* Actualizo el texto de score en pantalla */
 		scoreText.getText().replace(0, scoreText.getText().length(), String.valueOf(score));
 		
+		/* Centrar el texto que pudo haber cambiado de longitud */
+		scoreText.setLocalTranslation(new Vector3f(display.getWidth() * (1 - 0.5f * scoreLifesPanelWidth) - 0.5f * scoreText.getWidth(), display.getHeight() - 0.9f * hudTopBar.getHeight(), 1));
+
 		/* Actualizo el texto de score en LCD */
 		lcdScreen.setText(String.format(screenText, lifes, score), 24, ColorRGBA.red);
 	}
@@ -656,6 +655,9 @@ public class PinballGameState extends PhysicsEnhancedGameState
 		
 		/* Actualizo el texto de vidas en pantalla */
 		lifesRemainingText.getText().replace(0, lifesRemainingText.getText().length(), String.valueOf(lifes));
+		
+		/* Centrar el texto que pudo haber cambiado de longitud */
+		lifesRemainingText.setLocalTranslation(new Vector3f((scoreLifesPanelWidth * display.getWidth() - lifesRemainingText.getWidth()) * 0.5f, display.getHeight() - 0.9f * hudTopBar.getHeight(), 1));
 		
 		/* Actualizo el texto de vidas en LCD */
 		lcdScreen.setText(String.format(screenText, lifes, score), 24, ColorRGBA.red);
@@ -694,11 +696,6 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	{
 		return balls;
 	}
-	
-//	public Vector3f getBallStartUp() 
-//    {
-//        return ballStartUp;
-//    }
 	
     public LightState getLightState()
     {
