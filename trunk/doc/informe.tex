@@ -105,7 +105,7 @@ herramientas tales como un motor gráfico que se ocupe de los
 aspectos de la visualización y bibliotecas para el manejo de la
 física.
 
-El juego desarrollado es un pinbal. Una bola es lanzada sobre un
+El juego desarrollado es un pinball. Una bola es lanzada sobre un
 panel con obstáculos (imanes, rampas, spinners, bumpers, puertas y
 objetos estáticos) que la van desviado de su camino y que van
 haciendo sumar puntaje al usuario. Mediante el uso de flippers, el
@@ -130,11 +130,11 @@ el único soportado es \emph{LWJGL}.
 
 Además de ocuparse del rendering de la escena y de su representación
 en memoria mediante un grafo, JME permite la utilización de
-texturas, ilumunación y sonidos entre otras cosas.
+texturas, ilumunación, input y sonidos entre otras cosas.
 
 La versión de JME utilizada es la 2.0, la rasterización y shading
-son realizados mediante \emph{OpenGL} (la librería utilizada es
-\emph{lwjgl}), y para el audio se utilizó la librería \emph{OpenAL}.
+son realizados mediante \emph{OpenGL} (la biblioteca utilizada es
+\emph{LWJGL}, un wrapper de jni para dicho estándar), y para el audio se utilizó la librería \emph{OpenAL}.
 
 Para más información ver \cite{JME}
 
@@ -161,13 +161,13 @@ herramienta provee una interfaz entre \emph{JME} y \emph{ODE} (Open
 Dynamics Engine), facilitando la inclusión de fuerzas y todo tipo de
 dinámica entre los objetos que componen la escena.
 
-Para su funcionamiento, \emph{JME Physics} hace uso de las librerias
-de ODE (\emph{odejava}).
+Para su funcionamiento, \emph{JME Physics} hace uso de la biblioteca
+de ODE mediante \emph{odejava}, que vía Java Native Interfaces se comunica con la biblioteca nativa de ODE.
 
 Para más información ver \cite{JME_Physics}
 
 \subsection{FenGUI}
-\emph{FengGUI} es una API basada en \emph{OpenGl} y escrita
+\emph{FengGUI} es una API basada en \emph{OpenGL} y escrita
 puramente en \emph{JAVA} que permite programar interaces gráficas de
 usuario (GUI) en diversas aplicaciones. Provee todos los componentes
 típicos de una \emph{GUI}, como botones, sliders, áreas de texto y
@@ -250,6 +250,7 @@ cargando, fisica...) EXPLICAR BREVEMENTE POR QUÉ SE USARON (HACEN
 THREADING COMO SUPONIAMOS?), DE QUÉ SE ENCARGA CADA UNO Y EL NOMBRE
 DE LAS CLASES QUE LOS IMPLEMENTAN.
 
+no sé si hay threads como uno esperaría... hay un único thread al momento de jugar. eso se ve al hacer debug con eclipse.
 HABLAR DE LOS THREADS ???
 
 \subsection{Diseño de componentes}
@@ -360,7 +361,7 @@ aplicación de texturas y colores a la mesa y sus componentes.
 \section{Problemas encontrados}
 Uno de los principales problemas que se tuvieron durante el
 desarrollo del proyecto fue la poca documentacion disponible sobre
-\emph{JME} y \emph{JME Physics}, por lo cual, se tuvo que recurrir
+\emph{Feng-gui}, \emph{JME} y \emph{JME Physics}, por lo cual, se tuvo que recurrir
 mucho a los foros disponibles en las páginas de ambos proyectos. Los
 aspectos que no se pudieron resolver por los medios anteriores,
 fueron solucionados experimentando por prueba y error.
@@ -368,7 +369,8 @@ fueron solucionados experimentando por prueba y error.
 La dll de ODE provista por JME, contenía asserts de debug, lo cual
 causaba que durante el juego surgieran excepciones runtime con la
 información de debug. Para solucionar este problema, se tuvo que
-recompilar la dll sin los asserts problemáticos.
+recompilar la dll sin los asserts problemáticos. Con todo lo que 
+ello acarrea para poder realizar los binds con las funciones de java. 
 
 
 AGREGAR ALGUNO SI SE LES OCURRE!!!
