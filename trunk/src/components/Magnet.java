@@ -27,7 +27,7 @@ public class Magnet extends Node implements ActivableComponent
 	private static float forceFieldRadius = 4f; // La bola tiene radio 0.25 
 	
 	// Constante de proporcionalidad para el calculo de la intensidad de la fuerza atractora
-	private static float maxRadius = 3f;
+	private static float maxRadius = 4f;
 	
 	// Esta activo este magnet?
 	public boolean active = false;
