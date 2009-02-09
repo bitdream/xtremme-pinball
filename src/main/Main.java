@@ -293,7 +293,7 @@ public class Main
         {
             
         }
-        return prefs;
+        return prefs.getSettings();
 
     }
 }
