@@ -17,7 +17,6 @@ import com.jmex.game.StandardGame;
 import com.jmex.game.StandardGame.GameType;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
-import com.sun.org.apache.bcel.internal.generic.UnconditionalBranch;
 
 
 public class Main
