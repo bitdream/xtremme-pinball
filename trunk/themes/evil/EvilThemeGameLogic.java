@@ -362,7 +362,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("Care, you are inside a swamp!");//TODO ruido a pantano??
+		showMessage("You are lost in a swamp!");//TODO ruido a pantano??
 	}
 	
 	private void showDisabledMagnetsMessage()
