@@ -29,7 +29,7 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int ACTIVE_MAGNETS_RAMP = 3;
 	
 	// Cantidad de rebotes contra bumpers para activar imanes
-	private static final int ACTIVE_MAGNETS_BUMPERS = 40;
+	private static final int ACTIVE_MAGNETS_BUMPERS = /*40*/ 2; //TODO
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 750 /*500*/; //TODO ajustar valores para la entrega
@@ -388,7 +388,7 @@ public class CarsThemeGameLogic extends GameLogic
 	
 	private void showDisabledMagnetsMessage()
 	{
-		showMessage("You escaped from the slippery road.");
+		showMessage("You escaped from the slippery road!");
 	}
 	
 	// Llamado al perder una vida

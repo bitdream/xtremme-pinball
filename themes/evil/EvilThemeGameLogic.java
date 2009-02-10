@@ -19,24 +19,20 @@ import gamestates.PinballGameState;
 public class EvilThemeGameLogic extends GameLogic
 {
 	// Puntajes que otorga cada componente
-	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 15/*, RAMP_SCORE = 50*/, COMPLETE_SEQ_SCORE = 300;
+	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 15/*, RAMP_SCORE = 50*/, COMPLETE_SEQ_SCORE = 150;
 	
 	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	private static final int MAX_BALLS = 3;
-	
-	// Cantidad de pasajes por rampa para activar imanes
-//	private static final int ACTIVE_MAGNETS_RAMP = 3;
 	
 	// Cantidad de rebotes contra bumpers para activar imanes
 	private static final int ACTIVE_MAGNETS_BUMPERS = 35;
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
-	private static final int EXTRA_LIFE_STEP = 800 /*500*/; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = /*800*/ 100; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = /*500*/ 30; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
-//	private int rampCnt = 0;	
 	private int spinnerCollisionCnt = 0; // No usado
 	private int thisBallScore = 0;
 	private int extraLifesCnt = 1;
@@ -48,26 +44,25 @@ public class EvilThemeGameLogic extends GameLogic
 	private boolean magnetsActive = false;
 	
 	// Sonidos
-	private AudioTrack /*rampUpSound, */lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, /*magnetOffSound,*/ music;
+	private AudioTrack lostBallSound, lostLastBallSound, extraBallSound, gameStartSound, gameOverSound, extraLifeSound, sequenceCompletedSound, magnetOnSound, /*magnetOffSound,*/ music;
 	
 	public EvilThemeGameLogic(PinballGameState pinball)
 	{
 		super(pinball);
 		
 		// Preparo las pistas de audio que voy a usar 
-//		rampUpSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/ramp-up.wav"), false);
-		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/lost-ball.wav"), false);
-		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/lost-last-ball.wav"), false);
-		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/start.wav"), false);
-		gameOverSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/end.wav"), false);
-		extraBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/extra-ball.wav"), false);
-		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/life-up.wav"), false);
-		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/checkpoint.wav"), false);
-		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-on.wav"), false);
+		lostBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/lost-ball.wav"), false); 
+		lostLastBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/lost-last-ball.wav"), false);
+		gameStartSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/start.wav"), false);
+		gameOverSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/end.wav"), false);
+		extraBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/extra-ball.wav"), false);
+		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/life-up.wav"), false);
+		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/seq-complete.wav"), false);
+		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-on.wav"), false);//TODO
 		//magnetOffSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-off.wav"), false);
 		
 		// Inicializo la musica
-		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/music.wav"), false);
+		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/music.wav"), false);
 		music.setType(TrackType.MUSIC);
 		music.setLooping(true);
 		music.setTargetVolume(Main.getMusicVolume());
@@ -99,7 +94,7 @@ public class EvilThemeGameLogic extends GameLogic
 					completeSeqCnt = 2;
 					
 					// Mensaje al usuario diciendo el proximo paso a seguir
-					showMessage("Anda a el bosque para huir de los ALFAJORES!"); //TODO
+					showMessage("To lost him go to the static bumpers!"); 
 				}
 				// Sino valia cero y debe seguir asi
 			}
@@ -114,8 +109,11 @@ public class EvilThemeGameLogic extends GameLogic
 					score += COMPLETE_SEQ_SCORE;
 					thisBallScore += COMPLETE_SEQ_SCORE;
 					
+					// Reiniciar la secuencia
+					completeSeqCnt = 0;
+					
 					// Mensaje al usuario avisando del bonus obtenido
-					showMessage("Secuencia completa!!!"); //TODO
+					showMessage("You killed the werewolf!"); 
 					
 					// Sonido de checkpoint
 					sequenceCompletedSound.play();
@@ -126,7 +124,7 @@ public class EvilThemeGameLogic extends GameLogic
 					completeSeqCnt = 0;
 					
 					// Mensaje al usuario diciendo que perdio la secuencia
-					showMessage("Te perdiste en el bosque maldito!"); //TODO
+					showMessage("The werewolf lost you, you were lucky!"); 
 				}
 				// Sino es cero y debe seguir asi
 
@@ -204,80 +202,18 @@ public class EvilThemeGameLogic extends GameLogic
 				completeSeqCnt = 1;  //Se realizo el segundo paso de la secuencia
 				
 				// Mensaje al usuario diciendo el proximo paso a seguir
-				showMessage("Opponent overtook. Ramp for checkpoint!"); //TODO
+				showMessage("Werewolf behind you, go to the bumpers!"); 
 			}
 			else
 			{
 				completeSeqCnt = 0;
 				
 				// Mensaje al usuario diciendo que perdio la secuencia
-				showMessage("Te perdiste en el bosque maldito!"); //TODO
+				showMessage("The werewolf lost you, you were lucky!");
 			}
 		}		
 	}
 	
-//	public void sensorRampCollision()
-//	{
-//		// No sumar si hay abuso de tilt
-//		if (!tiltAbused)
-//		{			
-//			// Ver si forma parte de la secuencia bumper saltarin+ -> spinner+ -> rampa
-//			if (completeSeqCnt == 2)
-//			{
-//				// Otorgar el bonus por secuencia completa
-//				score += COMPLETE_SEQ_SCORE;
-//				thisBallScore += COMPLETE_SEQ_SCORE;
-//				
-//				// Mensaje al usuario avisando del bonus obtenido
-//				showMessage("Checkpoint!!!");
-//				
-//				// Sonido de checkpoint
-//				sequenceCompletedSound.play();
-//			}
-//			else
-//			{
-//				// Sonido de este theme para el pasaje por rampa
-//				rampUpSound.play();
-//				
-//				// Solo sumar los puntos de pasaje por rampa
-//				score += RAMP_SCORE;
-//				thisBallScore += RAMP_SCORE;
-//				
-//				// Solo incrementado si no termina la secuencia con este pasaje por rampa
-//				rampCnt++;
-//				
-//				if(completeSeqCnt == 1)
-//				{
-//					// No obedecio la secuencia, cartel indicador
-//					showMessage("Next time obey your team. Seqn. aborted!");
-//				}
-//			}
-//			// Reinicio la secuencia siempre
-//			completeSeqCnt = 0;  
-//			
-//			// Cada ACTIVE_MAGNETS_RAMP pasajes por rampa que no pertenezcan a la finalizacion de una secuencia, activar los imanes hasta que una bola se pierda
-//			if ( rampCnt == ACTIVE_MAGNETS_RAMP && !magnetsActive)
-//			{
-//				// Activar los magnets 
-//				for (StaticPhysicsNode magnet : pinball.getMagnets()) 
-//				{
-//					((Magnet)magnet.getChild(0)).setActive(true);
-//				}
-//				magnetsActive = true;
-//				
-//				// Mensaje y sonido al usuario
-//				showActiveMagnetsMessage();
-//				playActiveMagnetsSound();
-//				
-//				// Reinicio el contador
-//				rampCnt = 0;
-//			}
-//			
-//			// Se actualizan los datos de pantalla de usuario
-//			showScore();
-//		}
-//	}
-
 	@Override
 	public void tilt()
 	{
@@ -324,11 +260,11 @@ public class EvilThemeGameLogic extends GameLogic
 				// Para que no le reste la vida
 				lifes ++;
 				
-				showMessage("Poor performance, try again..."); //TODO
+				showMessage("You are so afraid, try again..."); 
 			}
 			else
 			{
-				showMessage("Pit stop, lost ball!"); //TODO
+				showMessage("You are under a spell, lost ball!");
 			}
 			
 			// Perdio una bola que baja la vida, resetear contadores de rampa, bumpers, puntos de bola actual, etc
@@ -336,7 +272,7 @@ public class EvilThemeGameLogic extends GameLogic
 		}
 		else
 		{
-			showMessage("Accident in front of you, slow down!"); //TODO se fue una bola que no me hizo perder vida
+			showMessage("Care, werewolves getting closer!");
 		}	
 		
 		if (magnetsActive)
@@ -381,6 +317,8 @@ public class EvilThemeGameLogic extends GameLogic
 				// Agrego una bola extra a la mesa.
 				pinball.addBall(extraBallRotatedPossibleStartUps.get(0));
 				
+				System.out.println("Agrego bola!");
+				
 				// Mensaje y sonido al usuario
 				showExtraBallMessage();
 				playExtraBallSound();
@@ -390,7 +328,7 @@ public class EvilThemeGameLogic extends GameLogic
 		// Vida extra?
 		if (thisBallScore >= EXTRA_LIFE_STEP * extraLifesCnt)
 		{
-			extraLifesCnt++;			
+			extraLifesCnt++;		
 			
 			// Mensaje y sonido al usuario
 			lifes++;
@@ -407,7 +345,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showExtraBallMessage()
 	{
-		showMessage("Best lap, extra ball!"); //TODO
+		showMessage("Hunters arrived in your help!");
 	}
 	
 	private void playExtraLifeSound()
@@ -417,7 +355,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showExtraLifeMessage()
 	{
-		showMessage("Lap record, extra fuel!");//TODO
+		showMessage("Witch hiding place found, health up!");
 	}
 	
 	private void playActiveMagnetsSound()
@@ -427,12 +365,12 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("Slippery road ahead!");//TODO ruido a pantano??
+		showMessage("Care, you are inside a swamp!");//TODO ruido a pantano??
 	}
 	
 	private void showDisabledMagnetsMessage()
 	{
-		showMessage("You escaped from the slippery road.");//TODO
+		showMessage("You escaped from the swamp!");
 	}
 	
 	// Llamado al perder una vida
