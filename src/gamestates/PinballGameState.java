@@ -53,7 +53,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
 	public static final String PHYSIC_NODE_NAME_FOR_BALLS = "ball";
 	
 	private static final String GAME_NAME = "xtremme pinball";
-	private static final String GAME_VERSION = "0.8";
+	private static final String GAME_VERSION = "1.0";
 	
 	/* Logger de la clase Pinball */
     private static final Logger logger = Logger.getLogger(PinballGameState.class.getName());
@@ -996,6 +996,7 @@ public class PinballGameState extends PhysicsEnhancedGameState
     {
     	super.cleanup();
     	
+    	/* Limpio las texturas que traje a memoria para este juego */
     	TextureManager.clearCache();
     }
 
