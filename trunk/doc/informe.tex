@@ -176,7 +176,7 @@ tabs.
 Durante el desarrollo del juego, se la utilizó para el diseño de
 todos los menúes. La razón de su elección fue principalmente que
 provee una \emph{API} completa, fácil de usar, se integra muy bien
-con \emph{JME} por estar escritos ambos ne \emph{JAVA} y permite la
+con \emph{JME} por estar escritos ambos en \emph{JAVA} y permite la
 obtención de un producto de mayor calidad que Swing a un menor
 precio (esfuerzo).
 
@@ -197,7 +197,7 @@ La implementación puede dividirse en diversas etapas, donde cada una
 de ellas cubre aspectos diferentes en lo que respecta al desarrollo
 del juego.
 
-\subsection{Conversor de X3D a JME}
+\subsection{Conversor de X3D a JME}\label{conversion}
 En la implementación, la descripción de la escena se efectúa por
 medio de 3 archivos X3D. El primero de ellos, \emph{Room.x3d}
 describe la habitación en la que está contenida la máquina, el
@@ -243,19 +243,12 @@ hablar aca de la ubicacion de las luces???? -> Mariano?
 
 
 \subsection{Gamestates}
-PABLO
 
-Gamestates -> uno para cada estado posible del juego (menu, juego,
-cargando, fisica...) EXPLICAR BREVEMENTE POR QUÉ SE USARON (HACEN
-THREADING COMO SUPONIAMOS?), DE QUÉ SE ENCARGA CADA UNO Y EL NOMBRE
-DE LAS CLASES QUE LOS IMPLEMENTAN.
-
-no sé si hay threads como uno esperaría... hay un único thread al momento de jugar. eso se ve al hacer debug con eclipse.
-HABLAR DE LOS THREADS ???
+El flujo normal desde que se inicia la aplicación lleva al juego a través de diferentes estados. Desde la presentación del menú hasta la simulación en sí, pasando por la pantalla de carga, se atraviesan lo que podedmos llamar \emph{GameStates}. Cada uno de ellos se caracteriza por tener cargado cierto entorno de trabajo para garantizar el correcto funcionamiento del juego. \emph{Xtremme Pinball} cuenta con tres \emph{GameStates} principales: el estado de menu (\emph{MenuGameState}), el estado de carga (\emph{LoadingGameState}) y el estado de juego propiamente dicho (\emph{PinballGameState}). Cada uno de ellos hereda indirectamente de una clase de JME denominada \emph{GameState} que le provee la útil funcionalidad de activarse y desactivarse mediante el uso del método \emph{setActive(boolean)}. De esta manera, para cambiar de estado al juego bastará con una simple llamada de desactivación del estado actual y de activación del estado deseado, por ejemplo, para pasar de la simulación al menú principal con la presión de la tecla de menú.
 
 \subsection{Diseño de componentes}
-En el package components, se encuentran las clases que implementan
-cada uno de los componetes que pueden ubicarse sobre la mesa de
+En el package components se encuentran las clases que implementan
+cada uno de los componentes que pueden ubicarse sobre la mesa de
 juego. Algunos de ellos son dinámicos: flippers, spinners, plunger,
 doors y bumpers saltarines (los que tiene forma de hongo) y otros
 estáticos: magnets, bumpers estáticos (los triangulares ubicados
@@ -338,9 +331,10 @@ que la mesa se está moviendo.
 
 
 \subsection{Aplicación de texturtas}
-PENDIENTE:  Aplicacion de texturas desde donde??????? Poner
-screenshot del antes y despues de aplicacion de texturas!!! En la
-figura \ref{no_texturas} se observa un screenshot del juego cuando
+
+La aplicación de texturas se realiza durante el proceso de conversión de formato \emph{X3D} a \emph{JME} especificado en la subsección \ref{conversion}. Esto se hace tomando los nombres de archivo de las texturas especificados en el \emph{X3D} y envolviendo la geometría del nodo que la requiera, para ya tenerlas incluidas en el grafo de salida. Los colores son especificados a través de materiales asignados a los elementos en el \emph{X3D}.
+
+En la figura \ref{no_texturas} se observa un screenshot del juego cuando
 aún no se le habían aplicado texturas y colores. Mientras que en la
 figura \ref{si_texturas} se expone el resultado obtenido luego de la
 aplicación de texturas y colores a la mesa y sus componentes.
@@ -348,16 +342,16 @@ aplicación de texturas y colores a la mesa y sus componentes.
 \begin{figure}
 \begin{center}
 \includegraphics[angle=0,scale=0.4]{images/sin_texturas2.eps}
-\caption{\emph{Con texturas}} \label{no_texturas}
+\caption{\emph{Sin texturas aplicadas.}} \label{no_texturas}
 \end{center}
 \end{figure}
 
-%\begin{figure}
-%\begin{center}
-%\includegraphics[angle=0,scale=0.4]{images/con_texturas.eps}
-%\caption{\emph{Sin texturas aplicadas}} \label{si_texturas}
-%\end{center}
-%\end{figure}
+\begin{figure}
+\begin{center}
+\includegraphics[angle=0,scale=0.4]{images/con_texturas.eps}
+\caption{\emph{Con texturas aplicadas.}} \label{si_texturas}
+\end{center}
+\end{figure}
 
 
 
@@ -375,8 +369,6 @@ información de debug. Para solucionar este problema, se tuvo que
 recompilar la dll sin los asserts problemáticos. Con todo lo que
 ello acarrea para poder realizar los binds con las funciones de java.
 
-
-AGREGAR ALGUNO SI SE LES OCURRE!!!
 
 %\section{Conclusiones y posibles extensiones}
 %Si bien el uso de JME y JME Physics resuelve ciertos aspectos de
