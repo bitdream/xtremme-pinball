@@ -5,6 +5,7 @@ import gamestates.MenuGameState;
 import gamestates.PinballGameState;
 import gamestates.PinballGameStateSettings;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import com.jmex.game.StandardGame;
 import com.jmex.game.StandardGame.GameType;
 import com.jmex.game.state.GameState;
 import com.jmex.game.state.GameStateManager;
+import com.sun.org.apache.bcel.internal.generic.UnconditionalBranch;
 
 
 public class Main
@@ -63,7 +65,17 @@ public class Main
 		audio.getMusicQueue().setRepeatType(RepeatType.ONE);
 	
 		/* Inicializacion del juego principal */
-		stdGame = new StandardGame("xtremme-pinball", GameType.GRAPHICAL, getNewSettings( "xtremme-pinball" ));
+		stdGame = new StandardGame("xtremme-pinball", GameType.GRAPHICAL, getNewSettings( "xtremme-pinball" ),
+		    new UncaughtExceptionHandler() {
+
+                @Override
+                public void uncaughtException( Thread t, Throwable e )
+                {
+                    System.err.println(e.getMessage());
+                    System.exit( 1 );
+                }
+		    
+		});
        
         /* Para multithreading */
 		gamestates.PhysicsEnhancedGameState.game = stdGame;
