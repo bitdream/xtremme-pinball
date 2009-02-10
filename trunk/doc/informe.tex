@@ -113,10 +113,6 @@ jugador debe intentar evitar que la bola se pierda por entre medio
 de ellos o por las vías de escape laterales. El objetivo del juego
 es sumar la mayor cantidad de puntos posibles.
 
-En la figura XXX se expone un screenshot del juego.
-
-TODO DONDE CORRESPONDA AGREGAR SCREENSHOTS!!!
-
 \section{Herramientas utilizadas}
 A continuación se hace una breve descripción de las herramientas
 usadas para el desarrollo del juego.
@@ -129,12 +125,12 @@ permitir el uso de cualquier sistema de rendering, en la actualidad
 el único soportado es \emph{LWJGL}.
 
 Además de ocuparse del rendering de la escena y de su representación
-en memoria mediante un grafo, JME permite la utilización de
-texturas, ilumunación, input y sonidos entre otras cosas.
+en memoria mediante un grafo, \emph{JME} permite la utilización de
+texturas, ilumunación, input y sonido entre otras cosas.
 
-La versión de JME utilizada es la 2.0, la rasterización y shading
-son realizados mediante \emph{OpenGL} (la biblioteca utilizada es
-\emph{LWJGL}, un wrapper de jni para dicho estándar), y para el audio se utilizó la librería \emph{OpenAL}.
+La versión de JME utilizada es la 2.0. La rasterización y shading
+se realizan mediante \emph{OpenGL} (la biblioteca que usa es
+\emph{LWJGL}, un wrapper de jni para dicho estándar), y para el audio se utiliza la librería \emph{OpenAL}.
 
 Para más información ver \cite{JME}
 
@@ -173,9 +169,9 @@ usuario (GUI) en diversas aplicaciones. Provee todos los componentes
 típicos de una \emph{GUI}, como botones, sliders, áreas de texto y
 tabs.
 
-Durante el desarrollo del juego, se la utilizó para el diseño de
-todos los menúes. La razón de su elección fue principalmente que
-provee una \emph{API} completa, fácil de usar, se integra muy bien
+Durante el desarrollo del juego, se la utilizó para el diseño del
+menú. La razón de su elección fue principalmente que
+provee una \emph{API} completa, fácil de usar, con buena integración 
 con \emph{JME} por estar escritos ambos en \emph{JAVA} y permite la
 obtención de un producto de mayor calidad que Swing a un menor
 precio (esfuerzo).
@@ -193,15 +189,15 @@ utilizado para llevar adelante el desarrollo.
 %del proyecto, hay una breve descripción del mismo y un issue tracker
 %con las tareas que lo conforman.
 
-La implementación puede dividirse en diversas etapas, donde cada una
+La implementación puede dividirse en diversas áreas, donde cada una
 de ellas cubre aspectos diferentes en lo que respecta al desarrollo
 del juego.
 
 \subsection{Conversor de X3D a JME}\label{conversion}
 En la implementación, la descripción de la escena se efectúa por
-medio de 3 archivos X3D. El primero de ellos, \emph{Room.x3d}
-describe la habitación en la que está contenida la máquina, el
-segundo, \emph{Machine.x3d}, descibe a la máquina es sí, y el
+medio de 3 archivos \emph{X3D}. El primero de ellos, \emph{Room.x3d}
+describe la habitación en la que está contenida la máquina. El
+segundo, \emph{Machine.x3d}, describe a la máquina en sí, y el
 tercero, cuyo nombre depende del theme que se quiera utilizar (cuya
 elección se hace desde el menú de juego nuevo), contiene información
 sobre la mesa de juego con todos los componentes que la conforman.
@@ -216,8 +212,8 @@ figuras complejas son interpretadas como mallas de triángulos para
 poder rasterizarlas con \emph{OpenGL}. En el archivo \emph{X3D} se
 encuentra la \emph{metadata}, o información que no pertenece al
 formato \emph{X3D}, y que describe el comportamiento de cada uno de
-los elementos de la mesa. Así, cada mesa puede tener la cantidad de
-flippers que desee, y cada flipper puede tener su propia
+los elementos de la mesa. Así, cada mesa, por ejemplo, puede tener la cantidad de
+flippers que desee, y cada flipper puede tener su propia forma y 
 \emph{metadata}. Con este diseño se busca aumentar la extensibilidad
 y flexibilidad del modelo. Todos los elementos de la mesa pueden
 tener \emph{metadata}, por ejemplo, se puede configurar que un
@@ -238,8 +234,13 @@ cálculo de normales de tres archivos con grandes cantidades de datos
 numéricos es una operación costosa en tiempo.
 
 
-
-hablar aca de la ubicacion de las luces???? -> Mariano?
+La iluminación de la escena se realizó con dos luces. La primera
+es una luz puntual ubicada cerca del techo de la habitación,
+por detrás de la posición natural de la cámara al jugar. Con esta
+luz puntual se ilumina toda la escena para que se puedan notar
+los detalles del cuarto. La segunda luz es un spot que apunta a la máquina
+para poder iluminar mejor sus componentes y está cerca de la
+intersección entre techo con la pared opuesta a la máquina.
 
 
 \subsection{Gamestates}
@@ -247,19 +248,19 @@ hablar aca de la ubicacion de las luces???? -> Mariano?
 El flujo normal desde que se inicia la aplicación lleva al juego a través de diferentes estados. Desde la presentación del menú hasta la simulación en sí, pasando por la pantalla de carga, se atraviesan lo que podedmos llamar \emph{GameStates}. Cada uno de ellos se caracteriza por tener cargado cierto entorno de trabajo para garantizar el correcto funcionamiento del juego. \emph{Xtremme Pinball} cuenta con tres \emph{GameStates} principales: el estado de menu (\emph{MenuGameState}), el estado de carga (\emph{LoadingGameState}) y el estado de juego propiamente dicho (\emph{PinballGameState}). Cada uno de ellos hereda indirectamente de una clase de JME denominada \emph{GameState} que le provee la útil funcionalidad de activarse y desactivarse mediante el uso del método \emph{setActive(boolean)}. De esta manera, para cambiar de estado al juego bastará con una simple llamada de desactivación del estado actual y de activación del estado deseado, por ejemplo, para pasar de la simulación al menú principal con la presión de la tecla de menú.
 
 \subsection{Diseño de componentes}
-En el package components se encuentran las clases que implementan
+En el package \emph{components} se encuentran las clases que implementan
 cada uno de los componentes que pueden ubicarse sobre la mesa de
 juego. Algunos de ellos son dinámicos: flippers, spinners, plunger,
-doors y bumpers saltarines (los que tiene forma de hongo) y otros
+doors y bumpers saltarines (los que tienen forma de hongo) y otros
 estáticos: magnets, bumpers estáticos (los triangulares ubicados
 arriba de los flippers), sensores y obstáculos fijos.
 
 Los componentes Bumper, Flipper y Magnet, implementan la interfaz
-ActivableComponet, mediante ello, los mismos pueden ser activados y
+ActivableComponent. Mediante ello, los mismos pueden ser activados y
 desactivados por la lógica del juego según sea necesario. Por
 ejemplo, en el theme \emph{Just Race!}, los imanes se activan
 únicamente cuando el usuario logró cierta cantidad de rebotes contra
-bumpers sin perder vidas o cuando realizó un cierto número de
+bumpers sin perder vidas o cuando realizó cierto número de
 pasajes por la rampa.
 
 Cada una de las clases que los implementan determinan el
@@ -267,14 +268,14 @@ comportamiento de los mismos. Por ejemplo, los bumpers saltarines,
 cuando están activos, al sufrir una colisión con una bola, ejercen
 dos acciones: por un lado, aplican una fuerza sobre la bola cuya
 intensidad es proporcional a la velocidad que la misma traía al
-momento del impacto. Por otro, una fuerza vertical es aplicda sobre
+momento del impacto. Por otro, una fuerza vertical es aplicada sobre
 el bumper, a fin de hacerlo saltar. Los imanes, cuando están
 activos, ejercen una fuerza atractora sobre todas las bolas de la
 mesa que se encuentren dentro de su radio de acción. Esta fuerza es
 suficiente para desviar la trayectoria de las bolas, pero no para
 retenerlas. En las implementaciones realizadas, los imanes están
 ubicados debajo de la mesa (no son obstáculos visibles) en zonas
-elegidas con la finalidad de atraer las bolas hacia una via de
+elegidas con la finalidad de atraer las bolas hacia una vía de
 escape lateral.
 
 Un aspecto importante en el diseño de los componentes es la elección
@@ -282,21 +283,21 @@ del material con el que están hechos, ya que esto repercute
 directamente en la densidad que tendrán, en el coeficiente de
 rozamiento y el rebote contra otros materiales. Al material usado
 para los spinners se le seteó un valor de densidad que permitiera no
-hacerlos muy pesados, pero evitar que los mismos giraran de forma
+hacerlos muy pesados, para evitar que los mismos giraran de forma
 indefinida cada vez que una bola los golpeara. Para los bumpers se
-creó un material que tuviera la densidad sufuciente como para que la
-bola no los corra de lugar al impactarlos, y para los flippers se
+creó un material con una densidad sufuciente como para que la
+bola no los corriera de lugar al impactarlos, y para los flippers se
 utilizó plástico, un material que viene incorporado en \emph{JME}.
 
 
 \subsection{Lógica del juego}
 Para la implementación de la lógica y reglas del juego, se diseñó la
 clase \emph{GameLogic} que implementa las reglas y comportamientos
-default de un juevo de pinball. Cuando finaliza el juego desactiva
-los flippers, al perder una bola, si es que ésta era la única que
+default de un juego de pinball. Cuando finaliza el juego desactiva
+los flippers. Al perder una bola, si es que ésta era la única que
 quedaba en la mesa, se decrementa en uno la cantidad de vidas
-restante, detecta el abuso en el uso de tilt y efectúa la
-penalización correspondiente y provee una serie de sonidos y
+restante. Detecta el abuso en el uso de tilt y efectúa la
+penalización correspondiente. También provee una serie de sonidos y
 mensajes de usuario default para ciertos eventos tales como perder
 una bola o mover un flipper.
 
@@ -308,13 +309,13 @@ extienda a \emph{GameLogic} y le agregue el comportamiento
 necesario. En la implementación presentada, por ejemplo, el theme
 \emph{Just Race!}, a través de la clase \emph{CarsThemeGameLogic},
 agrega sonidos relacionados con autos para cada evento posible y
-overridea los mensajes default para simular una carrera de
+hace override de los mensajes default para simular una carrera de
 automóviles.
 
 La idea es que mediante el agregado de un archivo X3D (que describa
-la mesa a agregar) y un archivo .class que contenga el binario de
+la mesa a agregar), sonidos, texturas y un archivo \emph{.class} que contenga el binario de
 una clase que extienda a \emph{GameLogic}, se pueda cambiar
-totalmente el look, sonidos y las reglas del juego. Es como si se
+totalmente el look, audio y reglas del juego. Es como si se
 pusiera un nuevo 'cartucho' de juego que reutilice toda la
 implementación desarrollada y agregue un comportamiento y aspecto
 visual que lo diferencie del resto de los otros 'cartuchos'.
@@ -323,16 +324,16 @@ visual que lo diferencie del resto de los otros 'cartuchos'.
 \subsection{Inputs de usuario}
 El manejo de las input de usuario se llevó a cabo a través de la API
 provista por JME. La forma de utilización consiste en instalar
-listeners para cada tecla a utilizar y asociarla a la accion que la
-misma deba ejercer. Por ejemplo, la tecla SPACE realiza tilt sobre
+listeners para cada tecla a utilizar y asociarles la accion que deban ejercer.
+Por ejemplo, la tecla SPACE realiza tilt sobre
 la mesa, aplicando una fuerza sobre las bolas que están sobre la
-misma y generando un movimiento de la cámara que de la sensación de
+misma y generando un movimiento de la cámara que da la sensación de
 que la mesa se está moviendo.
 
 
 \subsection{Aplicación de texturtas}
 
-La aplicación de texturas se realiza durante el proceso de conversión de formato \emph{X3D} a \emph{JME} especificado en la subsección \ref{conversion}. Esto se hace tomando los nombres de archivo de las texturas especificados en el \emph{X3D} y envolviendo la geometría del nodo que la requiera, para ya tenerlas incluidas en el grafo de salida. Los colores son especificados a través de materiales asignados a los elementos en el \emph{X3D}.
+La aplicación de texturas se realiza durante el proceso de conversión de formato \emph{X3D} a \emph{JME} detallado en la subsección \ref{conversion}. Esto se hace tomando los nombres de archivo de las texturas especificados en el \emph{X3D} y envolviendo la geometría del nodo que la requiera, para ya tenerlas incluidas en el grafo de salida. Los colores son especificados a través de materiales asignados a los elementos en el \emph{X3D}.
 
 En la figura \ref{no_texturas} se observa un screenshot del juego cuando
 aún no se le habían aplicado texturas y colores. Mientras que en la
@@ -358,15 +359,15 @@ aplicación de texturas y colores a la mesa y sus componentes.
 \section{Problemas encontrados}
 Uno de los principales problemas que se tuvieron durante el
 desarrollo del proyecto fue la poca documentacion disponible sobre
-\emph{Feng-gui}, \emph{JME} y \emph{JME Physics}, por lo cual, se tuvo que recurrir
+\emph{Feng-gui}, \emph{JME} y \emph{JME Physics}, por lo que se tuvo que recurrir
 mucho a los foros disponibles en las páginas de ambos proyectos. Los
 aspectos que no se pudieron resolver por los medios anteriores,
 fueron solucionados experimentando por prueba y error.
 
-La dll de ODE provista por JME, contenía asserts de debug, lo cual
+La dll de ODE provista por JME contenía asserts de debug, lo cual
 causaba que durante el juego surgieran excepciones runtime con la
-información de debug. Para solucionar este problema, se tuvo que
-recompilar la dll sin los asserts problemáticos. Con todo lo que
+información de debug. Para solucionar este problema se tuvo que
+recompilar la dll sin los asserts problemáticos, con todo lo que
 ello acarrea para poder realizar los binds con las funciones de java.
 
 
