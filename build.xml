@@ -46,7 +46,7 @@
         <delete dir="bin"/>
     	<delete file="build/pinball.jar"/>
     </target>
-    <target depends="clean" name="cleanall"/>
+    <target depends="clean,clean-themes" name="cleanall"/>
 	<target depends="build-jar,build-themes" name="build"/>
     
 	<target depends="build-project" name="build-jar">
@@ -73,5 +73,10 @@
             <classpath refid="xtremme-pinball.classpath"/>
         	<classpath location="build/pinball.jar"/>
         </javac>
+    </target>
+    <target name="clean-themes">
+        <delete>
+            <fileset dir="themes" includes="**/*.class"/>
+        </delete>
     </target>
 </project>
