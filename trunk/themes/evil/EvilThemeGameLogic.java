@@ -25,11 +25,11 @@ public class EvilThemeGameLogic extends GameLogic
 	private static final int MAX_BALLS = 3;
 	
 	// Cantidad de rebotes contra bumpers para activar imanes
-	private static final int ACTIVE_MAGNETS_BUMPERS = 35;
+	private static final int ACTIVE_MAGNETS_BUMPERS = /*35*/ 10; //TODO
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
-	private static final int EXTRA_LIFE_STEP = 800; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = 500; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = 800;
+	private static final int EXTRA_BALL_STEP = /*500*/ 40; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -58,7 +58,7 @@ public class EvilThemeGameLogic extends GameLogic
 		extraBallSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/extra-ball.wav"), false);
 		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/life-up.wav"), false);
 		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/seq-complete.wav"), false);
-		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-on.wav"), false);//TODO
+		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/magnet-on.wav"), false);
 		
 		// Inicializo la musica
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/music.wav"), false);
@@ -93,7 +93,7 @@ public class EvilThemeGameLogic extends GameLogic
 					completeSeqCnt = 2;
 					
 					// Mensaje al usuario diciendo el proximo paso a seguir
-					showMessage("To lost him go to the static bumpers!"); 
+					showMessage("To loose him go to the static bumpers!"); 
 				}
 				// Sino valia cero y debe seguir asi
 			}
@@ -271,7 +271,7 @@ public class EvilThemeGameLogic extends GameLogic
 		}
 		else
 		{
-			showMessage("Care, werewolves getting closer!");
+			showMessage("The werewolves are getting closer!");
 		}	
 		
 		if (magnetsActive)
