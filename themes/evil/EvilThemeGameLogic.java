@@ -1,4 +1,4 @@
-package evil; //TODO cambiar a evil
+package evil;
 
 import main.Main;
 import com.jme.math.Vector3f;
@@ -25,11 +25,11 @@ public class EvilThemeGameLogic extends GameLogic
 	private static final int MAX_BALLS = 3;
 	
 	// Cantidad de rebotes contra bumpers para activar imanes
-	private static final int ACTIVE_MAGNETS_BUMPERS = /*35*/ 10; //TODO
+	private static final int ACTIVE_MAGNETS_BUMPERS = 35; 
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
 	private static final int EXTRA_LIFE_STEP = 800;
-	private static final int EXTRA_BALL_STEP = /*500*/ 40; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = 500;
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -362,7 +362,7 @@ public class EvilThemeGameLogic extends GameLogic
 	
 	private void showActiveMagnetsMessage()
 	{
-		showMessage("You are lost in a swamp!");//TODO ruido a pantano??
+		showMessage("You are lost in a swamp!");
 	}
 	
 	private void showDisabledMagnetsMessage()
