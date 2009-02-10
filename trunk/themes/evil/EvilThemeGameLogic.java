@@ -19,7 +19,7 @@ import gamestates.PinballGameState;
 public class EvilThemeGameLogic extends GameLogic
 {
 	// Puntajes que otorga cada componente
-	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 15/*, RAMP_SCORE = 50*/, COMPLETE_SEQ_SCORE = 150;
+	private static final int BUMPER_SCORE = 10, SPINNER_SCORE = 15, COMPLETE_SEQ_SCORE = 150;
 	
 	// Maxima cantidad de bolas que podra haber en la mesa en un determinado momento
 	private static final int MAX_BALLS = 3;
@@ -28,8 +28,8 @@ public class EvilThemeGameLogic extends GameLogic
 	private static final int ACTIVE_MAGNETS_BUMPERS = 35;
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
-	private static final int EXTRA_LIFE_STEP = /*800*/ 100; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = /*500*/ 30; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = 800; //TODO ajustar valores para la entrega
+	private static final int EXTRA_BALL_STEP = 500; //TODO ajustar valores para la entrega
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
@@ -59,7 +59,6 @@ public class EvilThemeGameLogic extends GameLogic
 		extraLifeSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/life-up.wav"), false);
 		sequenceCompletedSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/seq-complete.wav"), false);
 		magnetOnSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-on.wav"), false);//TODO
-		//magnetOffSound = audio.createAudioTrack(this.getClass().getClassLoader().getResource("cars/sounds/magnet-off.wav"), false);
 		
 		// Inicializo la musica
 		music = Main.getAudioSystem().createAudioTrack(this.getClass().getClassLoader().getResource("evil/sounds/music.wav"), false);
@@ -316,8 +315,6 @@ public class EvilThemeGameLogic extends GameLogic
 			{
 				// Agrego una bola extra a la mesa.
 				pinball.addBall(extraBallRotatedPossibleStartUps.get(0));
-				
-				System.out.println("Agrego bola!");
 				
 				// Mensaje y sonido al usuario
 				showExtraBallMessage();
