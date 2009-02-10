@@ -29,11 +29,11 @@ public class CarsThemeGameLogic extends GameLogic
 	private static final int ACTIVE_MAGNETS_RAMP = 3;
 	
 	// Cantidad de rebotes contra bumpers para activar imanes
-	private static final int ACTIVE_MAGNETS_BUMPERS = /*40*/ 2; //TODO
+	private static final int ACTIVE_MAGNETS_BUMPERS = 40; 
 	
 	// Multiplicadores para decidir el incremento de vidas y bolas extra que se dan
-	private static final int EXTRA_LIFE_STEP = 750 /*500*/; //TODO ajustar valores para la entrega
-	private static final int EXTRA_BALL_STEP = 500 /*70*/; //TODO ajustar valores para la entrega
+	private static final int EXTRA_LIFE_STEP = 750;
+	private static final int EXTRA_BALL_STEP = 500;
 	
 	// Contadores
 	private int bumperCollisionCnt = 0;	
