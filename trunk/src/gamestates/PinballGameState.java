@@ -26,6 +26,7 @@ import com.jme.scene.shape.Sphere;
 import com.jme.scene.state.CullState;
 import com.jme.scene.state.LightState;
 import com.jme.util.NanoTimer;
+import com.jme.util.TextureManager;
 import com.jme.util.Timer;
 import com.jmex.physics.DynamicPhysicsNode;
 import com.jmex.physics.PhysicsSpace;
@@ -988,6 +989,14 @@ public class PinballGameState extends PhysicsEnhancedGameState
             
         }
         
+    }
+    
+    @Override
+    public void cleanup()
+    {
+    	super.cleanup();
+    	
+    	TextureManager.clearCache();
     }
 
 	public void setLCDScreen(LCDScreen lcdScreen)
